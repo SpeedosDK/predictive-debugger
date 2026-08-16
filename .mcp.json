@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "predictive-debugger": {
+      "command": "node",
+      "args": ["./out/mcp/server.js"]
+    }
+  }
+}

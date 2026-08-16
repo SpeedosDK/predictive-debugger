@@ -1,0 +1,7 @@
+INFO: Starting server
+INFO: User logged in
+INFO: Fetching data
+ERROR: Timeout after 3000ms
+WARN: Retrying request
+ERROR: Unexpected null value
+INFO: Completed

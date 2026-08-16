@@ -1,0 +1,70 @@
+# --- Build output -----------------------------------------------------------
+/out
+/dist
+/build
+*.tsbuildinfo
+
+# --- Dependencies -----------------------------------------------------------
+/node_modules
+# package-lock.json is deliberately NOT ignored — commit it so builds reproduce.
+
+# --- Packaged extension -----------------------------------------------------
+*.vsix
+
+# --- Secrets ----------------------------------------------------------------
+.env
+.env.local
+.env.*.local
+
+# --- Python (tools/log-analyzer) --------------------------------------------
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# --- Logs -------------------------------------------------------------------
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+# …but the sample log is a committed test fixture.
+!tools/log-analyzer/logs/sample.log
+
+# --- Tests / coverage -------------------------------------------------------
+/coverage
+/.nyc_output
+.vscode-test/
+
+# --- Editors ----------------------------------------------------------------
+# JetBrains (WebStorm)
+/.idea
+
+# VS Code: ignore personal settings, keep the shared project config so the
+# F5 launch configurations work for anyone who clones this.
+.vscode/*
+!.vscode/launch.json
+!.vscode/tasks.json
+!.vscode/settings.json
+!.vscode/extensions.json
+
+# Misc editors
+.project
+.classpath
+.settings/
+*.sublime-workspace
+*.launch
+
+# --- OS ---------------------------------------------------------------------
+.DS_Store
+Thumbs.db
+
+# --- Temp / runtime ---------------------------------------------------------
+.tmp
+.temp
+pids
+*.pid
+*.seed
+*.pid.lock
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json

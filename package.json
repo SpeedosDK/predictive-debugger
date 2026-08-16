@@ -1,0 +1,84 @@
+{
+  "name": "predictive-debugger",
+  "displayName": "Predictive Debugger",
+  "version": "1.0.0",
+  "description": "Predicts where code is likely to fail. Ships as a VS Code extension and as an MCP server that coding agents can call while reviewing code. Auth is borrowed from the Claude Code CLI or Codex CLI you are already signed in to.",
+  "main": "./out/extension/extension.js",
+  "bin": {
+    "predictive-debugger-mcp": "./out/mcp/server.js"
+  },
+  "files": [
+    "out",
+    "tools"
+  ],
+  "scripts": {
+    "compile": "tsc -p tsconfig.json",
+    "watch": "tsc -p tsconfig.json --watch",
+    "mcp": "node ./out/mcp/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "activationEvents": [],
+  "dependencies": {
+    "@babel/parser": "^8.0.4",
+    "@babel/traverse": "^8.0.4",
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "zod": "^4.4.3"
+  },
+  "contributes": {
+    "commands": [
+      {
+        "command": "predictiveDebugger.connect",
+        "title": "Predictive Debugger: Connect"
+      },
+      {
+        "command": "predictiveDebugger.predictFile",
+        "title": "Predictive Debugger: Predict Failures in Current File"
+      },
+      {
+        "command": "predictiveDebugger.predictProject",
+        "title": "Predictive Debugger: Predict Failures Across Project"
+      }
+    ],
+    "configuration": {
+      "title": "Predictive Debugger",
+      "properties": {
+        "predictiveDebugger.claudeModel": {
+          "type": "string",
+          "default": "",
+          "description": "Model alias passed to the Claude Code CLI (e.g. claude-haiku-4-5). Leave empty to use the CLI's own default."
+        },
+        "predictiveDebugger.codexModel": {
+          "type": "string",
+          "default": "",
+          "description": "Model passed to the Codex CLI. Leave empty to use the CLI's own default."
+        },
+        "predictiveDebugger.logFile": {
+          "type": "string",
+          "default": "",
+          "description": "Workspace-relative path to a log file to analyse alongside the source. Leave empty to skip log analysis."
+        },
+        "predictiveDebugger.pythonPath": {
+          "type": "string",
+          "default": "",
+          "description": "Python interpreter used for the log analyzer. Leave empty to auto-detect."
+        },
+        "predictiveDebugger.maxFiles": {
+          "type": "number",
+          "default": 25,
+          "description": "Maximum number of files to analyse in a project run. Each file costs one CLI call."
+        }
+      }
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^26.2.0",
+    "@types/vscode": "^1.125.0",
+    "typescript": "^5.9.3"
+  }
+}

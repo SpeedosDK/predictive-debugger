@@ -1,0 +1,13 @@
+# Normalise line endings so the repo stays LF on GitHub regardless of who
+# clones it. Without this, committing from Windows produces CRLF diffs that
+# look like every line changed.
+* text=auto eol=lf
+
+# Keep the Python analyzer LF — it is executed directly on macOS/Linux.
+*.py text eol=lf
+
+# Never touch binaries.
+*.png binary
+*.jpg binary
+*.gif binary
+*.vsix binary
