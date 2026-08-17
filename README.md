@@ -1,6 +1,6 @@
 # Predictive Debugger
 
-[![CI](https://github.com/SpeedosDK/predictive-debugger/actions/workflows/ci.yml/badge.svg)](https://github.com/SpeedosDK/predictive-debugger/actions/workflows/ci.yml)
+[![CI](https://github.com/SpeedosDK/predictive-debugger/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/SpeedosDK/predictive-debugger/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
 Finds where code is likely to fail before it does. It ships in two shapes:
