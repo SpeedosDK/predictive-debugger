@@ -1,5 +1,8 @@
 # Predictive Debugger
 
+[![CI](https://github.com/SpeedosDK/predictive-debugger/actions/workflows/ci.yml/badge.svg)](https://github.com/SpeedosDK/predictive-debugger/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 Finds where code is likely to fail before it does. It ships in two shapes:
 
 - a **VS Code extension** for a human reviewing their own code
@@ -33,11 +36,31 @@ The dependency direction is one-way: `extension/` and `mcp/` both depend on
 `core/` and `providers/`, and never on each other. `core/` depends on nothing
 editor-specific, which is why the same engine backs both surfaces.
 
+## Status and caveats
+
+Read this before relying on it.
+
+- **Developed and manually verified on Windows.** CI builds and tests on Linux,
+  macOS and Windows, but the CLI-discovery paths for macOS and Linux
+  (`/usr/local/bin`, `/opt/homebrew/bin`, `~/.local/bin`) have not been
+  exercised against a real install. The macOS branch of the Claude credential
+  check assumes Keychain storage and reports "signed in" without verifying it —
+  the connect flow's live check is what actually confirms the sign-in.
+- **`predict_failures` sends file contents to a model provider.** The
+  deterministic tools (`analyze_file`, `scan_project`, `analyze_logs`) run
+  entirely locally and send nothing anywhere. If you point the MCP server at a
+  private codebase, know which tools your agent is calling.
+- **The static score is a heuristic, not a proof.** It counts structural risk
+  factors — it does not know your invariants, and a high score is a hint about
+  where to look, not a defect report.
+- Only JavaScript and TypeScript are analysed.
+
 ## Setup
 
 ```bash
 npm install
 npm run compile
+npm test
 ```
 
 You also need at least one CLI installed and signed in:
@@ -137,3 +160,29 @@ look worst.
 
 Static risk and log analysis run locally and cost nothing. Only the model
 verdict spawns a CLI.
+
+A file that cannot be parsed is reported with a `parseError` and a zero score
+rather than throwing, and a project scan that fails on one file keeps the
+results for the rest and lists the failures separately. Both behaviours are
+covered by tests — they were originally bugs the test suite caught.
+
+## Development
+
+```bash
+npm run watch     # incremental TypeScript build
+npm test          # 48 tests, Node's built-in runner, no test dependencies
+```
+
+Tests live in `src/test/`. They cover the pure logic — the risk model, AST
+metrics, model-reply parsing, Windows argument quoting, the source-tree walker,
+and the log analyzer's degradation contract. Anything that needs a signed-in CLI
+is deliberately not unit-tested; `.github/scripts/check-mcp.mjs` covers the MCP
+surface end to end without credentials.
+
+## Contributing
+
+Issues and pull requests are welcome. Please run `npm test` before opening a PR.
+
+## License
+
+MIT — see [LICENSE](LICENSE).

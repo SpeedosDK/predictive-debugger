@@ -152,10 +152,13 @@ async function predictWorkspace(): Promise<void> {
             for (const file of result.files) {
                 reporter.publish(vscode.Uri.file(file.file), file);
             }
-            reporter.report(result.files);
+            reporter.report(result.files, result.failures);
 
+            const skipped = result.failures.length
+                ? ` ${result.failures.length} file(s) could not be analysed.`
+                : "";
             vscode.window.showInformationMessage(
-                `Project risk ${percent(result.projectRisk)} across ${result.files.length} files.`
+                `Project risk ${percent(result.projectRisk)} across ${result.files.length} files.${skipped}`
             );
         }
     );

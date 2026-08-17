@@ -20,7 +20,7 @@ export interface RunOptions {
 const isWindows = process.platform === "win32";
 
 /** Quote a single argument for cmd.exe when using windowsVerbatimArguments. */
-function quoteForCmd(arg: string): string {
+export function quoteForCmd(arg: string): string {
     if (arg.length > 0 && !/[\s"^&|<>()%!]/.test(arg)) {
         return arg;
     }

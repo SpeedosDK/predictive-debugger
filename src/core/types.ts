@@ -17,6 +17,11 @@ export interface StaticAnalysis {
     riskScore: number;
     /** Human-readable notes about what drove the score. */
     signals: string[];
+    /**
+     * Set when the file could not be parsed. Metrics are zeroed in that case;
+     * the file is reported rather than silently skipped.
+     */
+    parseError?: string;
 }
 
 export interface BugPrediction {
@@ -59,4 +64,6 @@ export interface FilePrediction {
 export interface ProjectPrediction {
     projectRisk: number;
     files: FilePrediction[];
+    /** Files that could not be analysed at all, with the reason why. */
+    failures: Array<{ file: string; reason: string }>;
 }
