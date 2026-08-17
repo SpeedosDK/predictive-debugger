@@ -1,0 +1,14 @@
+# Everything not needed inside the packaged .vsix.
+src/**
+out/test/**
+out/**/*.map
+examples/**
+.github/**
+.vscode/**
+node_modules/typescript/**
+node_modules/@types/**
+.gitignore
+.gitattributes
+.mcp.json
+tsconfig.json
+**/*.test.js

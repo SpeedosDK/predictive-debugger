@@ -3,25 +3,53 @@
   "displayName": "Predictive Debugger",
   "version": "1.0.0",
   "description": "Predicts where code is likely to fail. Ships as a VS Code extension and as an MCP server that coding agents can call while reviewing code. Auth is borrowed from the Claude Code CLI or Codex CLI you are already signed in to.",
+  "author": "SpeedosDK",
+  "license": "MIT",
+  "publisher": "speedosdk",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SpeedosDK/predictive-debugger.git"
+  },
+  "bugs": {
+    "url": "https://github.com/SpeedosDK/predictive-debugger/issues"
+  },
+  "homepage": "https://github.com/SpeedosDK/predictive-debugger#readme",
+  "keywords": [
+    "static-analysis",
+    "code-review",
+    "mcp",
+    "mcp-server",
+    "claude-code",
+    "codex",
+    "vscode-extension",
+    "bug-prediction",
+    "ai-agents"
+  ],
+  "categories": [
+    "Linters",
+    "Programming Languages",
+    "Other"
+  ],
   "main": "./out/extension/extension.js",
   "bin": {
     "predictive-debugger-mcp": "./out/mcp/server.js"
   },
   "files": [
     "out",
-    "tools"
+    "tools",
+    "LICENSE",
+    "README.md"
   ],
   "scripts": {
     "compile": "tsc -p tsconfig.json",
     "watch": "tsc -p tsconfig.json --watch",
-    "mcp": "node ./out/mcp/server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "pretest": "npm run compile",
+    "test": "node --test \"out/test/**/*.test.js\"",
+    "mcp": "node ./out/mcp/server.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "engines": {
-    "vscode": "^1.85.0"
+    "vscode": "^1.85.0",
+    "node": ">=20.11.0"
   },
   "activationEvents": [],
   "dependencies": {

@@ -34,7 +34,10 @@ export class PredictionReporter {
         this.diagnostics.set(uri, [diagnostic]);
     }
 
-    report(results: FilePrediction[]): void {
+    report(
+        results: FilePrediction[],
+        failures: Array<{ file: string; reason: string }> = []
+    ): void {
         this.output.appendLine(`--- ${new Date().toLocaleTimeString()} ---`);
 
         for (const result of results) {
@@ -43,6 +46,10 @@ export class PredictionReporter {
                     `      static ${percent(result.riskScore)} · model ${percent(result.aiPrediction.score)} · ${summarize(result)}` +
                     (result.logs.skipped ? `\n      logs: ${result.logs.skipped}` : "")
             );
+        }
+
+        for (const failure of failures) {
+            this.output.appendLine(`  --  ${failure.file}\n      skipped: ${failure.reason}`);
         }
 
         this.output.show(true);

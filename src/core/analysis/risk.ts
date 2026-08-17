@@ -1,6 +1,6 @@
 import fs from "fs/promises";
 import { FileMetrics, StaticAnalysis } from "../types";
-import { collectMetrics } from "./ast";
+import { collectMetrics, emptyMetrics } from "./ast";
 
 interface Weight {
     key: keyof FileMetrics;
@@ -51,7 +51,25 @@ export async function analyzeSource(
     filePath: string,
     code: string
 ): Promise<StaticAnalysis> {
-    const metrics = await collectMetrics(code);
+    let metrics: FileMetrics;
+
+    try {
+        metrics = await collectMetrics(code);
+    } catch (err) {
+        // Babel's errorRecovery handles most damage, but not all of it. A file
+        // we cannot parse must not abort a whole project scan, so report it as
+        // a zero-risk result carrying the reason.
+        const reason = err instanceof Error ? err.message : String(err);
+        const empty = emptyMetrics();
+        return {
+            file: filePath,
+            metrics: empty,
+            riskScore: 0,
+            signals: [`could not be parsed: ${reason}`],
+            parseError: reason
+        };
+    }
+
     return {
         file: filePath,
         metrics,
