@@ -58,12 +58,35 @@ export function explainRisk(metrics: FileMetrics): string[] {
 }
 
 /**
+ * Largest file we will read into memory. The MCP server accepts arbitrary paths
+ * from the calling agent, so an unbounded read is a denial-of-service waiting to
+ * happen — a generated bundle or an accidentally-matched blob would exhaust the
+ * heap. Well past any hand-written source file.
+ */
+const MAX_FILE_BYTES = 4 * 1024 * 1024;
+
+/**
  * Deterministic analysis of one file: no model call, no network, no credentials.
  * This is what agents should reach for when reviewing code.
  */
 export async function analyzeFile(filePath: string): Promise<StaticAnalysis> {
-    const code = await fs.readFile(filePath, "utf8");
-    return analyzeSource(filePath, code);
+    const stat = await fs.stat(filePath);
+
+    if (!stat.isFile()) {
+        throw new Error(`Not a file: ${filePath}`);
+    }
+    if (stat.size > MAX_FILE_BYTES) {
+        const reason = `file is ${Math.round(stat.size / 1024)} KB, above the ${MAX_FILE_BYTES / 1024 / 1024} MB analysis limit`;
+        return {
+            file: filePath,
+            metrics: emptyMetrics(),
+            riskScore: 0,
+            signals: [`skipped: ${reason}`],
+            parseError: reason
+        };
+    }
+
+    return analyzeSource(filePath, await fs.readFile(filePath, "utf8"));
 }
 
 export async function analyzeSource(

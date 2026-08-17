@@ -1,7 +1,10 @@
 import assert from "node:assert/strict";
+import fsp from "node:fs/promises";
+import os from "node:os";
+import path from "node:path";
 import { describe, it } from "node:test";
 import { emptyMetrics } from "../core/analysis/ast";
-import { analyzeSource, calculateRisk, explainRisk } from "../core/analysis/risk";
+import { analyzeFile, analyzeSource, calculateRisk, explainRisk } from "../core/analysis/risk";
 
 describe("calculateRisk", () => {
     it("scores an empty file near zero", () => {
@@ -92,5 +95,38 @@ describe("analyzeSource — unparseable input", () => {
     it("leaves parseError unset for valid input", async () => {
         const result = await analyzeSource("ok.js", "const x = 1;");
         assert.equal(result.parseError, undefined);
+    });
+});
+
+describe("analyzeFile — input limits", () => {
+    it("rejects a directory", async () => {
+        await assert.rejects(analyzeFile(os.tmpdir()), /Not a file/);
+    });
+
+    it("skips a file above the size limit instead of reading it", async () => {
+        const dir = await fsp.mkdtemp(path.join(os.tmpdir(), "pd-size-"));
+        const big = path.join(dir, "big.js");
+        // 5 MB of valid JS, above the 4 MB cap.
+        await fsp.writeFile(big, "// pad\n".repeat(750_000));
+        try {
+            const result = await analyzeFile(big);
+            assert.match(result.parseError ?? "", /above the .* analysis limit/);
+            assert.equal(result.riskScore, 0);
+        } finally {
+            await fsp.rm(dir, { recursive: true, force: true });
+        }
+    });
+
+    it("analyses a normal-sized file", async () => {
+        const dir = await fsp.mkdtemp(path.join(os.tmpdir(), "pd-size-"));
+        const small = path.join(dir, "small.js");
+        await fsp.writeFile(small, "for (let i=0;i<2;i++) { for (let j=0;j<2;j++) {} }");
+        try {
+            const result = await analyzeFile(small);
+            assert.equal(result.parseError, undefined);
+            assert.equal(result.metrics.nestedLoops, 1);
+        } finally {
+            await fsp.rm(dir, { recursive: true, force: true });
+        }
     });
 });
