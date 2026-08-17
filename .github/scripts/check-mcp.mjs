@@ -23,7 +23,7 @@ const client = new Client({ name: "ci-smoke", version: "1.0.0" });
 await client.connect(
     new StdioClientTransport({
         command: process.execPath,
-        args: [path.join("out", "mcp", "server.js")],
+        args: [path.join("dist", "mcp-server.js")],
         cwd: process.cwd()
     })
 );

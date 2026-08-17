@@ -22,9 +22,12 @@ export class PredictionReporter {
         }
 
         const zeroBased = Math.max(0, (line ?? 1) - 1);
+        const partial = result.aiPrediction.truncated
+            ? ` [${result.aiPrediction.truncated}]`
+            : "";
         const diagnostic = new vscode.Diagnostic(
             new vscode.Range(zeroBased, 0, zeroBased, Number.MAX_SAFE_INTEGER),
-            `${pattern} (${percent(score)}): ${reason}`,
+            `${pattern} (${percent(score)}): ${reason}${partial}`,
             result.combinedScore >= 0.6
                 ? vscode.DiagnosticSeverity.Warning
                 : vscode.DiagnosticSeverity.Information
@@ -44,6 +47,9 @@ export class PredictionReporter {
             this.output.appendLine(
                 `${percent(result.combinedScore).padStart(4)}  ${result.file}\n` +
                     `      static ${percent(result.riskScore)} · model ${percent(result.aiPrediction.score)} · ${summarize(result)}` +
+                    (result.aiPrediction.truncated
+                        ? `\n      partial: ${result.aiPrediction.truncated}`
+                        : "") +
                     (result.logs.skipped ? `\n      logs: ${result.logs.skipped}` : "")
             );
         }

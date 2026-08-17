@@ -1,0 +1,22 @@
+# What to leave out of the npm tarball (the MCP server distribution).
+#
+# This file exists because vsce refuses to run with both a "files" property in
+# package.json and a .vscodeignore. npm gets .npmignore, vsce gets
+# .vscodeignore, and neither strategy interferes with the other.
+#
+# Note that .npmignore fully replaces .gitignore for packaging purposes, so
+# dist/ is included here even though git ignores it — that is the shipped build.
+
+src/
+out/
+esbuild.mjs
+tsconfig.json
+examples/
+.github/
+.vscode/
+.idea/
+.mcp.json
+.vscodeignore
+.gitattributes
+**/*.map
+*.vsix
