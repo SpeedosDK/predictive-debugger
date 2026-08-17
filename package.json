@@ -30,22 +30,23 @@
     "Programming Languages",
     "Other"
   ],
-  "main": "./out/extension/extension.js",
+  "main": "./dist/extension.js",
   "bin": {
-    "predictive-debugger-mcp": "./out/mcp/server.js"
+    "predictive-debugger-mcp": "./dist/mcp-server.js"
   },
-  "files": [
-    "out",
-    "tools",
-    "LICENSE",
-    "README.md"
-  ],
   "scripts": {
+    "check": "tsc -p tsconfig.json --noEmit",
     "compile": "tsc -p tsconfig.json",
-    "watch": "tsc -p tsconfig.json --watch",
+    "bundle": "node esbuild.mjs --production",
+    "build": "npm run check && npm run bundle",
+    "watch": "node esbuild.mjs --watch",
+    "watch:tsc": "tsc -p tsconfig.json --watch",
     "pretest": "npm run compile",
     "test": "node --test \"out/test/**/*.test.js\"",
-    "mcp": "node ./out/mcp/server.js"
+    "mcp": "node ./dist/mcp-server.js",
+    "package": "npm run build && vsce package --allow-missing-repository --skip-license",
+    "vscode:prepublish": "npm run build",
+    "bundle:dev": "node esbuild.mjs"
   },
   "engines": {
     "vscode": "^1.85.0",
@@ -109,7 +110,8 @@
   },
   "devDependencies": {
     "@types/node": "^26.2.0",
-    "@types/vscode": "^1.125.0",
+    "@types/vscode": "~1.85.0",
+    "esbuild": "^0.28.2",
     "typescript": "^5.9.3"
   },
   "capabilities": {
