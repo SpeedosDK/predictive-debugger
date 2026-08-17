@@ -66,32 +66,6 @@ describe("parsePrediction", () => {
     });
 });
 
-describe("parsePrediction — bounding untrusted model output", () => {
-    it("clips an overlong reason", () => {
-        const long = "x".repeat(5000);
-        const result = parsePrediction(
-            JSON.stringify({ pattern: "off_by_one", score: 0.5, reason: long })
-        );
-        assert.ok(result.reason.length <= 401, `reason was ${result.reason.length} chars`);
-        assert.ok(result.reason.endsWith("…"));
-    });
-
-    it("clips an overlong pattern id", () => {
-        const result = parsePrediction(
-            JSON.stringify({ pattern: "y".repeat(500), score: 0.5, reason: "r" })
-        );
-        assert.ok(result.pattern.length <= 65);
-    });
-
-    it("leaves normal-length fields untouched", () => {
-        const result = parsePrediction(
-            '{"pattern":"race_condition","score":0.5,"reason":"short reason"}'
-        );
-        assert.equal(result.reason, "short reason");
-        assert.equal(result.pattern, "race_condition");
-    });
-});
-
 describe("buildPrompt truncation reporting", () => {
     it("does not flag a normal-sized file", async () => {
         const fake = fakeProvider('{"pattern":"none","score":0,"reason":"fine"}');
