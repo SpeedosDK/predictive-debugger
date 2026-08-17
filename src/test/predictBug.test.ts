@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { parsePrediction } from "../core/prediction/predictBug";
+import { parsePrediction, predictBug } from "../core/prediction/predictBug";
 
 describe("parsePrediction", () => {
     it("parses a clean JSON verdict", () => {
@@ -65,3 +65,79 @@ describe("parsePrediction", () => {
         assert.equal(parsePrediction('{"pattern":"   ","score":0.9}').pattern, "none");
     });
 });
+
+describe("parsePrediction — bounding untrusted model output", () => {
+    it("clips an overlong reason", () => {
+        const long = "x".repeat(5000);
+        const result = parsePrediction(
+            JSON.stringify({ pattern: "off_by_one", score: 0.5, reason: long })
+        );
+        assert.ok(result.reason.length <= 401, `reason was ${result.reason.length} chars`);
+        assert.ok(result.reason.endsWith("…"));
+    });
+
+    it("clips an overlong pattern id", () => {
+        const result = parsePrediction(
+            JSON.stringify({ pattern: "y".repeat(500), score: 0.5, reason: "r" })
+        );
+        assert.ok(result.pattern.length <= 65);
+    });
+
+    it("leaves normal-length fields untouched", () => {
+        const result = parsePrediction(
+            '{"pattern":"race_condition","score":0.5,"reason":"short reason"}'
+        );
+        assert.equal(result.reason, "short reason");
+        assert.equal(result.pattern, "race_condition");
+    });
+});
+
+describe("buildPrompt truncation reporting", () => {
+    it("does not flag a normal-sized file", async () => {
+        const fake = fakeProvider('{"pattern":"none","score":0,"reason":"fine"}');
+        const result = await predictBug({
+            provider: fake.provider,
+            location: { file: "fake" },
+            filePath: "small.js",
+            code: "const x = 1;\n"
+        });
+        assert.equal(result.truncated, undefined);
+        assert.ok(fake.lastPrompt.includes("const x = 1;"));
+    });
+
+    it("reports how much of an oversized file was analysed", async () => {
+        const fake = fakeProvider('{"pattern":"none","score":0,"reason":"fine"}');
+        // 200k chars of 10-char lines = 20,000 lines, past the 120k cap.
+        const code = "let a = 1;\n".repeat(20_000);
+        const result = await predictBug({
+            provider: fake.provider,
+            location: { file: "fake" },
+            filePath: "big.js",
+            code
+        });
+        assert.match(result.truncated ?? "", /covers the first \d+ of 20001 lines/);
+        assert.ok(fake.lastPrompt.includes("file truncated here"));
+        // The prompt must stay bounded even for a huge input.
+        assert.ok(fake.lastPrompt.length < 130_000, `prompt was ${fake.lastPrompt.length}`);
+    });
+});
+
+function fakeProvider(reply: string) {
+    const state = { lastPrompt: "" };
+    return {
+        get lastPrompt() {
+            return state.lastPrompt;
+        },
+        provider: {
+            id: "claude" as const,
+            label: "fake",
+            installHint: "",
+            locate: async () => ({ file: "fake" }),
+            checkAuth: () => ({ hasCredentials: true }),
+            complete: async (_loc: unknown, opts: { prompt: string }) => {
+                state.lastPrompt = opts.prompt;
+                return reply;
+            }
+        }
+    };
+}

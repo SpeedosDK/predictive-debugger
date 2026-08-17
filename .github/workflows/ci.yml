@@ -36,11 +36,17 @@ jobs:
 
       - run: npm ci
 
-      - name: Type-check and build
+      - name: Type-check
+        run: npm run check
+
+      - name: Build test output
         run: npm run compile
 
       - name: Test
         run: node --test "out/test/**/*.test.js"
 
-      - name: Verify the MCP server starts and lists its tools
+      - name: Bundle
+        run: npm run bundle
+
+      - name: Verify the bundled MCP server starts and lists its tools
         run: node .github/scripts/check-mcp.mjs

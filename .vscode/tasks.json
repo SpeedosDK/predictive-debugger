@@ -2,11 +2,25 @@
   "version": "2.0.0",
   "tasks": [
     {
+      "label": "bundle:dev",
       "type": "npm",
-      "script": "compile",
-      "problemMatcher": "$tsc",
+      "script": "bundle:dev",
+      "problemMatcher": [],
       "presentation": { "reveal": "silent" },
       "group": { "kind": "build", "isDefault": true }
+    },
+    {
+      "label": "check",
+      "type": "npm",
+      "script": "check",
+      "problemMatcher": "$tsc",
+      "presentation": { "reveal": "silent" }
+    },
+    {
+      "label": "F5 build",
+      "dependsOn": ["check", "bundle:dev"],
+      "dependsOrder": "sequence",
+      "problemMatcher": []
     }
   ]
 }

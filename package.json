@@ -1,7 +1,7 @@
 {
   "name": "predictive-debugger",
   "displayName": "Predictive Debugger",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Predicts where code is likely to fail. Ships as a VS Code extension and as an MCP server that coding agents can call while reviewing code. Auth is borrowed from the Claude Code CLI or Codex CLI you are already signed in to.",
   "author": "SpeedosDK",
   "license": "MIT",
@@ -30,22 +30,23 @@
     "Programming Languages",
     "Other"
   ],
-  "main": "./out/extension/extension.js",
+  "main": "./dist/extension.js",
   "bin": {
-    "predictive-debugger-mcp": "./out/mcp/server.js"
+    "predictive-debugger-mcp": "./dist/mcp-server.js"
   },
-  "files": [
-    "out",
-    "tools",
-    "LICENSE",
-    "README.md"
-  ],
   "scripts": {
+    "check": "tsc -p tsconfig.json --noEmit",
     "compile": "tsc -p tsconfig.json",
-    "watch": "tsc -p tsconfig.json --watch",
+    "bundle": "node esbuild.mjs --production",
+    "build": "npm run check && npm run bundle",
+    "watch": "node esbuild.mjs --watch",
+    "watch:tsc": "tsc -p tsconfig.json --watch",
     "pretest": "npm run compile",
     "test": "node --test \"out/test/**/*.test.js\"",
-    "mcp": "node ./out/mcp/server.js"
+    "mcp": "node ./dist/mcp-server.js",
+    "package": "npm run build && vsce package --allow-missing-repository --skip-license",
+    "vscode:prepublish": "npm run build",
+    "bundle:dev": "node esbuild.mjs"
   },
   "engines": {
     "vscode": "^1.85.0",
@@ -79,12 +80,14 @@
         "predictiveDebugger.claudeModel": {
           "type": "string",
           "default": "",
-          "description": "Model alias passed to the Claude Code CLI (e.g. claude-haiku-4-5). Leave empty to use the CLI's own default."
+          "description": "Model alias passed to the Claude Code CLI (e.g. claude-haiku-4-5). Leave empty to use the CLI's own default.",
+          "scope": "machine-overridable"
         },
         "predictiveDebugger.codexModel": {
           "type": "string",
           "default": "",
-          "description": "Model passed to the Codex CLI. Leave empty to use the CLI's own default."
+          "description": "Model passed to the Codex CLI. Leave empty to use the CLI's own default.",
+          "scope": "machine-overridable"
         },
         "predictiveDebugger.logFile": {
           "type": "string",
@@ -94,7 +97,8 @@
         "predictiveDebugger.pythonPath": {
           "type": "string",
           "default": "",
-          "description": "Python interpreter used for the log analyzer. Leave empty to auto-detect."
+          "scope": "machine",
+          "markdownDescription": "Python interpreter used for the log analyzer. Leave empty to auto-detect. This is a machine-scoped setting: a workspace cannot override it, because the value is executed."
         },
         "predictiveDebugger.maxFiles": {
           "type": "number",
@@ -106,7 +110,14 @@
   },
   "devDependencies": {
     "@types/node": "^26.2.0",
-    "@types/vscode": "^1.125.0",
+    "@types/vscode": "~1.85.0",
+    "esbuild": "^0.28.2",
     "typescript": "^5.9.3"
+  },
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": false,
+      "description": "Predictive Debugger spawns the Claude Code or Codex CLI and reads workspace-configured paths, so it requires a trusted workspace."
+    }
   }
 }

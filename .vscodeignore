@@ -1,14 +1,35 @@
-# Everything not needed inside the packaged .vsix.
+# What to leave out of the packaged .vsix.
+#
+# The extension ships as a single bundled file (dist/extension.js), so almost
+# everything else is excluded — including node_modules, which esbuild has
+# already inlined.
+
+# --- Sources and intermediate build output ----------------------------------
 src/**
-out/test/**
-out/**/*.map
+out/**
+esbuild.mjs
+tsconfig.json
+**/*.map
+
+# --- Dependencies are bundled into dist/ ------------------------------------
+node_modules/**
+
+# --- Repo tooling and fixtures ----------------------------------------------
 examples/**
 .github/**
 .vscode/**
-node_modules/typescript/**
-node_modules/@types/**
 .gitignore
 .gitattributes
+.npmignore
+.vscodeignore
 .mcp.json
-tsconfig.json
-**/*.test.js
+*.vsix
+
+# JetBrains project files. workspace.xml carries local paths and personal
+# settings — it must never end up in a published package.
+.idea/**
+
+# Kept deliberately: dist/**, tools/**, README.md, CHANGELOG.md, LICENSE,
+# package.json. The MCP server bundle rides along so a single install provides
+# both surfaces, and tools/ holds the Python log analyzer, which is spawned as a
+# separate process and therefore cannot be bundled.

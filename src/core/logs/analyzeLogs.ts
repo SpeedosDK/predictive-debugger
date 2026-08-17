@@ -23,10 +23,33 @@ interface AnalyzerOutput {
     error?: string;
 }
 
-/** Path to the analyzer shipped with this package. */
+const SCRIPT_RELATIVE_PATH = path.join("tools", "log-analyzer", "analyze_logs.py");
+
+/**
+ * Path to the analyzer shipped with this package.
+ *
+ * Walks up from this module rather than counting directory levels, because the
+ * depth differs between the tsc output (`out/core/logs/`) and the bundled
+ * output (`dist/`).
+ */
 export function bundledScriptPath(): string {
-    // out/core/logs/analyzeLogs.js -> <root>/tools/log-analyzer/analyze_logs.py
-    return path.resolve(__dirname, "..", "..", "..", "tools", "log-analyzer", "analyze_logs.py");
+    let dir = __dirname;
+
+    for (let i = 0; i < 6; i++) {
+        const candidate = path.join(dir, SCRIPT_RELATIVE_PATH);
+        if (fs.existsSync(candidate)) {
+            return candidate;
+        }
+        const parent = path.dirname(dir);
+        if (parent === dir) {
+            break;
+        }
+        dir = parent;
+    }
+
+    // Nothing found — return the most likely location so the caller can report
+    // a useful "not found" path rather than an empty string.
+    return path.resolve(__dirname, "..", SCRIPT_RELATIVE_PATH);
 }
 
 function defaultInterpreter(): string {

@@ -26,10 +26,12 @@ src/
   providers/       Claude Code / Codex CLI adapters + process spawning
   extension/       VS Code integration only
   mcp/             MCP stdio server
+  test/            unit tests (Node built-in runner)
 examples/
   bug-patterns/    deliberately broken files used for testing
 tools/
   log-analyzer/    dependency-free Python log anomaly scorer
+dist/              bundled output (esbuild) — the only thing shipped
 ```
 
 The dependency direction is one-way: `extension/` and `mcp/` both depend on
@@ -50,18 +52,56 @@ Read this before relying on it.
   deterministic tools (`analyze_file`, `scan_project`, `analyze_logs`) run
   entirely locally and send nothing anywhere. If you point the MCP server at a
   private codebase, know which tools your agent is calling.
+- **Very large files are analysed only in part.** Up to 120,000 characters
+  (roughly 3,500 lines) are sent to the model; beyond that the verdict covers a
+  prefix and says so. Files over 4 MB (~120,000 lines) skip static analysis
+  entirely rather than being read into memory.
 - **The static score is a heuristic, not a proof.** It counts structural risk
   factors — it does not know your invariants, and a high score is a hint about
   where to look, not a defect report.
 - Only JavaScript and TypeScript are analysed.
 
+## Security model
+
+- **No credentials are handled.** The extension stores only the chosen provider
+  id. Tokens stay with the CLI, which does its own auth. Nothing is read from
+  `~/.claude/.credentials.json` or `~/.codex/auth.json` beyond checking that the
+  file exists and is non-empty.
+- **No shell is invoked.** Every child process is `spawn`ed directly with an
+  argument array. Prompts and file contents travel over **stdin**, never argv.
+  On Windows, npm's `.cmd` shims are routed through `cmd.exe` with quoting this
+  project controls rather than `shell: true`.
+- **The extension requires a trusted workspace** (`untrustedWorkspaces:
+  supported: false`), and `predictiveDebugger.pythonPath` is machine-scoped so a
+  repository cannot point the interpreter we execute at its own binary.
+- **Analysed source is treated as untrusted data.** A file could contain text
+  engineered to read as instructions. Claude runs with `--tools ""`, so it has
+  no tools to misuse; `codex exec` has no equivalent switch and can still read
+  files within its read-only sandbox, so the prompt marks the source explicitly
+  as data and the parsed `reason`/`pattern` fields are length-capped. Prefer the
+  Claude provider when analysing code you do not trust.
+- **The MCP tools accept absolute paths from the calling agent** and will read
+  any file the process can read — by design, since the point is to analyse a
+  codebase. Files above 4 MB are skipped rather than loaded.
+- `npm audit` reports 0 vulnerabilities across 111 production dependencies.
+
 ## Setup
 
 ```bash
 npm install
-npm run compile
+npm run build     # type-check, then bundle to dist/
 npm test
 ```
+
+Both entry points ship as single bundled files, produced by esbuild:
+
+| Output | Purpose |
+| --- | --- |
+| `dist/extension.js` | VS Code extension (`vscode` stays external) |
+| `dist/mcp-server.js` | MCP stdio server, also exposed as the `predictive-debugger-mcp` bin |
+
+`tools/` is not bundled — the log analyzer is a Python script spawned as a
+separate process.
 
 You also need at least one CLI installed and signed in:
 
@@ -91,7 +131,7 @@ open in another window, so the dev host needs a different folder.
 
 ### Claude Code
 
-A project-scoped `.mcp.json` is already committed, so from this directory:
+A project-scoped `.mcp.json` is already committed (it points at `dist/mcp-server.js`, so run `npm run build` first), so from this directory:
 
 ```bash
 claude
@@ -100,7 +140,7 @@ claude
 Claude Code picks up the server automatically. To register it globally instead:
 
 ```bash
-claude mcp add predictive-debugger -- node /absolute/path/to/out/mcp/server.js
+claude mcp add predictive-debugger -- node /absolute/path/to/dist/mcp-server.js
 ```
 
 ### Codex
@@ -110,7 +150,7 @@ Add to `~/.codex/config.toml`:
 ```toml
 [mcp_servers.predictive-debugger]
 command = "node"
-args = ["/absolute/path/to/out/mcp/server.js"]
+args = ["/absolute/path/to/dist/mcp-server.js"]
 ```
 
 ### Tools
@@ -161,6 +201,12 @@ look worst.
 Static risk and log analysis run locally and cost nothing. Only the model
 verdict spawns a CLI.
 
+The static component applies a smooth saturation (`x / (x + k)`) to the weighted
+signal sum rather than clamping it. Clamping made every non-trivial file score
+exactly 1, which destroyed the ranking `scan_project` exists to provide;
+saturation is strictly monotonic, so heavier files always compare correctly and
+the result still cannot exceed 1.
+
 A file that cannot be parsed is reported with a `parseError` and a zero score
 rather than throwing, and a project scan that fails on one file keeps the
 results for the rest and lists the failures separately. Both behaviours are
@@ -169,9 +215,16 @@ covered by tests — they were originally bugs the test suite caught.
 ## Development
 
 ```bash
-npm run watch     # incremental TypeScript build
+npm run watch     # esbuild in watch mode (unminified, with sourcemaps)
+npm run check     # type-check only — esbuild does not type-check
 npm test          # 48 tests, Node's built-in runner, no test dependencies
+npm run package   # build and produce a .vsix
 ```
+
+**esbuild does no type checking.** `npm run build` runs `tsc --noEmit` first for
+exactly that reason, and CI runs them as separate steps so a type error is
+distinguishable from a bundling error. Tests run against the `tsc` output in
+`out/`, not the bundle.
 
 Tests live in `src/test/`. They cover the pure logic — the risk model, AST
 metrics, model-reply parsing, Windows argument quoting, the source-tree walker,

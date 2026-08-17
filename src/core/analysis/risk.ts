@@ -18,13 +18,32 @@ const WEIGHTS: Weight[] = [
     { key: "cyclomatic", weight: 0.02, label: (n) => `cyclomatic complexity ${n}` }
 ];
 
-/** Heuristic complexity score in [0, 1], independent of any model. */
+/**
+ * Half-saturation constant: the raw weighted sum that maps to 0.5.
+ *
+ * Tuned so ordinary application files land in the middle of the range rather
+ * than pinned at the top — a file with, say, a dozen branches and a few async
+ * boundaries should look moderate, not maximal.
+ */
+const HALF_SATURATION = 2.5;
+
+/** Raw weighted sum of the risk signals. Unbounded; use calculateRisk instead. */
+function rawRisk(metrics: FileMetrics): number {
+    return WEIGHTS.reduce((total, { key, weight }) => total + metrics[key] * weight, 0);
+}
+
+/**
+ * Heuristic complexity score in [0, 1), independent of any model.
+ *
+ * Uses a smooth saturation (`x / (x + k)`) rather than clamping the weighted
+ * sum. Clamping made every non-trivial real-world file score exactly 1, which
+ * destroyed the ranking that `scan_project` exists to provide. Saturation is
+ * strictly monotonic, so two heavy files always compare correctly no matter how
+ * complex they get, and it can never exceed 1 by construction.
+ */
 export function calculateRisk(metrics: FileMetrics): number {
-    const score = WEIGHTS.reduce(
-        (total, { key, weight }) => total + metrics[key] * weight,
-        0
-    );
-    return Math.min(score, 1);
+    const raw = rawRisk(metrics);
+    return raw / (raw + HALF_SATURATION);
 }
 
 /** The signals that contributed most to the score, biggest first. */

@@ -33,6 +33,11 @@ export interface BugPrediction {
     reason: string;
     /** 1-based line the model points at, when it identifies one. */
     line?: number;
+    /**
+     * Set when the file was too large to send in full. The verdict is then based
+     * on a prefix of the file, which the caller should make visible.
+     */
+    truncated?: string;
 }
 
 export interface LogAnomaly {
