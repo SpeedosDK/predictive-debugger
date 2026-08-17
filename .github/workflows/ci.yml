@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, master]
   pull_request:
   workflow_dispatch:
 
@@ -16,19 +16,21 @@ jobs:
         # The CLI adapters resolve executables differently per platform, so all
         # three matter — the project was developed on Windows.
         os: [ubuntu-latest, windows-latest, macos-latest]
-        node: ["20.x", "22.x"]
+        # Node 20 is end-of-life and its test runner cannot expand the glob in
+        # the `test` script (glob support landed in Node 21).
+        node: ["22.x", "24.x"]
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: ${{ matrix.node }}
           cache: npm
 
       # The log analyzer is a Python script; setting it up lets its tests run
       # instead of self-skipping.
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
