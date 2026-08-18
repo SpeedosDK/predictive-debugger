@@ -220,6 +220,27 @@ the file, and is the answer good enough to act on unread? Full write-up with
 charts, including where the tool does badly, is in
 **[bench/RESULTS.md](bench/RESULTS.md)**.
 
+The report is rendered directly on GitHub and includes light/dark charts,
+per-file outcomes, the score-threshold analysis, the agent A/B comparison, and
+the project-ranking results. The underlying corpus and raw result files remain
+in `bench/` so the figures can be inspected and reproduced, but that directory
+is excluded from the published npm and VSIX packages.
+
+To regenerate the benchmark artifacts from a cloned repository:
+
+```bash
+npm install
+npm run build                    # build dist/mcp-server.js used by the benchmark
+node bench/generate-corpus.mjs   # generate the 40-file corpus and answer key
+node bench/measure.mjs           # measure scan_project ranking quality
+node bench/measure-file.mjs      # compare predict_failures with reading files
+node bench/markdown.mjs          # rebuild RESULTS.md and its SVG charts
+```
+
+`measure-file.mjs` uses real model CLI calls. It honours `BENCH_PROVIDER`
+(`claude` or `codex`) and `BENCH_TRIALS` (default: 3), so a full run takes a few
+minutes and consumes model usage.
+
 Headline, over 12 files with 3 trials each against the Claude CLI:
 
 | | |
