@@ -1,0 +1,184 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 446" width="900" height="446" font-family='system-ui, -apple-system, "Segoe UI", sans-serif'>
+  <rect width="900" height="446" rx="12" fill="#1a1a19"/>
+  <rect x="24" y="13" width="11" height="11" rx="3" fill="#0ca30c"/><text x="42" y="22" font-size="12.5" fill="#c3c2b7">✓  Named the correct line</text><rect x="229" y="13" width="11" height="11" rx="3" fill="#d03b3b"/><text x="247" y="22" font-size="12.5" fill="#c3c2b7">✗  Reported the file clean (missed the bug)</text><rect x="552.8" y="13" width="11" height="11" rx="3" fill="#fab219"/><text x="570.8" y="22" font-size="12.5" fill="#c3c2b7">!  False alarm on a clean file</text><rect x="790.8" y="13" width="11" height="11" rx="3" fill="#383835"/><text x="808.8" y="22" font-size="12.5" fill="#c3c2b7">·  Correctly reported a clean file</text><g transform="translate(0 34)"><text x="265" y="14" font-size="11.5" fill="#898781" text-anchor="middle">trial 1</text><text x="297" y="14" font-size="11.5" fill="#898781" text-anchor="middle">trial 2</text><text x="329" y="14" font-size="11.5" fill="#898781" text-anchor="middle">trial 3</text><text x="238" y="41" font-size="12.5" fill="#ffffff" text-anchor="end">api/adminController.js</text><g><title>api/adminController.js — trial 1
+False alarm on a clean file
+Points to line 11
+req.body is accessed without verifying it exists, so a request with no body (undefined) will throw when reading req.body.orderId.</title>
+      <rect x="250" y="22" width="30" height="30" rx="4" fill="#fab219"/>
+      <text x="265" y="42" font-size="14" font-weight="600" fill="#0b0b0b" text-anchor="middle">!</text></g><g><title>api/adminController.js — trial 2
+False alarm on a clean file
+Points to line 11
+req.body is accessed without verifying it exists, so a request with no body (undefined) will throw when reading req.body.orderId.</title>
+      <rect x="282" y="22" width="30" height="30" rx="4" fill="#fab219"/>
+      <text x="297" y="42" font-size="14" font-weight="600" fill="#0b0b0b" text-anchor="middle">!</text></g><g><title>api/adminController.js — trial 3
+False alarm on a clean file
+Points to line 11
+req.body is accessed without verifying it exists, so a request with no body (undefined) will throw when reading req.body.orderId.</title>
+      <rect x="314" y="22" width="30" height="30" rx="4" fill="#fab219"/>
+      <text x="329" y="42" font-size="14" font-weight="600" fill="#0b0b0b" text-anchor="middle">!</text></g><text x="238" y="73" font-size="12.5" fill="#ffffff" text-anchor="end">services/orderService.js</text><g><title>services/orderService.js — trial 1
+False alarm on a clean file
+Points to line 15
+order.lines is accessed without a null/undefined check, so a batch row lacking a lines property will throw on iteration.</title>
+      <rect x="250" y="54" width="30" height="30" rx="4" fill="#fab219"/>
+      <text x="265" y="74" font-size="14" font-weight="600" fill="#0b0b0b" text-anchor="middle">!</text></g><g><title>services/orderService.js — trial 2
+False alarm on a clean file
+Points to line 15
+order.lines is accessed without a null/undefined check, so any order lacking a lines array from repo.loadBatch will throw a TypeError.</title>
+      <rect x="282" y="54" width="30" height="30" rx="4" fill="#fab219"/>
+      <text x="297" y="74" font-size="14" font-weight="600" fill="#0b0b0b" text-anchor="middle">!</text></g><g><title>services/orderService.js — trial 3
+False alarm on a clean file
+Points to line 15
+order.lines is accessed without a null/undefined check, so a batch entry lacking a lines property will throw when iterated.</title>
+      <rect x="314" y="54" width="30" height="30" rx="4" fill="#fab219"/>
+      <text x="329" y="74" font-size="14" font-weight="600" fill="#0b0b0b" text-anchor="middle">!</text></g><text x="238" y="105" font-size="12.5" fill="#ffffff" text-anchor="end">repositories/orderRepository.js</text><g><title>repositories/orderRepository.js — trial 1
+False alarm on a clean file
+Points to line 8
+rows.map is called on the result of db.query without checking it is an array, so a null/undefined result (e.g., no rows or a driver returning undefined) throws a TypeError.</title>
+      <rect x="250" y="86" width="30" height="30" rx="4" fill="#fab219"/>
+      <text x="265" y="106" font-size="14" font-weight="600" fill="#0b0b0b" text-anchor="middle">!</text></g><g><title>repositories/orderRepository.js — trial 2
+False alarm on a clean file
+Points to line 8
+db.query results are mapped without checking rows is a non-null array, so a null/undefined result from the query would throw on .map.</title>
+      <rect x="282" y="86" width="30" height="30" rx="4" fill="#fab219"/>
+      <text x="297" y="106" font-size="14" font-weight="600" fill="#0b0b0b" text-anchor="middle">!</text></g><g><title>repositories/orderRepository.js — trial 3
+False alarm on a clean file
+Points to line 9
+rows.map assumes db.query always resolves to an array; if the query returns null/undefined (e.g. no rows or driver quirk), calling .map on it throws.</title>
+      <rect x="314" y="86" width="30" height="30" rx="4" fill="#fab219"/>
+      <text x="329" y="106" font-size="14" font-weight="600" fill="#0b0b0b" text-anchor="middle">!</text></g><text x="238" y="137" font-size="12.5" fill="#ffffff" text-anchor="end">services/pricingService.js</text><g><title>services/pricingService.js — trial 1
+Named the correct line
+Points to line 37 (planted: 34)
+In priceLine's tier loop, `next` is undefined for the last tier (tiers[i+1] out of bounds), and accessing next.minQuantity throws when quantity is high enough to reach the final tier.</title>
+      <rect x="250" y="118" width="30" height="30" rx="4" fill="#0ca30c"/>
+      <text x="265" y="138" font-size="14" font-weight="600" fill="#ffffff" text-anchor="middle">✓</text></g><g><title>services/pricingService.js — trial 2
+Named the correct line
+Points to line 36 (planted: 34)
+In priceLine's tier loop, 'next' is undefined for the last tier, so accessing next.minQuantity throws when quantity meets or exceeds the last tier's minQuantity.</title>
+      <rect x="282" y="118" width="30" height="30" rx="4" fill="#0ca30c"/>
+      <text x="297" y="138" font-size="14" font-weight="600" fill="#ffffff" text-anchor="middle">✓</text></g><g><title>services/pricingService.js — trial 3
+Named the correct line
+Points to line 34 (planted: 34)
+In priceLine, tiers[i+1] is undefined for the last tier, so accessing next.minQuantity throws when line.quantity is beyond all lower bounds but never matched earlier.</title>
+      <rect x="314" y="118" width="30" height="30" rx="4" fill="#0ca30c"/>
+      <text x="329" y="138" font-size="14" font-weight="600" fill="#ffffff" text-anchor="middle">✓</text></g><text x="238" y="169" font-size="12.5" fill="#ffffff" text-anchor="end">services/inventoryService.js</text><g><title>services/inventoryService.js — trial 1
+Named the correct line
+Points to line 29 (planted: 28)
+reserve() uses lines.forEach with an async callback, so the function returns before reservations complete and any rejection is unhandled, and reserved is empty/incomplete.</title>
+      <rect x="250" y="150" width="30" height="30" rx="4" fill="#0ca30c"/>
+      <text x="265" y="170" font-size="14" font-weight="600" fill="#ffffff" text-anchor="middle">✓</text></g><g><title>services/inventoryService.js — trial 2
+Named the correct line
+Points to line 29 (planted: 28)
+reserve() uses lines.forEach with an async callback, so the awaits inside are never awaited by reserve(), causing it to return before reservations complete and letting any rejection go unhandled.</title>
+      <rect x="282" y="150" width="30" height="30" rx="4" fill="#0ca30c"/>
+      <text x="297" y="170" font-size="14" font-weight="600" fill="#ffffff" text-anchor="middle">✓</text></g><g><title>services/inventoryService.js — trial 3
+Named the correct line
+Points to line 29 (planted: 28)
+reserve() uses lines.forEach with an async callback, so the function returns before reservations complete and errors from the awaited calls are unhandled.</title>
+      <rect x="314" y="150" width="30" height="30" rx="4" fill="#0ca30c"/>
+      <text x="329" y="170" font-size="14" font-weight="600" fill="#ffffff" text-anchor="middle">✓</text></g><text x="238" y="201" font-size="12.5" fill="#ffffff" text-anchor="end">workers/reconciliationWorker.js</text><g><title>workers/reconciliationWorker.js — trial 1
+Reported the file clean (missed the bug)
+Points to line — (planted: 28)
+No clear defect: errors are caught in start/retryFailed, loops are correctly bounded, and no obviously null-dereferenced value is present in the shown code.</title>
+      <rect x="250" y="182" width="30" height="30" rx="4" fill="#d03b3b"/>
+      <text x="265" y="202" font-size="14" font-weight="600" fill="#ffffff" text-anchor="middle">✗</text></g><g><title>workers/reconciliationWorker.js — trial 2
+Named the correct line
+Points to line 27 (planted: 28)
+tick() reads balanceOf then settledSince and writes back computed balance without locking, so concurrent ticks or external writes between the awaits can overwrite each other's updates.</title>
+      <rect x="282" y="182" width="30" height="30" rx="4" fill="#0ca30c"/>
+      <text x="297" y="202" font-size="14" font-weight="600" fill="#ffffff" text-anchor="middle">✓</text></g><g><title>workers/reconciliationWorker.js — trial 3
+Named the correct line
+Points to line 26 (planted: 28)
+Between reading balanceOf/settledSince and writing the reconciled balance, concurrent ticks or external writers can mutate the ledger, causing the write to overwrite intervening changes.</title>
+      <rect x="314" y="182" width="30" height="30" rx="4" fill="#0ca30c"/>
+      <text x="329" y="202" font-size="14" font-weight="600" fill="#ffffff" text-anchor="middle">✓</text></g><text x="238" y="233" font-size="12.5" fill="#ffffff" text-anchor="end">services/auditService.js</text><g><title>services/auditService.js — trial 1
+False alarm on a clean file
+Points to line 10
+Repository calls (loadBatch, findOrders, findInvoices) are awaited with no try/catch, so any rejection propagates as an unhandled promise rejection to callers.</title>
+      <rect x="250" y="214" width="30" height="30" rx="4" fill="#fab219"/>
+      <text x="265" y="234" font-size="14" font-weight="600" fill="#0b0b0b" text-anchor="middle">!</text></g><g><title>services/auditService.js — trial 2
+False alarm on a clean file
+Points to line 10
+Repo calls (loadBatch, findOrders, findInvoices) are awaited without try/catch, so any rejection propagates unhandled to the caller.</title>
+      <rect x="282" y="214" width="30" height="30" rx="4" fill="#fab219"/>
+      <text x="297" y="234" font-size="14" font-weight="600" fill="#0b0b0b" text-anchor="middle">!</text></g><g><title>services/auditService.js — trial 3
+False alarm on a clean file
+Points to line 10
+Repository calls (loadBatch, findOrders, findInvoices) are awaited with no try/catch, so any rejection propagates unhandled to the caller.</title>
+      <rect x="314" y="214" width="30" height="30" rx="4" fill="#fab219"/>
+      <text x="329" y="234" font-size="14" font-weight="600" fill="#0b0b0b" text-anchor="middle">!</text></g><text x="238" y="265" font-size="12.5" fill="#ffffff" text-anchor="end">lib/paging.js</text><g><title>lib/paging.js — trial 1
+Correctly reported a clean file
+Points to line —
+All functions safely guard type checks and null values before dereferencing; no unbounded loops, unawaited promises, or unreleased resources are present.</title>
+      <rect x="250" y="246" width="30" height="30" rx="4" fill="#383835"/>
+      <text x="265" y="266" font-size="14" font-weight="600" fill="#0b0b0b" text-anchor="middle">·</text></g><g><title>lib/paging.js — trial 2
+Correctly reported a clean file
+Points to line —
+All functions safely guard type checks and null values before dereferencing, so no runtime failure is evident.</title>
+      <rect x="282" y="246" width="30" height="30" rx="4" fill="#383835"/>
+      <text x="297" y="266" font-size="14" font-weight="600" fill="#0b0b0b" text-anchor="middle">·</text></g><g><title>lib/paging.js — trial 3
+Correctly reported a clean file
+Points to line —
+All functions safely guard type checks and null values before dereferencing; no evident runtime failure path exists.</title>
+      <rect x="314" y="246" width="30" height="30" rx="4" fill="#383835"/>
+      <text x="329" y="266" font-size="14" font-weight="600" fill="#0b0b0b" text-anchor="middle">·</text></g><text x="238" y="297" font-size="12.5" fill="#ffffff" text-anchor="end">models/payment.js</text><g><title>models/payment.js — trial 1
+Correctly reported a clean file
+Points to line —
+Simple row mapper with null-coalescing defaults for every field; no dereference, async, or bounds logic present that could fail at runtime.</title>
+      <rect x="250" y="278" width="30" height="30" rx="4" fill="#383835"/>
+      <text x="265" y="298" font-size="14" font-weight="600" fill="#0b0b0b" text-anchor="middle">·</text></g><g><title>models/payment.js — trial 2
+Correctly reported a clean file
+Points to line —
+Simple row mapper with null-coalescing defaults for every field; no dereference, async, loop, or resource handling exists to fail at runtime.</title>
+      <rect x="282" y="278" width="30" height="30" rx="4" fill="#383835"/>
+      <text x="297" y="298" font-size="14" font-weight="600" fill="#0b0b0b" text-anchor="middle">·</text></g><g><title>models/payment.js — trial 3
+False alarm on a clean file
+Points to line 4
+Constructor assumes row is a non-null object and will throw if row is null or undefined when property access is attempted.</title>
+      <rect x="314" y="278" width="30" height="30" rx="4" fill="#fab219"/>
+      <text x="329" y="298" font-size="14" font-weight="600" fill="#0b0b0b" text-anchor="middle">!</text></g><text x="238" y="329" font-size="12.5" fill="#ffffff" text-anchor="end">lib/dateWindow.js</text><g><title>lib/dateWindow.js — trial 1
+Named the correct line
+Points to line 7 (planted: 7)
+Loop condition i &lt;= days produces days+1 entries instead of days, off by one for a function meant to build a window of 'days' length.</title>
+      <rect x="250" y="310" width="30" height="30" rx="4" fill="#0ca30c"/>
+      <text x="265" y="330" font-size="14" font-weight="600" fill="#ffffff" text-anchor="middle">✓</text></g><g><title>lib/dateWindow.js — trial 2
+Named the correct line
+Points to line 7 (planted: 7)
+Loop condition `i &lt;= days` produces days+1 entries instead of days, extending past the intended exclusive-end boundary.</title>
+      <rect x="282" y="310" width="30" height="30" rx="4" fill="#0ca30c"/>
+      <text x="297" y="330" font-size="14" font-weight="600" fill="#ffffff" text-anchor="middle">✓</text></g><g><title>lib/dateWindow.js — trial 3
+Named the correct line
+Points to line 7 (planted: 7)
+Loop condition uses i &lt;= days, producing days+1 entries instead of the requested days count.</title>
+      <rect x="314" y="310" width="30" height="30" rx="4" fill="#0ca30c"/>
+      <text x="329" y="330" font-size="14" font-weight="600" fill="#ffffff" text-anchor="middle">✓</text></g><text x="238" y="361" font-size="12.5" fill="#ffffff" text-anchor="end">lib/retry.js</text><g><title>lib/retry.js — trial 1
+Named the correct line
+Points to line 10 (planted: 7)
+After all attempts fail, the function falls through and returns undefined instead of throwing the last error, silently swallowing the failure.</title>
+      <rect x="250" y="342" width="30" height="30" rx="4" fill="#0ca30c"/>
+      <text x="265" y="362" font-size="14" font-weight="600" fill="#ffffff" text-anchor="middle">✓</text></g><g><title>lib/retry.js — trial 2
+Named the correct line
+Points to line 10 (planted: 7)
+After all attempts are exhausted the function returns undefined instead of throwing or propagating the last error, silently masking failure.</title>
+      <rect x="282" y="342" width="30" height="30" rx="4" fill="#0ca30c"/>
+      <text x="297" y="362" font-size="14" font-weight="600" fill="#ffffff" text-anchor="middle">✓</text></g><g><title>lib/retry.js — trial 3
+Named the correct line
+Points to line 10 (planted: 7)
+After all attempts are exhausted the loop ends and the function returns undefined instead of throwing or propagating the last error, silently swallowing failures.</title>
+      <rect x="314" y="342" width="30" height="30" rx="4" fill="#0ca30c"/>
+      <text x="329" y="362" font-size="14" font-weight="600" fill="#ffffff" text-anchor="middle">✓</text></g><text x="238" y="393" font-size="12.5" fill="#ffffff" text-anchor="end">models/cartTotals.js</text><g><title>models/cartTotals.js — trial 1
+Named the correct line
+Points to line 6 (planted: 6)
+row.discount is dereferenced without a null/undefined check, so a row lacking a discount object throws a TypeError.</title>
+      <rect x="250" y="374" width="30" height="30" rx="4" fill="#0ca30c"/>
+      <text x="265" y="394" font-size="14" font-weight="600" fill="#ffffff" text-anchor="middle">✓</text></g><g><title>models/cartTotals.js — trial 2
+Named the correct line
+Points to line 6 (planted: 6)
+row.discount is accessed without a null check, so row.discount.amount throws if row.discount is undefined or null.</title>
+      <rect x="282" y="374" width="30" height="30" rx="4" fill="#0ca30c"/>
+      <text x="297" y="394" font-size="14" font-weight="600" fill="#ffffff" text-anchor="middle">✓</text></g><g><title>models/cartTotals.js — trial 3
+Named the correct line
+Points to line 6 (planted: 6)
+row.discount is accessed without a null check, so a missing discount property will throw when reading .amount.</title>
+      <rect x="314" y="374" width="30" height="30" rx="4" fill="#0ca30c"/>
+      <text x="329" y="394" font-size="14" font-weight="600" fill="#ffffff" text-anchor="middle">✓</text></g></g>
+</svg>

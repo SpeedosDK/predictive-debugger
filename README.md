@@ -212,6 +212,41 @@ rather than throwing, and a project scan that fails on one file keeps the
 results for the rest and lists the failures separately. Both behaviours are
 covered by tests — they were originally bugs the test suite caught.
 
+## Measured results
+
+`bench/` holds a benchmark that puts numbers on the two questions worth asking:
+does calling the tool actually cost a reviewing agent less context than reading
+the file, and is the answer good enough to act on unread? Full write-up with
+charts, including where the tool does badly, is in
+**[bench/RESULTS.md](bench/RESULTS.md)**.
+
+Headline, over 12 files with 3 trials each against the Claude CLI:
+
+| | |
+|---|---|
+| Context to read the files | 10,228 tokens |
+| Context to ask `predict_failures` | 2,991 tokens |
+| Runs that named the planted line (±3) | 17 of 18 |
+| False alarms on clean files, raw output | 13 of 18 |
+| False alarms at `score >= 0.65` | 0 of 18 |
+
+Three findings that should change how the tools are used:
+
+- **The answer costs a flat ~250 tokens**, so asking is only cheaper than
+  reading for files above roughly that size. On a 90-token helper it costs more.
+- **`score` separates real defects from generic remarks.** The planted bugs
+  score 0.70–0.90; the "this could be null if the caller passes null" noise tops
+  out at 0.60. Agents should gate on it. The exact cut-off is fitted to this
+  corpus and needs re-testing on unseen code.
+- **`scan_project`'s ranking tracks file size** (Spearman ρ = 0.82 against raw
+  token count) and does not beat reading the tree in directory order at any
+  budget. It is a complexity heuristic, and half the planted bugs live in small
+  files.
+
+A two-agent A/B on the same corpus reached identical verdicts in both arms, with
+the tool-using agent spending 26% fewer tokens — much less than the 71% the
+per-file accounting suggests, because the agent's own overhead dominates.
+
 ## Development
 
 ```bash

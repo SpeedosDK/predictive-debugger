@@ -1,0 +1,59 @@
+{
+  "note": "Transcribed from two background subagent runs. The token and duration figures are the harness's own accounting for each agent; the verdicts are the agents' reported output, checked here against bench/manifest.json. Two runs are not statistics -- this validates behaviour, not the token ratios, which are measured directly in results-file.json.",
+  "model": "claude-sonnet",
+  "task": "Name the single most likely runtime failure in each of four files, or report none.",
+  "arms": {
+    "readTheFile": {
+      "label": "Without the tool — reads the files",
+      "instruction": "Read each file and reason about it. No analysis tool.",
+      "totalTokens": 23449,
+      "toolUses": 4,
+      "durationMs": 47823,
+      "linesRead": 580
+    },
+    "askTheTool": {
+      "label": "With the tool — calls predict_failures",
+      "instruction": "Run bench/predict.mjs per file. Do not open the source. Treat score >= 0.65 as actionable.",
+      "totalTokens": 17395,
+      "toolUses": 4,
+      "durationMs": 38922,
+      "linesRead": 0
+    }
+  },
+  "files": [
+    {
+      "file": "src/services/pricingService.js",
+      "truth": { "defect": true, "line": 34, "pattern": "off-by-one" },
+      "readTheFile": { "defect": true, "line": 36, "correct": true },
+      "askTheTool": { "defect": true, "line": 36, "score": 0.85, "correct": true }
+    },
+    {
+      "file": "src/workers/reconciliationWorker.js",
+      "truth": { "defect": true, "line": 28, "pattern": "race-condition" },
+      "readTheFile": { "defect": false, "line": null, "correct": false },
+      "askTheTool": { "defect": false, "line": null, "score": 0.4, "correct": false },
+      "comment": "Both arms missed it. The tool did surface a race-condition concern but scored it 0.4, below the gate. In the 3-trial run in results-file.json the same file scored 0.85 twice and was missed once, so the model is unstable on this one."
+    },
+    {
+      "file": "src/models/cartTotals.js",
+      "truth": { "defect": true, "line": 6, "pattern": "null-pointer" },
+      "readTheFile": { "defect": true, "line": 6, "correct": true },
+      "askTheTool": { "defect": true, "line": 6, "score": 0.85, "correct": true }
+    },
+    {
+      "file": "src/services/orderService.js",
+      "truth": { "defect": false, "line": null, "pattern": null },
+      "readTheFile": { "defect": false, "line": null, "correct": true },
+      "askTheTool": { "defect": false, "line": null, "score": 0.6, "correct": true },
+      "comment": "The clean control. Both cleared it. The reading arm additionally noticed that three methods are defined twice in this file -- a corpus-generation artifact -- which the tool never mentioned across four total runs on it."
+    }
+  ],
+  "summary": {
+    "identicalVerdicts": 4,
+    "of": 4,
+    "bugsFound": { "readTheFile": 2, "askTheTool": 2, "of": 3 },
+    "falsePositives": { "readTheFile": 0, "askTheTool": 0, "of": 1 },
+    "tokenRatio": 0.742,
+    "durationRatio": 0.814
+  }
+}

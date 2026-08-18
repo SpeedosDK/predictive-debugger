@@ -12,6 +12,7 @@ out/
 esbuild.mjs
 tsconfig.json
 examples/
+bench/
 .github/
 .vscode/
 .idea/

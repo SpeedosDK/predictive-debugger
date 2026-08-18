@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 334" width="900" height="334" font-family='system-ui, -apple-system, "Segoe UI", sans-serif'>
+  <rect width="900" height="334" rx="12" fill="#fcfcfb"/>
+  <rect x="24" y="13" width="11" height="11" rx="3" fill="#2a78d6"/><text x="42" y="22" font-size="12.5" fill="#52514e">Risk order (scan_project)</text><rect x="229" y="13" width="11" height="11" rx="3" fill="#eb6834"/><text x="247" y="22" font-size="12.5" fill="#52514e">Directory order</text><rect x="368" y="13" width="11" height="11" rx="3" fill="#1baf7a"/><text x="386" y="22" font-size="12.5" fill="#52514e">Random (expected)</text><g transform="translate(0 34)"><line x1="48" y1="248" x2="876" y2="248" stroke="#e1e0d9" stroke-width="1"/><text x="38" y="252" font-size="11.5" fill="#898781" text-anchor="end">0</text><line x1="48" y1="170.66666666666669" x2="876" y2="170.66666666666669" stroke="#e1e0d9" stroke-width="1"/><text x="38" y="174.66666666666669" font-size="11.5" fill="#898781" text-anchor="end">2</text><line x1="48" y1="93.33333333333334" x2="876" y2="93.33333333333334" stroke="#e1e0d9" stroke-width="1"/><text x="38" y="97.33333333333334" font-size="11.5" fill="#898781" text-anchor="end">4</text><line x1="48" y1="16" x2="876" y2="16" stroke="#e1e0d9" stroke-width="1"/><text x="38" y="20" font-size="11.5" fill="#898781" text-anchor="end">6</text><g><title>Risk order at 5 files: 0 of 6 bugs</title>
+        <rect x="98.5" y="248" width="34" height="0" rx="4" fill="#2a78d6"/>
+        <rect x="98.5" y="248" width="34" height="0" fill="#2a78d6"/>
+        <text x="115.5" y="242" font-size="11.5" fill="#52514e" text-anchor="middle">0</text></g><g><title>Directory order at 5 files: 0 of 6 bugs</title>
+        <rect x="134.5" y="248" width="34" height="0" rx="4" fill="#eb6834"/>
+        <rect x="134.5" y="248" width="34" height="0" fill="#eb6834"/>
+        <text x="151.5" y="242" font-size="11.5" fill="#52514e" text-anchor="middle">0</text></g><g><title>Random (expected) at 5 files: 0.75 of 6 bugs</title>
+        <rect x="170.5" y="219" width="34" height="29" rx="4" fill="#1baf7a"/>
+        <rect x="170.5" y="244" width="34" height="4" fill="#1baf7a"/>
+        <text x="187.5" y="213" font-size="11.5" fill="#52514e" text-anchor="middle">0.75</text></g><text x="151.5" y="272" font-size="11.5" fill="#898781" text-anchor="middle">5 files read</text><g><title>Risk order at 10 files: 0 of 6 bugs</title>
+        <rect x="305.5" y="248" width="34" height="0" rx="4" fill="#2a78d6"/>
+        <rect x="305.5" y="248" width="34" height="0" fill="#2a78d6"/>
+        <text x="322.5" y="242" font-size="11.5" fill="#52514e" text-anchor="middle">0</text></g><g><title>Directory order at 10 files: 1 of 6 bugs</title>
+        <rect x="341.5" y="209.33333333333334" width="34" height="38.66666666666666" rx="4" fill="#eb6834"/>
+        <rect x="341.5" y="244" width="34" height="4" fill="#eb6834"/>
+        <text x="358.5" y="203.33333333333334" font-size="11.5" fill="#52514e" text-anchor="middle">1</text></g><g><title>Random (expected) at 10 files: 1.5 of 6 bugs</title>
+        <rect x="377.5" y="190" width="34" height="58" rx="4" fill="#1baf7a"/>
+        <rect x="377.5" y="244" width="34" height="4" fill="#1baf7a"/>
+        <text x="394.5" y="184" font-size="11.5" fill="#52514e" text-anchor="middle">1.5</text></g><text x="358.5" y="272" font-size="11.5" fill="#898781" text-anchor="middle">10 files read</text><g><title>Risk order at 15 files: 2 of 6 bugs</title>
+        <rect x="512.5" y="170.66666666666669" width="34" height="77.33333333333331" rx="4" fill="#2a78d6"/>
+        <rect x="512.5" y="244" width="34" height="4" fill="#2a78d6"/>
+        <text x="529.5" y="164.66666666666669" font-size="11.5" fill="#52514e" text-anchor="middle">2</text></g><g><title>Directory order at 15 files: 2 of 6 bugs</title>
+        <rect x="548.5" y="170.66666666666669" width="34" height="77.33333333333331" rx="4" fill="#eb6834"/>
+        <rect x="548.5" y="244" width="34" height="4" fill="#eb6834"/>
+        <text x="565.5" y="164.66666666666669" font-size="11.5" fill="#52514e" text-anchor="middle">2</text></g><g><title>Random (expected) at 15 files: 2.25 of 6 bugs</title>
+        <rect x="584.5" y="161" width="34" height="87" rx="4" fill="#1baf7a"/>
+        <rect x="584.5" y="244" width="34" height="4" fill="#1baf7a"/>
+        <text x="601.5" y="155" font-size="11.5" fill="#52514e" text-anchor="middle">2.25</text></g><text x="565.5" y="272" font-size="11.5" fill="#898781" text-anchor="middle">15 files read</text><g><title>Risk order at 20 files: 3 of 6 bugs</title>
+        <rect x="719.5" y="132" width="34" height="116" rx="4" fill="#2a78d6"/>
+        <rect x="719.5" y="244" width="34" height="4" fill="#2a78d6"/>
+        <text x="736.5" y="126" font-size="11.5" fill="#52514e" text-anchor="middle">3</text></g><g><title>Directory order at 20 files: 3 of 6 bugs</title>
+        <rect x="755.5" y="132" width="34" height="116" rx="4" fill="#eb6834"/>
+        <rect x="755.5" y="244" width="34" height="4" fill="#eb6834"/>
+        <text x="772.5" y="126" font-size="11.5" fill="#52514e" text-anchor="middle">3</text></g><g><title>Random (expected) at 20 files: 3 of 6 bugs</title>
+        <rect x="791.5" y="132" width="34" height="116" rx="4" fill="#1baf7a"/>
+        <rect x="791.5" y="244" width="34" height="4" fill="#1baf7a"/>
+        <text x="808.5" y="126" font-size="11.5" fill="#52514e" text-anchor="middle">3</text></g><text x="772.5" y="272" font-size="11.5" fill="#898781" text-anchor="middle">20 files read</text><line x1="48" y1="248" x2="876" y2="248" stroke="#c3c2b7" stroke-width="1"/></g>
+</svg>

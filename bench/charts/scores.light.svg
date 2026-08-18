@@ -1,0 +1,76 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 224" width="900" height="224" font-family='system-ui, -apple-system, "Segoe UI", sans-serif'>
+  <rect width="900" height="224" rx="12" fill="#fcfcfb"/>
+  <rect x="24" y="13" width="11" height="11" rx="3" fill="#eb6834"/><text x="42" y="22" font-size="12.5" fill="#52514e">Files with a planted bug</text><rect x="222.39999999999998" y="13" width="11" height="11" rx="3" fill="#2a78d6"/><text x="240.39999999999998" y="22" font-size="12.5" fill="#52514e">Clean control files</text><g transform="translate(0 34)"><line x1="150" y1="24" x2="150" y2="156" stroke="#e1e0d9" stroke-width="1"/><text x="150" y="174" font-size="11.5" fill="#898781" text-anchor="middle">0.0</text><line x1="294" y1="24" x2="294" y2="156" stroke="#e1e0d9" stroke-width="1"/><text x="294" y="174" font-size="11.5" fill="#898781" text-anchor="middle">0.2</text><line x1="438" y1="24" x2="438" y2="156" stroke="#e1e0d9" stroke-width="1"/><text x="438" y="174" font-size="11.5" fill="#898781" text-anchor="middle">0.4</text><line x1="582" y1="24" x2="582" y2="156" stroke="#e1e0d9" stroke-width="1"/><text x="582" y="174" font-size="11.5" fill="#898781" text-anchor="middle">0.6</text><line x1="726" y1="24" x2="726" y2="156" stroke="#e1e0d9" stroke-width="1"/><text x="726" y="174" font-size="11.5" fill="#898781" text-anchor="middle">0.8</text><line x1="870" y1="24" x2="870" y2="156" stroke="#e1e0d9" stroke-width="1"/><text x="870" y="174" font-size="11.5" fill="#898781" text-anchor="middle">1.0</text><line x1="618" y1="18" x2="618" y2="156" stroke="#52514e" stroke-width="1"/><text x="618" y="12" font-size="11.5" fill="#52514e" text-anchor="middle">threshold 0.65</text><text x="136" y="56" font-size="12.5" fill="#0b0b0b" text-anchor="end">Files with a planted bug</text><circle cx="762" cy="34" r="5" fill="#eb6834" stroke="#fcfcfb" stroke-width="2"><title>src/services/pricingService.js — trial 1
+score 0.85, line 37
+In priceLine's tier loop, `next` is undefined for the last tier (tiers[i+1] out of bounds), and accessing next.minQuantity throws when quantity is high enough to reach the final tier.</title></circle><circle cx="762" cy="43" r="5" fill="#eb6834" stroke="#fcfcfb" stroke-width="2"><title>src/services/pricingService.js — trial 2
+score 0.85, line 36
+In priceLine's tier loop, 'next' is undefined for the last tier, so accessing next.minQuantity throws when quantity meets or exceeds the last tier's minQuantity.</title></circle><circle cx="762" cy="52" r="5" fill="#eb6834" stroke="#fcfcfb" stroke-width="2"><title>src/services/pricingService.js — trial 3
+score 0.85, line 34
+In priceLine, tiers[i+1] is undefined for the last tier, so accessing next.minQuantity throws when line.quantity is beyond all lower bounds but never matched earlier.</title></circle><circle cx="150" cy="34" r="5" fill="#eb6834" stroke="#fcfcfb" stroke-width="2"><title>src/workers/reconciliationWorker.js — trial 1
+score 0, line —
+No clear defect: errors are caught in start/retryFailed, loops are correctly bounded, and no obviously null-dereferenced value is present in the shown code.</title></circle><circle cx="438" cy="34" r="5" fill="#eb6834" stroke="#fcfcfb" stroke-width="2"><title>src/workers/reconciliationWorker.js — trial 2
+score 0.4, line 27
+tick() reads balanceOf then settledSince and writes back computed balance without locking, so concurrent ticks or external writes between the awaits can overwrite each other's updates.</title></circle><circle cx="402" cy="34" r="5" fill="#eb6834" stroke="#fcfcfb" stroke-width="2"><title>src/workers/reconciliationWorker.js — trial 3
+score 0.35, line 26
+Between reading balanceOf/settledSince and writing the reconciled balance, concurrent ticks or external writers can mutate the ledger, causing the write to overwrite intervening changes.</title></circle><circle cx="798" cy="34" r="5" fill="#eb6834" stroke="#fcfcfb" stroke-width="2"><title>src/services/inventoryService.js — trial 1
+score 0.9, line 29
+reserve() uses lines.forEach with an async callback, so the function returns before reservations complete and any rejection is unhandled, and reserved is empty/incomplete.</title></circle><circle cx="798" cy="43" r="5" fill="#eb6834" stroke="#fcfcfb" stroke-width="2"><title>src/services/inventoryService.js — trial 2
+score 0.9, line 29
+reserve() uses lines.forEach with an async callback, so the awaits inside are never awaited by reserve(), causing it to return before reservations complete and letting any rejection go unhandled.</title></circle><circle cx="798" cy="52" r="5" fill="#eb6834" stroke="#fcfcfb" stroke-width="2"><title>src/services/inventoryService.js — trial 3
+score 0.9, line 29
+reserve() uses lines.forEach with an async callback, so the function returns before reservations complete and errors from the awaited calls are unhandled.</title></circle><circle cx="654" cy="34" r="5" fill="#eb6834" stroke="#fcfcfb" stroke-width="2"><title>src/lib/dateWindow.js — trial 1
+score 0.7, line 7
+Loop condition i &lt;= days produces days+1 entries instead of days, off by one for a function meant to build a window of 'days' length.</title></circle><circle cx="690" cy="34" r="5" fill="#eb6834" stroke="#fcfcfb" stroke-width="2"><title>src/lib/dateWindow.js — trial 2
+score 0.75, line 7
+Loop condition `i &lt;= days` produces days+1 entries instead of days, extending past the intended exclusive-end boundary.</title></circle><circle cx="654" cy="43" r="5" fill="#eb6834" stroke="#fcfcfb" stroke-width="2"><title>src/lib/dateWindow.js — trial 3
+score 0.7, line 7
+Loop condition uses i &lt;= days, producing days+1 entries instead of the requested days count.</title></circle><circle cx="762" cy="61" r="5" fill="#eb6834" stroke="#fcfcfb" stroke-width="2"><title>src/models/cartTotals.js — trial 1
+score 0.85, line 6
+row.discount is dereferenced without a null/undefined check, so a row lacking a discount object throws a TypeError.</title></circle><circle cx="762" cy="70" r="5" fill="#eb6834" stroke="#fcfcfb" stroke-width="2"><title>src/models/cartTotals.js — trial 2
+score 0.85, line 6
+row.discount is accessed without a null check, so row.discount.amount throws if row.discount is undefined or null.</title></circle><circle cx="762" cy="34" r="5" fill="#eb6834" stroke="#fcfcfb" stroke-width="2"><title>src/models/cartTotals.js — trial 3
+score 0.85, line 6
+row.discount is accessed without a null check, so a missing discount property will throw when reading .amount.</title></circle><circle cx="654" cy="52" r="5" fill="#eb6834" stroke="#fcfcfb" stroke-width="2"><title>src/lib/retry.js — trial 1
+score 0.7, line 10
+After all attempts fail, the function falls through and returns undefined instead of throwing the last error, silently swallowing the failure.</title></circle><circle cx="654" cy="61" r="5" fill="#eb6834" stroke="#fcfcfb" stroke-width="2"><title>src/lib/retry.js — trial 2
+score 0.7, line 10
+After all attempts are exhausted the function returns undefined instead of throwing or propagating the last error, silently masking failure.</title></circle><circle cx="654" cy="70" r="5" fill="#eb6834" stroke="#fcfcfb" stroke-width="2"><title>src/lib/retry.js — trial 3
+score 0.7, line 10
+After all attempts are exhausted the loop ends and the function returns undefined instead of throwing or propagating the last error, silently swallowing failures.</title></circle><text x="136" y="124" font-size="12.5" fill="#0b0b0b" text-anchor="end">Clean control files</text><circle cx="582" cy="102" r="5" fill="#2a78d6" stroke="#fcfcfb" stroke-width="2"><title>src/services/orderService.js — trial 1
+score 0.6, line 15
+order.lines is accessed without a null/undefined check, so a batch row lacking a lines property will throw on iteration.</title></circle><circle cx="546" cy="102" r="5" fill="#2a78d6" stroke="#fcfcfb" stroke-width="2"><title>src/services/orderService.js — trial 2
+score 0.55, line 15
+order.lines is accessed without a null/undefined check, so any order lacking a lines array from repo.loadBatch will throw a TypeError.</title></circle><circle cx="582" cy="111" r="5" fill="#2a78d6" stroke="#fcfcfb" stroke-width="2"><title>src/services/orderService.js — trial 3
+score 0.6, line 15
+order.lines is accessed without a null/undefined check, so a batch entry lacking a lines property will throw when iterated.</title></circle><circle cx="438" cy="102" r="5" fill="#2a78d6" stroke="#fcfcfb" stroke-width="2"><title>src/api/adminController.js — trial 1
+score 0.4, line 11
+req.body is accessed without verifying it exists, so a request with no body (undefined) will throw when reading req.body.orderId.</title></circle><circle cx="582" cy="120" r="5" fill="#2a78d6" stroke="#fcfcfb" stroke-width="2"><title>src/api/adminController.js — trial 2
+score 0.6, line 11
+req.body is accessed without verifying it exists, so a request with no body (undefined) will throw when reading req.body.orderId.</title></circle><circle cx="582" cy="129" r="5" fill="#2a78d6" stroke="#fcfcfb" stroke-width="2"><title>src/api/adminController.js — trial 3
+score 0.6, line 11
+req.body is accessed without verifying it exists, so a request with no body (undefined) will throw when reading req.body.orderId.</title></circle><circle cx="402" cy="102" r="5" fill="#2a78d6" stroke="#fcfcfb" stroke-width="2"><title>src/repositories/orderRepository.js — trial 1
+score 0.35, line 8
+rows.map is called on the result of db.query without checking it is an array, so a null/undefined result (e.g., no rows or a driver returning undefined) throws a TypeError.</title></circle><circle cx="366" cy="102" r="5" fill="#2a78d6" stroke="#fcfcfb" stroke-width="2"><title>src/repositories/orderRepository.js — trial 2
+score 0.3, line 8
+db.query results are mapped without checking rows is a non-null array, so a null/undefined result from the query would throw on .map.</title></circle><circle cx="438" cy="111" r="5" fill="#2a78d6" stroke="#fcfcfb" stroke-width="2"><title>src/repositories/orderRepository.js — trial 3
+score 0.4, line 9
+rows.map assumes db.query always resolves to an array; if the query returns null/undefined (e.g. no rows or driver quirk), calling .map on it throws.</title></circle><circle cx="150" cy="102" r="5" fill="#2a78d6" stroke="#fcfcfb" stroke-width="2"><title>src/lib/paging.js — trial 1
+score 0, line —
+All functions safely guard type checks and null values before dereferencing; no unbounded loops, unawaited promises, or unreleased resources are present.</title></circle><circle cx="150" cy="111" r="5" fill="#2a78d6" stroke="#fcfcfb" stroke-width="2"><title>src/lib/paging.js — trial 2
+score 0, line —
+All functions safely guard type checks and null values before dereferencing, so no runtime failure is evident.</title></circle><circle cx="150" cy="120" r="5" fill="#2a78d6" stroke="#fcfcfb" stroke-width="2"><title>src/lib/paging.js — trial 3
+score 0, line —
+All functions safely guard type checks and null values before dereferencing; no evident runtime failure path exists.</title></circle><circle cx="150" cy="129" r="5" fill="#2a78d6" stroke="#fcfcfb" stroke-width="2"><title>src/models/payment.js — trial 1
+score 0, line —
+Simple row mapper with null-coalescing defaults for every field; no dereference, async, or bounds logic present that could fail at runtime.</title></circle><circle cx="150" cy="138" r="5" fill="#2a78d6" stroke="#fcfcfb" stroke-width="2"><title>src/models/payment.js — trial 2
+score 0, line —
+Simple row mapper with null-coalescing defaults for every field; no dereference, async, loop, or resource handling exists to fail at runtime.</title></circle><circle cx="294" cy="102" r="5" fill="#2a78d6" stroke="#fcfcfb" stroke-width="2"><title>src/models/payment.js — trial 3
+score 0.2, line 4
+Constructor assumes row is a non-null object and will throw if row is null or undefined when property access is attempted.</title></circle><circle cx="366" cy="111" r="5" fill="#2a78d6" stroke="#fcfcfb" stroke-width="2"><title>src/services/auditService.js — trial 1
+score 0.3, line 10
+Repository calls (loadBatch, findOrders, findInvoices) are awaited with no try/catch, so any rejection propagates as an unhandled promise rejection to callers.</title></circle><circle cx="366" cy="120" r="5" fill="#2a78d6" stroke="#fcfcfb" stroke-width="2"><title>src/services/auditService.js — trial 2
+score 0.3, line 10
+Repo calls (loadBatch, findOrders, findInvoices) are awaited without try/catch, so any rejection propagates unhandled to the caller.</title></circle><circle cx="366" cy="129" r="5" fill="#2a78d6" stroke="#fcfcfb" stroke-width="2"><title>src/services/auditService.js — trial 3
+score 0.3, line 10
+Repository calls (loadBatch, findOrders, findInvoices) are awaited with no try/catch, so any rejection propagates unhandled to the caller.</title></circle></g>
+</svg>
