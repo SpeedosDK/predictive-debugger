@@ -7,14 +7,22 @@ export interface FileMetrics {
     mutations: number;
     tryCatch: number;
     cyclomatic: number;
+    /** Physical lines, so risk can be expressed per unit of code. */
+    lines: number;
 }
 
 /** A deterministic, model-free assessment of one file. */
 export interface StaticAnalysis {
     file: string;
     metrics: FileMetrics;
-    /** Heuristic complexity risk in [0, 1]. */
+    /** Heuristic complexity risk in [0, 1]. Grows with the size of the file. */
     riskScore: number;
+    /**
+     * Heuristic risk per unit of code, in [0, 1]. Independent of file length,
+     * so it ranks a dense 20-line file above a long but plain one. This is the
+     * ordering `scan_project` uses; see bench/RESULTS.md section 5.
+     */
+    riskDensity: number;
     /** Human-readable notes about what drove the score. */
     signals: string[];
     /**

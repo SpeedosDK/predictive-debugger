@@ -1,59 +1,107 @@
 {
-  "note": "Transcribed from two background subagent runs. The token and duration figures are the harness's own accounting for each agent; the verdicts are the agents' reported output, checked here against bench/manifest.json. Two runs are not statistics -- this validates behaviour, not the token ratios, which are measured directly in results-file.json.",
-  "model": "claude-sonnet",
-  "task": "Name the single most likely runtime failure in each of four files, or report none.",
-  "arms": {
-    "readTheFile": {
-      "label": "Without the tool — reads the files",
-      "instruction": "Read each file and reason about it. No analysis tool.",
-      "totalTokens": 23449,
-      "toolUses": 4,
-      "durationMs": 47823,
-      "linesRead": 580
-    },
-    "askTheTool": {
-      "label": "With the tool — calls predict_failures",
-      "instruction": "Run bench/predict.mjs per file. Do not open the source. Treat score >= 0.65 as actionable.",
-      "totalTokens": 17395,
-      "toolUses": 4,
-      "durationMs": 38922,
-      "linesRead": 0
-    }
+ "note": "Transcribed from two background subagent runs. The token and duration figures are the harness's own accounting for each agent; the verdicts are the agents' reported output, checked here against bench/manifest.json. Two runs are not statistics -- this validates behaviour, not the token ratios, which are measured directly in results-file.json.",
+ "measuredAgainst": "Run against the current build: the classifier prompt carries the evidence policy and the concurrency clause, and the tool-using arm was told to report a defect only when the response says `actionable` is true, rather than being given a numeric threshold to apply.",
+ "ranAt": "2026-08-19",
+ "model": "claude-sonnet",
+ "gate": 0.7,
+ "gateProvenance": "Applied by the tool itself. The agent was given the `actionable` boolean, not a number, which is the change this run is meant to exercise: the previous A/B handed the agent the threshold fitted on the trials of the day, and it reported a defect in a clean file that scored exactly at it.",
+ "task": "Name the single most likely runtime failure in each of four files, or report none.",
+ "arms": {
+  "readTheFile": {
+   "label": "Without the tool — reads the files",
+   "instruction": "Read each file and reason about it. No analysis tool.",
+   "totalTokens": 24160,
+   "toolUses": 4,
+   "durationMs": 40093,
+   "linesRead": 580
   },
-  "files": [
-    {
-      "file": "src/services/pricingService.js",
-      "truth": { "defect": true, "line": 34, "pattern": "off-by-one" },
-      "readTheFile": { "defect": true, "line": 36, "correct": true },
-      "askTheTool": { "defect": true, "line": 36, "score": 0.85, "correct": true }
-    },
-    {
-      "file": "src/workers/reconciliationWorker.js",
-      "truth": { "defect": true, "line": 28, "pattern": "race-condition" },
-      "readTheFile": { "defect": false, "line": null, "correct": false },
-      "askTheTool": { "defect": false, "line": null, "score": 0.4, "correct": false },
-      "comment": "Both arms missed it. The tool did surface a race-condition concern but scored it 0.4, below the gate. In the 3-trial run in results-file.json the same file scored 0.85 twice and was missed once, so the model is unstable on this one."
-    },
-    {
-      "file": "src/models/cartTotals.js",
-      "truth": { "defect": true, "line": 6, "pattern": "null-pointer" },
-      "readTheFile": { "defect": true, "line": 6, "correct": true },
-      "askTheTool": { "defect": true, "line": 6, "score": 0.85, "correct": true }
-    },
-    {
-      "file": "src/services/orderService.js",
-      "truth": { "defect": false, "line": null, "pattern": null },
-      "readTheFile": { "defect": false, "line": null, "correct": true },
-      "askTheTool": { "defect": false, "line": null, "score": 0.6, "correct": true },
-      "comment": "The clean control. Both cleared it. The reading arm additionally noticed that three methods are defined twice in this file -- a corpus-generation artifact -- which the tool never mentioned across four total runs on it."
-    }
-  ],
-  "summary": {
-    "identicalVerdicts": 4,
-    "of": 4,
-    "bugsFound": { "readTheFile": 2, "askTheTool": 2, "of": 3 },
-    "falsePositives": { "readTheFile": 0, "askTheTool": 0, "of": 1 },
-    "tokenRatio": 0.742,
-    "durationRatio": 0.814
+  "askTheTool": {
+   "label": "With the tool — calls predict_failures",
+   "instruction": "Run bench/predict.mjs per file. Do not open the source. Report a defect only when `actionable` is true.",
+   "totalTokens": 17867,
+   "toolUses": 4,
+   "durationMs": 40316,
+   "linesRead": 0
   }
+ },
+ "files": [
+  {
+   "file": "src/services/pricingService.js",
+   "truth": {
+    "defect": true,
+    "line": 34,
+    "pattern": "off-by-one"
+   },
+   "readTheFile": {
+    "defect": true,
+    "line": 36,
+    "correct": true
+   },
+   "askTheTool": {
+    "defect": true,
+    "line": 35,
+    "score": 0.92,
+    "correct": true
+   }
+  },
+  {
+   "file": "src/workers/reconciliationWorker.js",
+   "truth": {
+    "defect": true,
+    "line": 28,
+    "pattern": "race-condition"
+   },
+   "readTheFile": {
+    "defect": false,
+    "line": null,
+    "correct": false
+   },
+   "askTheTool": {
+    "defect": true,
+    "line": 40,
+    "score": 0.8,
+    "correct": false
+   },
+   "comment": "The two arms fail differently here for the first time. The reading agent concluded the arithmetic was internally consistent and reported nothing. The tool named the defect in words -- \"tick() reads balanceOf before an await, so a concurrent write can be overwritten by this stale-derived balance\", which is the planted bug exactly -- but pointed at line 40, in backfill, which has the same read-await-write shape. Graded a miss under the +-3 rule, though an agent following that reason would find the defect."
+  },
+  {
+   "file": "src/models/cartTotals.js",
+   "truth": {
+    "defect": true,
+    "line": 6,
+    "pattern": "null-pointer"
+   },
+   "readTheFile": {
+    "defect": true,
+    "line": 6,
+    "correct": true
+   },
+   "askTheTool": {
+    "defect": true,
+    "line": 6,
+    "score": 0.8,
+    "correct": true
+   }
+  },
+  {
+   "file": "src/services/orderService.js",
+   "truth": {
+    "defect": false,
+    "line": null,
+    "pattern": null
+   },
+   "readTheFile": {
+    "defect": true,
+    "line": 14,
+    "correct": false
+   },
+   "askTheTool": {
+    "defect": false,
+    "line": null,
+    "score": 0.0,
+    "correct": true
+   },
+   "comment": "The reversal of the previous A/B. The tool scored the file 0.00 and returned status none, explicitly noting that the duplicate method definitions are functionally equivalent and so not an observable defect. The reading agent reported a defect at line 14, arguing that repo.loadBatch returns a single object rather than an array. That is a real inconsistency in the generated corpus -- pricingService.js does treat the same call as an object -- but it is a generator artifact, not a planted defect, and the answer key counts it as a false alarm."
+  }
+ ]
 }

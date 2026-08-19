@@ -161,10 +161,10 @@ already a model, so it needs facts, not a second opinion.
 
 | Tool | Purpose |
 | --- | --- |
-| `analyze_file` | Complexity metrics + risk score for one file, with the signals that drove it |
-| `scan_project` | Rank every source file in a directory by risk, worst first |
+| `analyze_file` | Complexity metrics + risk score and risk density for one file, with the signals that drove it |
+| `scan_project` | Rank every source file in a directory by risk density — risk per line, not per file |
 | `analyze_logs` | Score log lines by severity and unusual wording, return the anomalies |
-| `predict_failures` | Full pipeline including a second-opinion model verdict — spawns a CLI, 5–15s per file |
+| `predict_failures` | Full pipeline including a second-opinion model verdict and an `actionable` precision gate — spawns a CLI, 5–15s per file |
 | `list_providers` | Which CLIs are installed and signed in (for diagnosing failures) |
 
 `predict_failures` is deliberately the odd one out. When an agent calls it, one
@@ -188,24 +188,42 @@ look worst.
 
 ## How the score works
 
-`combinedScore` blends three signals:
+`combinedScore` is the model verdict, nudged by two local signals:
 
 ```
-0.4 × static risk      AST complexity: nested loops, long functions,
-                       async boundaries, unguarded mutation
-0.4 × model verdict    likelihood the CLI's model assigns to a concrete
+0.90 × model verdict   likelihood the CLI's model assigns to a concrete
                        failure, with a pattern name and line number
-0.2 × log anomalies    share of log lines flagged as unusual
+0.10 × static risk     AST complexity: nested loops, long functions,
+                       async boundaries, unguarded mutation
+0.15 × log anomalies   share of log lines flagged as unusual — folded in
+                       only when a log file is supplied, with the other
+                       two weights renormalised to make room
 ```
+
+The verdict dominates on purpose. On the benchmark corpus the static score
+separates buggy files from clean ones with an AUC of 0.33 — worse than a coin
+toss, because complexity tracks file length and half the planted bugs sit in
+short files. An earlier 0.4/0.4/0.2 blend pulled the combined score down to AUC
+0.74 from the verdict's own 0.91 and ranked a clean 200-line service above four
+of the six real defects; it also capped the score at 0.8 whenever no log file
+was given, since the log term then contributed nothing.
 
 Static risk and log analysis run locally and cost nothing. Only the model
 verdict spawns a CLI.
 
-The static component applies a smooth saturation (`x / (x + k)`) to the weighted
-signal sum rather than clamping it. Clamping made every non-trivial file score
-exactly 1, which destroyed the ranking `scan_project` exists to provide;
-saturation is strictly monotonic, so heavier files always compare correctly and
-the result still cannot exceed 1.
+Two static scores are reported, and they answer different questions.
+`riskScore` is the weighted signal sum under a smooth saturation
+(`x / (x + k)`) — how much is going on in this file. It grows with length, so
+ranking by it is close to ranking by size (ρ = 0.83 against raw token count).
+`riskDensity` divides the same signals by the length of the file and damps the
+ones that accumulate with it — mutations, branches, cyclomatic complexity — to a
+tenth of their weight. That is what `scan_project` orders by, because the agent
+pays per token and a defect in a 14-line helper is nearly free to check.
+
+Saturation rather than clamping matters for both: clamping made every
+non-trivial file score exactly 1, which destroyed the ranking `scan_project`
+exists to provide. Saturation is strictly monotonic, so heavier files always
+compare correctly and the result still cannot exceed 1.
 
 A file that cannot be parsed is reported with a `parseError` and a zero score
 rather than throwing, and a project scan that fails on one file keeps the
@@ -221,16 +239,21 @@ charts, including where the tool does badly, is in
 **[bench/RESULTS.md](bench/RESULTS.md)**.
 
 The report is rendered directly on GitHub and includes light/dark charts,
-per-file outcomes, the score-threshold analysis, the agent A/B comparison, and
-the project-ranking results. The underlying corpus and raw result files remain
-in `bench/` so the figures can be inspected and reproduced, but that directory
-is excluded from the published npm and VSIX packages.
+per-file outcomes, the score-threshold analysis, a provider comparison, the agent
+A/B comparison, and the project-ranking results. The charts are Vega-Lite
+specifications rendered to standalone SVG at build time — GitHub gives a
+committed `.svg` no page CSS, so each one is written twice with literal colours
+and paired in a `<picture>`. The underlying corpus and raw result files remain in
+`bench/` so the figures can be inspected and reproduced, but that directory is
+excluded from the published npm and VSIX packages.
 
 To regenerate the benchmark artifacts from a cloned repository:
 
 ```bash
 npm install
 npm run build                    # build dist/mcp-server.js used by the benchmark
+npm run bench                    # all four steps below, in order
+
 node bench/generate-corpus.mjs   # generate the 40-file corpus and answer key
 node bench/measure.mjs           # measure scan_project ranking quality
 node bench/measure-file.mjs      # compare predict_failures with reading files
@@ -246,27 +269,51 @@ Headline, over 12 files with 3 trials each against the Claude CLI:
 | | |
 |---|---|
 | Context to read the files | 10,228 tokens |
-| Context to ask `predict_failures` | 2,991 tokens |
-| Runs that named the planted line (±3) | 17 of 18 |
-| False alarms on clean files, raw output | 13 of 18 |
-| False alarms at `score >= 0.65` | 0 of 18 |
+| Context to ask `predict_failures` | 1,652 tokens |
+| Runs that named the planted line (±3) | 15 of 18 |
+| False alarms on clean files, raw output | **0 of 18** |
+| Separation between buggy and clean runs (AUC) | 1.000 |
+
+That 0.70 cutoff is now product behaviour, not just advice in this README. Replaying the
+same 36 Claude responses changes VS Code Problems from **12 false alerts to 0**, while
+surfacing **15 of 18** planted-bug runs instead of all 18. The MCP response exposes the
+same decision as `actionable` and a four-state `status`: `actionable`, `uncertain`, `none`,
+or `unavailable`. An uncertain result keeps its pattern, score, line and reason, but is
+labelled “not added to Problems” instead of becoming an alert.
+
+That replay measured the reporting gate alone. A provider-matched rerun measures the
+prompt: with the evidence policy and the concurrency clause, Claude names **0 of 18**
+defects in clean controls, down from 13, while naming 15 of 18 planted lines. A
+three-trial run through the Codex provider on the same build also produced **0 of 18
+false alarms**, with 11 of 18 planted runs on the correct line. See the report for the
+per-provider comparison.
 
 Three findings that should change how the tools are used:
 
-- **The answer costs a flat ~250 tokens**, so asking is only cheaper than
-  reading for files above roughly that size. On a 90-token helper it costs more.
-- **`score` separates real defects from generic remarks.** The planted bugs
-  score 0.70–0.90; the "this could be null if the caller passes null" noise tops
-  out at 0.60. Agents should gate on it. The exact cut-off is fitted to this
-  corpus and needs re-testing on unseen code.
-- **`scan_project`'s ranking tracks file size** (Spearman ρ = 0.82 against raw
-  token count) and does not beat reading the tree in directory order at any
-  budget. It is a complexity heuristic, and half the planted bugs live in small
-  files.
+- **The answer costs a flat ~138 tokens**, so asking is only cheaper than
+  reading for files above roughly that size. On an 80-token helper it still
+  costs more.
+- **The false alarms were fixed in the prompt, not the threshold.** An evidence
+  policy that makes the model disprove a candidate before reporting it, plus a
+  clause saying concurrency is a normal execution rather than an invented input,
+  took clean-file alarms from 13 of 18 to 0 of 18. The 0.70 gate now costs
+  nothing and catches nothing — keep it as a backstop, because the refusal is a
+  model behaviour and not a guarantee. Earlier builds put clean-file noise as
+  high as 0.65.
+- **`scan_project` earns its keep only because it ranks by density.** Ordered by
+  total risk the ranking tracked file size (Spearman ρ = 0.83 against raw token
+  count) and beat neither directory order nor random order at any budget.
+  Ordered by density (ρ = 0.36) it surfaces 4 of 6 planted bugs in the first 15
+  files against 2 for directory order, and beats random at every budget. Two
+  bugs still rank last: a missing null check in a 16-line mapper has no
+  structural signature for any complexity heuristic to find.
 
-A two-agent A/B on the same corpus reached identical verdicts in both arms, with
-the tool-using agent spending 26% fewer tokens — much less than the 71% the
-per-file accounting suggests, because the agent's own overhead dominates.
+A two-agent A/B on the same corpus: the tool-using agent spent 26% fewer tokens,
+read no source at all, took the same wall-clock time, and found the same two of
+three bugs. It was also the arm that correctly cleared the clean control — the
+agent that read the code was the one that reported a defect there. Much less
+than the 84% saving the per-file accounting suggests, because the agent's own
+overhead dominates.
 
 ## Development
 

@@ -24,8 +24,17 @@ export function emptyMetrics(): FileMetrics {
         nestedLoops: 0,
         mutations: 0,
         tryCatch: 0,
-        cyclomatic: 1
+        cyclomatic: 1,
+        lines: 0
     };
+}
+
+function countLines(code: string): number {
+    let lines = 1;
+    for (let i = 0; i < code.length; i++) {
+        if (code.charCodeAt(i) === 10) lines++;
+    }
+    return lines;
 }
 
 /** Collect static complexity metrics from a JavaScript/TypeScript source file. */
@@ -39,6 +48,7 @@ export async function collectMetrics(code: string): Promise<FileMetrics> {
     });
 
     const metrics = emptyMetrics();
+    metrics.lines = countLines(code);
 
     traverse(ast, {
         "FunctionDeclaration|FunctionExpression|ArrowFunctionExpression"(path: any) {

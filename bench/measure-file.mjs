@@ -53,6 +53,11 @@ const CONTROLS = [
 
 const TRIALS = Number(process.env.BENCH_TRIALS ?? 3);
 const PROVIDER = process.env.BENCH_PROVIDER ?? "claude";
+const OUTPUT_FILE = process.env.BENCH_OUTPUT ?? "results-file.json";
+
+if (path.basename(OUTPUT_FILE) !== OUTPUT_FILE || !OUTPUT_FILE.endsWith(".json")) {
+    throw new Error("BENCH_OUTPUT must be a .json filename inside bench/");
+}
 
 async function main() {
     const manifest = JSON.parse(await fs.readFile(path.join(here, "manifest.json"), "utf8"));
@@ -106,8 +111,12 @@ async function main() {
                 continue;
             }
 
+            // predict_failures returns the verdict flat now, with the metric
+            // block and the log stanza behind `verbose`. Fall back to the old
+            // nested shape so a results file from before the change can still
+            // be reproduced against an older build.
             const parsed = JSON.parse(text);
-            const prediction = parsed.aiPrediction ?? {};
+            const prediction = parsed.aiPrediction ?? parsed;
 
             // What the agent actually pays: the answer it puts in its context.
             // The full tool response carries static metrics too, so measure the
@@ -116,6 +125,10 @@ async function main() {
 
             const predictedLine = typeof prediction.line === "number" ? prediction.line : null;
             const saysClean = prediction.pattern === "none" || (prediction.score ?? 0) < 0.2;
+            const actionable = parsed.actionable ??
+                (prediction.pattern !== "none" &&
+                    prediction.pattern !== "unknown" &&
+                    (prediction.score ?? 0) >= 0.7);
 
             let outcome;
             if (target.kind === "clean") {
@@ -126,6 +139,17 @@ async function main() {
                 outcome = "hit";
             } else {
                 outcome = "wrong-location";
+            }
+
+            let actionableOutcome;
+            if (target.kind === "clean") {
+                actionableOutcome = actionable ? "false-positive" : "true-negative";
+            } else if (!actionable) {
+                actionableOutcome = "false-negative";
+            } else if (predictedLine != null && Math.abs(predictedLine - target.line) <= LINE_TOLERANCE) {
+                actionableOutcome = "hit";
+            } else {
+                actionableOutcome = "wrong-location";
             }
 
             runs.push({
@@ -141,9 +165,17 @@ async function main() {
                 predictedLine,
                 predictedPattern: prediction.pattern ?? null,
                 score: prediction.score ?? null,
+                status: parsed.status ?? (actionable ? "actionable" : saysClean ? "none" : "uncertain"),
+                actionable,
+                // The two other scores the tool reports, so the question "which
+                // of these should an agent gate on" can be answered from the
+                // same runs instead of by hand afterwards.
+                combinedScore: parsed.combinedScore ?? null,
+                staticRisk: parsed.staticRisk ?? parsed.riskScore ?? null,
                 reason: prediction.reason ?? null,
                 truncated: prediction.truncated ?? null,
-                outcome
+                outcome,
+                actionableOutcome
             });
 
             process.stderr.write(
@@ -160,8 +192,45 @@ async function main() {
     const buggyRuns = ok.filter((run) => run.kind === "buggy");
     const cleanRuns = ok.filter((run) => run.kind === "clean");
 
+    // A provider-wide outage used to replace the last valid benchmark with a
+    // JSON file containing only failures. Keep the measured baseline intact so
+    // a rate limit or expired login cannot destroy the data it was meant to
+    // compare against.
+    if (ok.length === 0) {
+        throw new Error(
+            `All ${runs.length} prediction calls failed; keeping the existing ${OUTPUT_FILE}`
+        );
+    }
+
     const sum = (arr, key) => arr.reduce((total, run) => total + run[key], 0);
     const count = (arr, outcome) => arr.filter((run) => run.outcome === outcome).length;
+
+    /**
+     * Probability that a run on a buggy file scores above a run on a clean one,
+     * ties counted as half. 0.5 is a coin toss; below 0.5 the signal is pointing
+     * the wrong way.
+     *
+     * This is the question a calling agent actually has: which number do I gate
+     * on? Reporting it for all three scores keeps that answer measured rather
+     * than assumed -- an earlier build blended a static complexity score into
+     * the headline figure at 0.4 weight without anyone checking whether the
+     * static score separated anything.
+     */
+    const auc = (key) => {
+        let wins = 0;
+        let pairs = 0;
+        for (const b of buggyRuns) {
+            for (const c of cleanRuns) {
+                if (b[key] == null || c[key] == null) {
+                    continue;
+                }
+                pairs += 1;
+                if (b[key] > c[key]) wins += 1;
+                else if (b[key] === c[key]) wins += 0.5;
+            }
+        }
+        return pairs === 0 ? null : Number((wins / pairs).toFixed(3));
+    };
 
     const summary = {
         provider: PROVIDER,
@@ -177,10 +246,28 @@ async function main() {
             trueNegative: count(cleanRuns, "true-negative"),
             falsePositive: count(cleanRuns, "false-positive")
         },
+        actionable: {
+            threshold: 0.7,
+            buggy: {
+                hit: buggyRuns.filter((run) => run.actionableOutcome === "hit").length,
+                wrongLocation: buggyRuns.filter((run) => run.actionableOutcome === "wrong-location").length,
+                missed: buggyRuns.filter((run) => run.actionableOutcome === "false-negative").length
+            },
+            clean: {
+                trueNegative: cleanRuns.filter((run) => run.actionableOutcome === "true-negative").length,
+                falsePositive: cleanRuns.filter((run) => run.actionableOutcome === "false-positive").length
+            }
+        },
         context: {
             baselineTokens: sum(ok, "fileTokens"),
             toolTokens: sum(ok, "answerTokens"),
             ratio: Number((sum(ok, "answerTokens") / sum(ok, "fileTokens")).toFixed(3))
+        },
+        separation: {
+            note: "P(buggy run scores above clean run); 0.5 = chance",
+            aiScore: auc("score"),
+            combinedScore: auc("combinedScore"),
+            staticRisk: auc("staticRisk")
         },
         latency: {
             meanMsPerFile: Math.round(sum(ok, "wallClockMs") / Math.max(ok.length, 1)),
@@ -190,7 +277,7 @@ async function main() {
     };
 
     await fs.writeFile(
-        path.join(here, "results-file.json"),
+        path.join(here, OUTPUT_FILE),
         JSON.stringify({ generatedAt: new Date().toISOString(), summary, runs }, null, 2),
         "utf8"
     );
@@ -223,13 +310,17 @@ async function main() {
     console.log(`\n  Buggy files:  ${summary.buggy.hit}/${summary.buggy.runs} hit the planted line (+-${LINE_TOLERANCE}), ` +
         `${summary.buggy.wrongLocation} pointed elsewhere, ${summary.buggy.missed} reported clean`);
     console.log(`  Clean files:  ${summary.clean.falsePositive}/${summary.clean.runs} false positives`);
+    console.log(`  Actionable:   ${summary.actionable.buggy.hit}/${buggyRuns.length} planted lines, ` +
+        `${summary.actionable.clean.falsePositive}/${cleanRuns.length} false positives at >= ${summary.actionable.threshold}`);
     console.log(`\n  Context: ${summary.context.baselineTokens.toLocaleString()} tokens to read the files, ` +
         `${summary.context.toolTokens.toLocaleString()} to ask the tool (${(summary.context.ratio * 100).toFixed(1)}%)`);
     console.log(`  Latency: ${summary.latency.meanMsPerFile} ms mean per file, ${summary.latency.maxMs} ms worst`);
+    console.log(`  Separation (AUC, 0.5 = chance): model score ${summary.separation.aiScore}, ` +
+        `combined ${summary.separation.combinedScore}, static risk ${summary.separation.staticRisk}`);
     if (summary.failures > 0) {
         console.log(`  ${summary.failures} call(s) failed outright`);
     }
-    console.log(`\nwrote bench/results-file.json\n`);
+    console.log(`\nwrote bench/${OUTPUT_FILE}\n`);
 }
 
 main().catch((err) => {

@@ -152,9 +152,14 @@ async function main() {
     const scan = full.value;
     await client.close();
 
+    // scan_project now echoes paths relative to the directory it was given,
+    // which is corpus/src; the rest of the benchmark keys off corpus-relative
+    // paths ("src/lib/retry.js"), so put the prefix back.
     const ranked = scan.files.map((entry) => ({
-        file: rel(entry.file),
+        file: `src/${entry.file}`,
         riskScore: entry.riskScore,
+        riskDensity: entry.riskDensity,
+        lines: entry.lines,
         signals: entry.signals
     }));
 
@@ -261,9 +266,18 @@ async function main() {
         ranked.map((entry) => sizes.get(entry.file) ?? 0)
     );
 
+    // The same question asked of the ordering the tool actually returns. If
+    // density also tracks size, then nothing was fixed and the ranking is still
+    // "read the big files first" wearing a different name.
+    const densitySizeCorrelation = spearman(
+        ranked.map((entry) => entry.riskDensity),
+        ranked.map((entry) => sizes.get(entry.file) ?? 0)
+    );
+
     const results = {
         generatedAt: new Date().toISOString(),
         sizeCorrelation: Number(sizeCorrelation.toFixed(3)),
+        densitySizeCorrelation: Number(densitySizeCorrelation.toFixed(3)),
         tokenizer: "cl100k (gpt-tokenizer) — approximation of Claude's tokenizer",
         corpus: {
             files: files.length,
@@ -281,6 +295,7 @@ async function main() {
         strategies,
         recallAt,
         budgets,
+        tokenBudgets,
         bugRanks: bugRanks.map((bug) => ({
             file: bug.file,
             line: bug.line,
@@ -288,7 +303,8 @@ async function main() {
             complexity: bug.complexity,
             summary: bug.summary,
             rank: bug.rank,
-            riskScore: ranked.find((entry) => entry.file === bug.file)?.riskScore ?? null
+            riskScore: ranked.find((entry) => entry.file === bug.file)?.riskScore ?? null,
+            riskDensity: ranked.find((entry) => entry.file === bug.file)?.riskDensity ?? null
         })),
         ranked
     };
@@ -315,7 +331,7 @@ async function main() {
     for (const bug of results.bugRanks) {
         const mark = bug.rank <= 10 ? "hit " : "miss";
         console.log(
-            `    ${mark} #${String(bug.rank).padStart(2)}/${files.length}  risk ${bug.riskScore.toFixed(3)}  ${bug.complexity.padEnd(4)}  ${bug.file}`
+            `    ${mark} #${String(bug.rank).padStart(2)}/${files.length}  density ${bug.riskDensity.toFixed(3)}  total ${bug.riskScore.toFixed(3)}  ${bug.complexity.padEnd(4)}  ${bug.file}`
         );
     }
 
@@ -327,8 +343,17 @@ async function main() {
         );
     }
 
+    console.log("\n  Equal token budget — spend t tokens, how many of the 6 bugs are in them?");
+    console.log(`    ${"budget".padEnd(12)}${"risk order".padStart(12)}${"dir order".padStart(12)}`);
+    for (const b of tokenBudgets) {
+        console.log(
+            `    ${(b.budget.toLocaleString() + " tok").padEnd(12)}${String(b.riskOrder.found).padStart(12)}${String(b.directoryOrder.found).padStart(12)}`
+        );
+    }
+
     console.log(
-        `\n  Rank correlation between riskScore and raw file size: rho = ${sizeCorrelation.toFixed(3)}`
+        `\n  Rank correlation with raw file size: riskScore rho = ${sizeCorrelation.toFixed(3)}, ` +
+            `riskDensity rho = ${densitySizeCorrelation.toFixed(3)}`
     );
     console.log(`  scan_project output: ${scanTokens.toLocaleString()} tokens at limit 50, ${shortlist.tokens.toLocaleString()} at limit 10`);
 

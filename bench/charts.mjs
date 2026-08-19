@@ -1,10 +1,22 @@
 /**
  * Chart builders for the Markdown report.
  *
- * Every builder takes a `c` colour map whose values are any valid CSS colour
- * string. The Markdown report passes literal hex because a standalone .svg on
- * GitHub is rendered as an image and gets no CSS from the page around it.
+ * The charts are Vega-Lite specifications rendered to standalone SVG at build
+ * time. They used to be hand-written SVG strings; Vega-Lite replaced that
+ * because the layout arithmetic — tick placement, label collision, legend
+ * offsets — was being maintained by hand for every new chart, and it does not
+ * need to be.
+ *
+ * Two constraints shape everything here:
+ *
+ *   1. A .svg committed to the repo is rendered by GitHub as an image with no
+ *      access to the surrounding page's CSS. So every colour is a literal, and
+ *      each chart is written twice — once per theme — and paired in a <picture>.
+ *   2. The output is committed, so it has to be deterministic. No random jitter,
+ *      no timestamps: the same results files must produce byte-identical SVG.
  */
+import * as vega from "vega";
+import { compile } from "vega-lite";
 
 export const SANS = 'system-ui, -apple-system, "Segoe UI", sans-serif';
 
@@ -56,226 +68,390 @@ export const OUTCOME = {
     "false-positive": { glyph: "!", tone: "warning", onDark: false, label: "False alarm on a clean file" }
 };
 
-const esc = (s) =>
-    String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
-
-const fmt = (n) => n.toLocaleString("en-US");
+/* ------------------------------------------------------------------ *
+ * Rendering
+ * ------------------------------------------------------------------ */
 
 /**
- * Wraps a chart body as a standalone document: its own surface, its own font.
- * Used for the .svg files the markdown report links to.
+ * Theme applied to every chart, so a spec only ever describes its data and
+ * encoding. Vega-Lite's own defaults assume a white page and a browser font
+ * stack; both are wrong for a standalone .svg on a dark GitHub page.
  */
-export function standalone(body, width, height, c) {
-    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${width} ${height}" width="${width}" height="${height}" font-family='${SANS}'>
-  <rect width="${width}" height="${height}" rx="12" fill="${c.surface}"/>
-  ${body}
-</svg>
-`;
+function themeConfig(c) {
+    return {
+        background: c.surface,
+        font: SANS,
+        padding: 12,
+        view: { stroke: null },
+        axis: {
+            labelColor: c.textSecondary,
+            labelFontSize: 11.5,
+            titleColor: c.textSecondary,
+            titleFontSize: 12,
+            titleFontWeight: 500,
+            titlePadding: 10,
+            domainColor: c.axis,
+            tickColor: c.axis,
+            gridColor: c.grid,
+            gridWidth: 1,
+            labelPadding: 6
+        },
+        legend: {
+            labelColor: c.textPrimary,
+            labelFontSize: 12,
+            titleColor: c.textSecondary,
+            titleFontSize: 11.5,
+            symbolType: "square",
+            symbolSize: 130,
+            orient: "top",
+            direction: "horizontal",
+            offset: 8,
+            padding: 0,
+            columnPadding: 18,
+            titleLimit: 0,
+            labelLimit: 0
+        },
+        header: { labelColor: c.textPrimary, labelFontSize: 12.5, labelFontWeight: 600, titleColor: c.textSecondary },
+        title: { color: c.textPrimary, fontSize: 13, fontWeight: 600, anchor: "start", offset: 10 },
+        text: { font: SANS },
+        bar: { cornerRadiusEnd: 3 }
+    };
 }
 
-/** A legend rendered inside the SVG, for the standalone files that have no HTML around them. */
-export function svgLegend(items, c, x = 24, y = 22) {
-    let cursor = x;
-    return items
-        .map((item) => {
-            const swatch = `<rect x="${cursor}" y="${y - 9}" width="11" height="11" rx="3" fill="${item.color}"/>`;
-            const text = `<text x="${cursor + 18}" y="${y}" font-size="12.5" fill="${c.textSecondary}">${esc(item.label)}</text>`;
-            cursor += 18 + item.label.length * 6.6 + 22;
-            return swatch + text;
-        })
-        .join("");
+/** Compile one Vega-Lite spec and render it to a standalone SVG string. */
+export async function render(spec, c) {
+    const view = new vega.View(vega.parse(compile({ ...spec, config: themeConfig(c) }).spec), {
+        renderer: "none"
+    });
+    const svg = await view.toSVG();
+    view.finalize();
+    // Vega emits the surface as a <rect>; a standalone file also needs it as the
+    // element background, or a viewer that ignores the rect shows white gutters.
+    return svg.replace("<svg ", `<svg style="background:${c.surface}" `);
 }
 
 /* ------------------------------------------------------------------ *
- * 1 -- context cost per file. One axis (tokens), two series, so a
- * legend is required and the bar tips carry direct labels.
+ * 1 -- context cost. Magnitude comparison, so bars from a zero baseline.
  * ------------------------------------------------------------------ */
-export function contextChart(rows, c, { top = 8 } = {}) {
-    const W = 900;
-    const rowH = 44;
-    const barH = 15; // under the 24px cap; two bars plus a 2px surface gap per row
-    const padL = 250;
-    const padR = 90;
-    const H = top + rows.length * rowH + 8;
-    const max = Math.max(...rows.flatMap((r) => [r.fileTokens, r.answerTokens]));
-    const scale = (v) => (v / max) * (W - padL - padR);
-    const ticks = [0, 0.25, 0.5, 0.75, 1].map((f) => Math.round((max * f) / 100) * 100);
 
-    const grid = ticks
-        .map(
-            (t) =>
-                `<line x1="${padL + scale(t)}" y1="${top}" x2="${padL + scale(t)}" y2="${H - 8}" stroke="${c.grid}" stroke-width="1"/>` +
-                `<text x="${padL + scale(t)}" y="${H + 6}" font-size="11.5" fill="${c.muted}" text-anchor="middle">${fmt(t)}</text>`
-        )
-        .join("");
+const READ = "Read the file into context";
+const ASK = "Ask predict_failures";
 
-    const bars = rows
-        .map((r, i) => {
-            const y = top + i * rowH;
-            const wFile = Math.max(scale(r.fileTokens), 2);
-            const wAns = Math.max(scale(r.answerTokens), 2);
-            const label = r.file.replace(/^src\//, "");
-            const yA = y + 4;
-            const yB = y + 4 + barH + 2;
-            // A square root at the baseline plus a rounded data-end: the bar
-            // grows from the axis rather than floating with two round ends.
-            const bar = (yy, w, fill) =>
-                `<rect x="${padL}" y="${yy}" width="${w}" height="${barH}" rx="4" fill="${fill}"/>` +
-                `<rect x="${padL}" y="${yy}" width="4" height="${barH}" fill="${fill}"/>`;
+export function contextSpec(rows, c) {
+    const values = rows.flatMap((r) => {
+        const file = r.file.replace(/^src\//, "");
+        return [
+            { file, kind: r.kind, series: READ, tokens: r.fileTokens, order: r.fileTokens },
+            { file, kind: r.kind, series: ASK, tokens: r.answerTokens, order: r.fileTokens }
+        ];
+    });
 
-            return `<g><title>${esc(label)}
-Read the file: ${fmt(r.fileTokens)} tokens
-Ask predict_failures: ${fmt(r.answerTokens)} tokens</title>
-    <text x="${padL - 12}" y="${y + 17}" font-size="12.5" fill="${c.textPrimary}" text-anchor="end">${esc(label)}</text>
-    <text x="${padL - 12}" y="${y + 31}" font-size="11" fill="${c.muted}" text-anchor="end">${r.kind === "buggy" ? "bug" : "clean"}</text>
-    ${bar(yA, wFile, c.s1)}
-    ${bar(yB, wAns, c.s2)}
-    <text x="${padL + wFile + 8}" y="${yA + barH - 3}" font-size="11.5" fill="${c.textSecondary}">${fmt(r.fileTokens)}</text>
-    <text x="${padL + wAns + 8}" y="${yB + barH - 3}" font-size="11.5" fill="${c.textSecondary}">${fmt(r.answerTokens)}</text>
-  </g>`;
-        })
-        .join("");
-
-    return { body: grid + bars, width: W, height: H + 18 };
+    return {
+        $schema: "https://vega.github.io/schema/vega-lite/v5.json",
+        data: { values },
+        width: 560,
+        height: { step: 21 },
+        encoding: {
+            y: {
+                field: "file",
+                type: "nominal",
+                sort: { field: "order", op: "max", order: "descending" },
+                axis: { title: null, labelFontSize: 12, labelColor: c.textPrimary, domain: false, ticks: false, labelLimit: 0 }
+            },
+            x: {
+                field: "tokens",
+                type: "quantitative",
+                axis: { title: "Tokens in the calling agent's context", grid: true, format: ",d" }
+            },
+            yOffset: { field: "series", sort: [READ, ASK] }
+        },
+        layer: [
+            {
+                mark: { type: "bar", height: 13 },
+                // The colour scale lives on the bar layer, not the shared
+                // encoding: the label layer paints itself and would otherwise
+                // union a legend-less scale into this one.
+                encoding: {
+                    color: {
+                        field: "series",
+                        type: "nominal",
+                        scale: { domain: [READ, ASK], range: [c.s1, c.s2] },
+                        legend: { title: null }
+                    }
+                }
+            },
+            {
+                mark: { type: "text", align: "left", dx: 5, fontSize: 11, font: SANS },
+                encoding: {
+                    text: { field: "tokens", type: "quantitative", format: ",d" },
+                    color: { value: c.textSecondary }
+                }
+            }
+        ]
+    };
 }
 
 /* ------------------------------------------------------------------ *
  * 2 -- outcome per trial. State, not magnitude, so this is the status
  * palette; every cell carries a glyph as well as a colour.
  * ------------------------------------------------------------------ */
-export function outcomeChart(perFile, trials, c, { top = 22 } = {}) {
-    const cell = 30;
-    const gap = 2; // the surface gap, same mechanism as between bars
-    const padL = 250;
-    const W = 900;
-    const H = top + perFile.length * (cell + gap) + 6;
 
-    const head = Array.from({ length: trials }, (_, t) =>
-        `<text x="${padL + t * (cell + gap) + cell / 2}" y="${top - 8}" font-size="11.5" fill="${c.muted}" text-anchor="middle">trial ${t + 1}</text>`
-    ).join("");
+export function outcomeSpec(perFile, trials, c) {
+    const values = [];
+    for (const entry of perFile) {
+        const file = entry.file.replace(/^src\//, "");
+        for (let t = 1; t <= trials; t++) {
+            const run = entry.runs.find((r) => r.trial === t);
+            const meta = run ? OUTCOME[run.outcome] : null;
+            values.push({
+                file,
+                trial: `Trial ${t}`,
+                outcome: meta ? meta.label : "no result",
+                glyph: meta ? meta.glyph : "",
+                fill: meta ? c[meta.tone] : c.neutral,
+                ink: meta && meta.onDark ? c.onFill : c.onLight,
+                sort: entry.kind === "buggy" ? 0 : 1
+            });
+        }
+    }
 
-    const rows = perFile
-        .map((entry, i) => {
-            const y = top + i * (cell + gap);
-            const label = entry.file.replace(/^src\//, "");
-            const cells = entry.runs
-                .map((run, t) => {
-                    const o = OUTCOME[run.outcome];
-                    const x = padL + t * (cell + gap);
-                    return `<g><title>${esc(label)} — trial ${t + 1}
-${esc(o.label)}
-Points to line ${run.predictedLine ?? "—"}${entry.plantedLine ? ` (planted: ${entry.plantedLine})` : ""}
-${esc(run.reason ?? "")}</title>
-      <rect x="${x}" y="${y}" width="${cell}" height="${cell}" rx="4" fill="${c[o.tone]}"/>
-      <text x="${x + cell / 2}" y="${y + cell / 2 + 5}" font-size="14" font-weight="600" fill="${o.onDark ? c.onFill : c.onLight}" text-anchor="middle">${o.glyph}</text></g>`;
-                })
-                .join("");
-            return `<text x="${padL - 12}" y="${y + cell / 2 + 4}" font-size="12.5" fill="${c.textPrimary}" text-anchor="end">${esc(label)}</text>${cells}`;
-        })
-        .join("");
-
-    return { body: head + rows, width: W, height: H };
-}
-
-/* ------------------------------------------------------------------ *
- * 3 -- score distribution by class, as a strip plot.
- *
- * The question is whether two distributions separate, so plot every
- * observation. A mean would hide exactly the overlap the reader needs.
- * ------------------------------------------------------------------ */
-export function scoreStrip(runs, threshold, c) {
-    const W = 900;
-    const H = 190;
-    const padL = 150;
-    const padR = 30;
-    const padT = 24;
-    const x = (v) => padL + v * (W - padL - padR);
-
-    const lanes = [
-        { key: "buggy", y: padT + 28, color: c.s2, label: "Files with a planted bug" },
-        { key: "clean", y: padT + 96, color: c.s1, label: "Clean control files" }
-    ];
-
-    const ticks = [0, 0.2, 0.4, 0.6, 0.8, 1]
-        .map(
-            (t) =>
-                `<line x1="${x(t)}" y1="${padT}" x2="${x(t)}" y2="${H - 34}" stroke="${c.grid}" stroke-width="1"/>` +
-                `<text x="${x(t)}" y="${H - 16}" font-size="11.5" fill="${c.muted}" text-anchor="middle">${t.toFixed(1)}</text>`
-        )
-        .join("");
-
-    const cut =
-        `<line x1="${x(threshold)}" y1="${padT - 6}" x2="${x(threshold)}" y2="${H - 34}" stroke="${c.textSecondary}" stroke-width="1"/>` +
-        `<text x="${x(threshold)}" y="${padT - 12}" font-size="11.5" fill="${c.textSecondary}" text-anchor="middle">threshold ${threshold}</text>`;
-
-    const dots = lanes
-        .map((lane) => {
-            const seen = new Map();
-            const marks = runs
-                .filter((r) => r.kind === lane.key)
-                .map((r) => {
-                    // Spread ties vertically so overlapping observations stay countable.
-                    const n = seen.get(r.score) ?? 0;
-                    seen.set(r.score, n + 1);
-                    const offset = (n % 5) * 9 - 18;
-                    return `<circle cx="${x(r.score)}" cy="${lane.y + offset}" r="5" fill="${lane.color}" stroke="${c.surface}" stroke-width="2"><title>${esc(r.file)} — trial ${r.trial}
-score ${r.score}, line ${r.predictedLine ?? "—"}
-${esc(r.reason ?? "")}</title></circle>`;
-                })
-                .join("");
-            return `<text x="${padL - 14}" y="${lane.y + 4}" font-size="12.5" fill="${c.textPrimary}" text-anchor="end">${esc(lane.label)}</text>${marks}`;
-        })
-        .join("");
-
-    return { body: ticks + cut + dots, width: W, height: H };
-}
-
-/* ------------------------------------------------------------------ *
- * 4 -- project level, grouped columns.
- * ------------------------------------------------------------------ */
-export function budgetChart(budgets, totalBugs, c, { top = 16 } = {}) {
-    const W = 900;
-    const H = 300;
-    const padL = 48;
-    const padB = 52;
-    const groupW = (W - padL - 24) / budgets.length;
-    const barW = 34;
-    const y = (v) => top + (1 - v / totalBugs) * (H - top - padB);
-
-    const grid = Array.from({ length: totalBugs + 1 }, (_, i) => i)
-        .filter((i) => i % 2 === 0)
-        .map(
-            (t) =>
-                `<line x1="${padL}" y1="${y(t)}" x2="${W - 24}" y2="${y(t)}" stroke="${c.grid}" stroke-width="1"/>` +
-                `<text x="${padL - 10}" y="${y(t) + 4}" font-size="11.5" fill="${c.muted}" text-anchor="end">${t}</text>`
-        )
-        .join("");
-
-    const groups = budgets
-        .map((b, i) => {
-            const x0 = padL + i * groupW + (groupW - (3 * barW + 4)) / 2;
-            const series = [
-                { v: b.riskOrder.found, fill: c.s1, name: "Risk order" },
-                { v: b.directoryOrder.found, fill: c.s2, name: "Directory order" },
-                { v: b.randomExpected, fill: c.s3, name: "Random (expected)" }
-            ];
-            const bars = series
-                .map((s, j) => {
-                    const x = x0 + j * (barW + 2);
-                    const h = Math.max(y(0) - y(s.v), 0);
-                    return `<g><title>${esc(s.name)} at ${b.k} files: ${s.v} of ${totalBugs} bugs</title>
-        <rect x="${x}" y="${y(s.v)}" width="${barW}" height="${h}" rx="4" fill="${s.fill}"/>
-        <rect x="${x}" y="${y(s.v) + Math.max(h - 4, 0)}" width="${barW}" height="${Math.min(h, 4)}" fill="${s.fill}"/>
-        <text x="${x + barW / 2}" y="${y(s.v) - 6}" font-size="11.5" fill="${c.textSecondary}" text-anchor="middle">${s.v}</text></g>`;
-                })
-                .join("");
-            return `${bars}<text x="${x0 + (3 * barW + 4) / 2}" y="${H - padB + 24}" font-size="11.5" fill="${c.muted}" text-anchor="middle">${b.k} files read</text>`;
-        })
-        .join("");
+    const used = [...new Set(values.map((v) => v.outcome))];
 
     return {
-        body: `${grid}${groups}<line x1="${padL}" y1="${y(0)}" x2="${W - 24}" y2="${y(0)}" stroke="${c.axis}" stroke-width="1"/>`,
-        width: W,
-        height: H
+        $schema: "https://vega.github.io/schema/vega-lite/v5.json",
+        data: { values },
+        width: { step: 74 },
+        height: { step: 30 },
+        encoding: {
+            x: {
+                field: "trial",
+                type: "nominal",
+                axis: { title: null, orient: "top", labelColor: c.textSecondary, domain: false, ticks: false }
+            },
+            y: {
+                field: "file",
+                type: "nominal",
+                sort: { field: "sort" },
+                axis: { title: null, labelFontSize: 12, labelColor: c.textPrimary, domain: false, ticks: false, labelLimit: 0 }
+            }
+        },
+        layer: [
+            {
+                mark: { type: "rect", cornerRadius: 4, stroke: c.surface, strokeWidth: 2 },
+                encoding: {
+                    color: {
+                        field: "outcome",
+                        type: "nominal",
+                        scale: { domain: used, range: used.map((o) => values.find((v) => v.outcome === o).fill) },
+                        legend: { title: null, columns: 2, symbolType: "square" }
+                    }
+                }
+            },
+            {
+                mark: { type: "text", fontSize: 14, fontWeight: 600, font: SANS },
+                encoding: {
+                    text: { field: "glyph" },
+                    // A literal colour per row. Sharing the `outcome` field with
+                    // the rect layer would make Vega-Lite union the two scales
+                    // and paint the glyphs in the fill colours; `scale: null`
+                    // takes the value straight from the data, and the legend has
+                    // to be left unset rather than nulled, or it collides with
+                    // the rect layer's legend on the shared position channels.
+                    color: { field: "ink", type: "nominal", scale: null }
+                }
+            }
+        ]
+    };
+}
+
+/* ------------------------------------------------------------------ *
+ * 3 -- score distribution. A dot histogram rather than a jittered strip:
+ * the file is committed, so the layout has to be deterministic.
+ * ------------------------------------------------------------------ */
+
+export function scoreSpec(runs, threshold, c) {
+    const BUG = "Files with a planted bug";
+    const CLEAN = "Clean control files";
+
+    // Stack duplicates instead of jittering them, so identical scores are
+    // countable and the same input always renders the same picture.
+    const seen = new Map();
+    const values = [];
+    for (const run of [...runs].sort((a, b) => (a.file + a.trial).localeCompare(b.file + b.trial))) {
+        const group = run.kind === "buggy" ? BUG : CLEAN;
+        const score = run.score ?? 0;
+        const key = `${group}|${score}`;
+        const stack = (seen.get(key) ?? 0) + 1;
+        seen.set(key, stack);
+        values.push({ group, score, stack, file: run.file.replace(/^src\//, "") });
+    }
+
+    // A quiet build piles every clean run on score 0, so the axis has to follow
+    // the data rather than a constant chosen when the tool was noisier.
+    const tallest = Math.max(...values.map((v) => v.stack), 4);
+
+    return {
+        $schema: "https://vega.github.io/schema/vega-lite/v5.json",
+        data: { values },
+        width: 560,
+        height: 190,
+        layer: [
+            {
+                mark: { type: "rule", strokeDash: [5, 4], strokeWidth: 1.5 },
+                data: { values: [{ threshold }] },
+                encoding: {
+                    x: { field: "threshold", type: "quantitative" },
+                    color: { value: c.textSecondary }
+                }
+            },
+            {
+                mark: { type: "text", align: "left", dx: 6, dy: -80, fontSize: 11.5, font: SANS },
+                data: { values: [{ threshold, label: `gate ≥ ${threshold}` }] },
+                encoding: {
+                    x: { field: "threshold", type: "quantitative" },
+                    text: { field: "label" },
+                    color: { value: c.textSecondary }
+                }
+            },
+            {
+                mark: { type: "circle", size: 130, opacity: 1 },
+                encoding: {
+                    x: {
+                        field: "score",
+                        type: "quantitative",
+                        scale: { domain: [0, 1] },
+                        axis: { title: "Model score for the run", grid: true, values: [0, 0.2, 0.4, 0.6, 0.8, 1] }
+                    },
+                    y: {
+                        field: "stack",
+                        type: "quantitative",
+                        scale: { domain: [0, tallest + 1] },
+                        axis: { title: "Runs at this score", grid: false, tickMinStep: 1 }
+                    },
+                    color: {
+                        field: "group",
+                        type: "nominal",
+                        scale: { domain: [BUG, CLEAN], range: [c.s2, c.s1] },
+                        legend: { title: null }
+                    }
+                }
+            }
+        ]
+    };
+}
+
+/* ------------------------------------------------------------------ *
+ * 4 -- bugs found at an equal file budget.
+ * ------------------------------------------------------------------ */
+
+export function budgetSpec(budgets, totalBugs, c) {
+    const RISK = "Risk order (scan_project)";
+    const DIR = "Directory order";
+    const RAND = "Random (expected)";
+
+    const labels = budgets.map((b) => `${b.k} files`);
+    const values = budgets.flatMap((b) => [
+        { budget: `${b.k} files`, order: RISK, found: b.riskOrder.found },
+        { budget: `${b.k} files`, order: DIR, found: b.directoryOrder.found },
+        { budget: `${b.k} files`, order: RAND, found: b.randomExpected }
+    ]);
+
+    return {
+        $schema: "https://vega.github.io/schema/vega-lite/v5.json",
+        data: { values },
+        width: { step: 46 },
+        height: 230,
+        encoding: {
+            x: {
+                field: "budget",
+                type: "nominal",
+                sort: labels,
+                axis: { title: "Files the agent is allowed to read", labelAngle: 0, domain: false, ticks: false }
+            },
+            xOffset: { field: "order", sort: [RISK, DIR, RAND] },
+            y: {
+                field: "found",
+                type: "quantitative",
+                scale: { domain: [0, totalBugs] },
+                axis: { title: `Planted bugs included (of ${totalBugs})`, grid: true, tickMinStep: 1 }
+            },
+            color: {
+                field: "order",
+                type: "nominal",
+                scale: { domain: [RISK, DIR, RAND], range: [c.s1, c.s2, c.s3] },
+                legend: { title: null }
+            }
+        },
+        layer: [
+            { mark: { type: "bar", width: 14 } },
+            {
+                mark: { type: "text", dy: -7, fontSize: 11, font: SANS },
+                encoding: {
+                    text: { field: "found", type: "quantitative", format: ".2~f" },
+                    color: { value: c.textSecondary }
+                }
+            }
+        ]
+    };
+}
+
+/* ------------------------------------------------------------------ *
+ * 5 -- provider comparison. Two measures that trade against each other,
+ * so they are faceted rather than stacked on one axis.
+ * ------------------------------------------------------------------ */
+
+export function providerSpec(providers, c) {
+    const RAW = "Raw model reply";
+    const GATED = "After the actionable gate";
+    const FOUND = "Planted lines found";
+    const ALARM = "False alarms on clean code";
+
+    const values = providers.flatMap((p) => [
+        { provider: p.label, measure: FOUND, stage: RAW, count: p.rawHits, of: p.buggyRuns },
+        { provider: p.label, measure: FOUND, stage: GATED, count: p.gatedHits, of: p.buggyRuns },
+        { provider: p.label, measure: ALARM, stage: RAW, count: p.rawFalseAlarms, of: p.cleanRuns },
+        { provider: p.label, measure: ALARM, stage: GATED, count: p.gatedFalseAlarms, of: p.cleanRuns }
+    ]);
+    const max = Math.max(...values.map((v) => v.of));
+
+    return {
+        $schema: "https://vega.github.io/schema/vega-lite/v5.json",
+        data: { values },
+        columns: 2,
+        facet: { field: "measure", type: "nominal", sort: [FOUND, ALARM], header: { title: null } },
+        spec: {
+            width: { step: 44 },
+            height: 210,
+            encoding: {
+                x: {
+                    field: "provider",
+                    type: "nominal",
+                    axis: { title: null, labelAngle: 0, labelColor: c.textPrimary, labelFontSize: 12, domain: false, ticks: false }
+                },
+                xOffset: { field: "stage", sort: [RAW, GATED] },
+                y: {
+                    field: "count",
+                    type: "quantitative",
+                    scale: { domain: [0, max] },
+                    axis: { title: `Runs (of ${max})`, grid: true, tickMinStep: 2 }
+                },
+                color: {
+                    field: "stage",
+                    type: "nominal",
+                    scale: { domain: [RAW, GATED], range: [c.s1, c.s3] },
+                    legend: { title: null }
+                }
+            },
+            layer: [
+                { mark: { type: "bar", width: 16 } },
+                {
+                    mark: { type: "text", dy: -7, fontSize: 11, font: SANS },
+                    encoding: {
+                        text: { field: "count", type: "quantitative" },
+                        color: { value: c.textSecondary }
+                    }
+                }
+            ]
+        }
     };
 }

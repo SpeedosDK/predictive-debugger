@@ -105,6 +105,40 @@ describe("buildPrompt truncation reporting", () => {
         assert.ok(fake.lastPrompt.includes("const x = 1;"));
     });
 
+    it("asks for locally demonstrated defects rather than speculative failures", async () => {
+        const fake = fakeProvider('{"pattern":"none","score":0,"reason":"fine"}');
+        await predictBug({
+            provider: fake.provider,
+            location: { file: "fake" },
+            filePath: "service.js",
+            code: "async function load(repo) { return await repo.get(); }\n"
+        });
+
+        assert.ok(fake.lastPrompt.includes("Precision is more"));
+        assert.ok(fake.lastPrompt.includes("observably wrong return value"));
+        assert.ok(fake.lastPrompt.includes("awaited rejection propagating to the caller"));
+        assert.ok(fake.lastPrompt.includes(">= 0.70"));
+    });
+
+    it("treats concurrency as a normal execution, not an invented input", async () => {
+        // Without this the policy suppresses race conditions: asked to disprove
+        // the claim first, a model reading one sequential pass through the file
+        // always can. It cost the benchmark every trial on the planted race.
+        const fake = fakeProvider('{"pattern":"none","score":0,"reason":"fine"}');
+        await predictBug({
+            provider: fake.provider,
+            location: { file: "fake" },
+            filePath: "worker.js",
+            code: "async function tick(ledger) { const b = await ledger.read(); await ledger.write(b + 1); }"
+        });
+
+        assert.ok(fake.lastPrompt.includes("Concurrency is a normal execution"));
+        assert.ok(fake.lastPrompt.includes("entered again before an earlier call finishes"));
+        // The exemption matters as much as the rule: a local accumulator inside
+        // one invocation must not start reading as shared state.
+        assert.ok(fake.lastPrompt.includes("a local variable"));
+    });
+
     it("reports how much of an oversized file was analysed", async () => {
         const fake = fakeProvider('{"pattern":"none","score":0,"reason":"fine"}');
         // 200k chars of 10-char lines = 20,000 lines, past the 120k cap.

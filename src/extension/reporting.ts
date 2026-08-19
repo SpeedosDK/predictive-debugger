@@ -1,4 +1,8 @@
 import * as vscode from "vscode";
+import {
+    isActionablePrediction,
+    predictionStatus
+} from "../core/prediction/confidence";
 import { FilePrediction } from "../core/types";
 
 /** Renders predictions into the Problems panel and the output channel. */
@@ -16,7 +20,7 @@ export class PredictionReporter {
     publish(uri: vscode.Uri, result: FilePrediction): void {
         const { pattern, score, reason, line } = result.aiPrediction;
 
-        if (pattern === "none" || score <= 0) {
+        if (!isActionablePrediction(result.aiPrediction)) {
             this.diagnostics.set(uri, []);
             return;
         }
@@ -28,9 +32,7 @@ export class PredictionReporter {
         const diagnostic = new vscode.Diagnostic(
             new vscode.Range(zeroBased, 0, zeroBased, Number.MAX_SAFE_INTEGER),
             `${pattern} (${percent(score)}): ${reason}${partial}`,
-            result.combinedScore >= 0.6
-                ? vscode.DiagnosticSeverity.Warning
-                : vscode.DiagnosticSeverity.Information
+            vscode.DiagnosticSeverity.Warning
         );
         diagnostic.source = "Predictive Debugger";
 
@@ -63,9 +65,19 @@ export class PredictionReporter {
 }
 
 export function summarize(result: FilePrediction): string {
-    const { pattern, reason } = result.aiPrediction;
-    if (pattern === "none") {
+    const { pattern, score, reason, line } = result.aiPrediction;
+    const status = predictionStatus(result.aiPrediction);
+
+    if (status === "none") {
         return "no likely failure found";
+    }
+    if (status === "unavailable") {
+        return reason ? `prediction unavailable: ${reason}` : "prediction unavailable";
+    }
+    if (status === "uncertain") {
+        const at = line ? ` at line ${line}` : "";
+        const detail = reason ? `: ${reason}` : "";
+        return `uncertain ${pattern}${at} (${percent(score)}, not added to Problems)${detail}`;
     }
     return reason ? `${pattern}: ${reason}` : pattern;
 }

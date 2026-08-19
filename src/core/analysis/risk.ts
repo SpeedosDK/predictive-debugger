@@ -27,6 +27,40 @@ const WEIGHTS: Weight[] = [
  */
 const HALF_SATURATION = 2.5;
 
+/**
+ * Weights for risk *density*, which answers a different question than
+ * `WEIGHTS`: not "how much is going on in this file" but "how concentrated is
+ * the dangerous kind of code".
+ *
+ * Mutations, branches and cyclomatic complexity are almost linear in file
+ * length — every file accumulates them simply by existing — so at full weight
+ * they turn a per-line score into a measure of how assignment-heavy the file
+ * is, which ranks plain row mappers at the top. They are kept, because a branch
+ * is still a decision point, but damped to roughly a tenth of their weight in
+ * the total. The structural signals that do not scale with length — nested
+ * loops, async boundaries, long functions, try/catch — carry the ranking.
+ *
+ * Measured on bench/corpus: this ordering puts the planted bugs at ranks
+ * 4, 9, 11, 12 out of 40 versus 11, 14, 17, 38 for the size-driven total.
+ * Fitted on six bugs, so treat it as a hypothesis — see bench/RESULTS.md.
+ */
+const DENSITY_WEIGHTS: Weight[] = [
+    { key: "longFunctions", weight: 0.15, label: (n) => `${n} function(s) longer than 20 statements` },
+    { key: "nestedLoops", weight: 0.2, label: (n) => `${n} nested loop(s)` },
+    { key: "asyncCalls", weight: 0.1, label: (n) => `${n} async boundary/boundaries (await, timers)` },
+    { key: "tryCatch", weight: 0.05, label: (n) => `${n} try/catch block(s)` },
+    { key: "mutations", weight: 0.01, label: (n) => `${n} mutation(s) of existing state` },
+    { key: "branches", weight: 0.005, label: (n) => `${n} branch(es)` },
+    { key: "cyclomatic", weight: 0.005, label: (n) => `cyclomatic complexity ${n}` }
+];
+
+/**
+ * Half-saturation for density, in weighted units per 100 lines. Chosen so the
+ * median file in a normal application tree lands near 0.5 rather than bunched
+ * against either end.
+ */
+const HALF_SATURATION_DENSITY = 1.0;
+
 /** Raw weighted sum of the risk signals. Unbounded; use calculateRisk instead. */
 function rawRisk(metrics: FileMetrics): number {
     return WEIGHTS.reduce((total, { key, weight }) => total + metrics[key] * weight, 0);
@@ -44,6 +78,30 @@ function rawRisk(metrics: FileMetrics): number {
 export function calculateRisk(metrics: FileMetrics): number {
     const raw = rawRisk(metrics);
     return raw / (raw + HALF_SATURATION);
+}
+
+/**
+ * Heuristic risk per 100 lines, in [0, 1).
+ *
+ * `calculateRisk` grows with file length, so ranking by it is close to ranking
+ * by size: on the benchmark corpus its rank correlation with raw file size is
+ * 0.82, and it ranks the two smallest planted bugs 38th and 39th of 40. That
+ * is the correct answer to "which file contains the most risk" and the wrong
+ * answer to "which file should I read first", because the agent pays per token
+ * and a defect in a 14-line file costs almost nothing to check.
+ *
+ * Density answers the second question. Files too short to say anything about
+ * are damped towards 0 rather than allowed to spike on a single await.
+ */
+export function calculateRiskDensity(metrics: FileMetrics): number {
+    const raw = DENSITY_WEIGHTS.reduce(
+        (total, { key, weight }) => total + metrics[key] * weight,
+        0
+    );
+    // A 5-line file with one await is not denser than a 50-line file with ten;
+    // the floor stops tiny files from dominating the ranking on one signal.
+    const per100 = (raw / Math.max(metrics.lines, 10)) * 100;
+    return per100 / (per100 + HALF_SATURATION_DENSITY);
 }
 
 /** The signals that contributed most to the score, biggest first. */
@@ -81,6 +139,7 @@ export async function analyzeFile(filePath: string): Promise<StaticAnalysis> {
             file: filePath,
             metrics: emptyMetrics(),
             riskScore: 0,
+            riskDensity: 0,
             signals: [`skipped: ${reason}`],
             parseError: reason
         };
@@ -107,6 +166,7 @@ export async function analyzeSource(
             file: filePath,
             metrics: empty,
             riskScore: 0,
+            riskDensity: 0,
             signals: [`could not be parsed: ${reason}`],
             parseError: reason
         };
@@ -116,6 +176,7 @@ export async function analyzeSource(
         file: filePath,
         metrics,
         riskScore: calculateRisk(metrics),
+        riskDensity: calculateRiskDensity(metrics),
         signals: explainRisk(metrics)
     };
 }

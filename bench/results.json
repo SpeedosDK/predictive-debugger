@@ -1,6 +1,7 @@
 {
-  "generatedAt": "2026-08-18T11:24:42.539Z",
-  "sizeCorrelation": 0.824,
+  "generatedAt": "2026-08-18T17:23:23.095Z",
+  "sizeCorrelation": 0.826,
+  "densitySizeCorrelation": 0.359,
   "tokenizer": "cl100k (gpt-tokenizer) — approximation of Claude's tokenizer",
   "corpus": {
     "files": 40,
@@ -8,12 +9,12 @@
     "bugs": 6
   },
   "scan": {
-    "wallClockMs": 249,
+    "wallClockMs": 108,
     "scanned": 40,
     "returned": 40,
-    "outputTokens": 6512,
-    "shortlistTokens": 1755,
-    "shortlistWallClockMs": 99
+    "outputTokens": 3307,
+    "shortlistTokens": 938,
+    "shortlistWallClockMs": 45
   },
   "strategies": {
     "readAll": {
@@ -31,8 +32,8 @@
     "scanFirst": {
       "label": "scan_project, then read in risk order",
       "filesRead": 40,
-      "tokens": 46148,
-      "scanTokens": 6512,
+      "tokens": 42943,
+      "scanTokens": 3307,
       "foundAll": true
     }
   },
@@ -49,17 +50,17 @@
     },
     {
       "k": 5,
-      "found": 0,
+      "found": 1,
       "of": 6
     },
     {
       "k": 10,
-      "found": 0,
+      "found": 2,
       "of": 6
     },
     {
       "k": 20,
-      "found": 3,
+      "found": 4,
       "of": 6
     }
   ],
@@ -67,8 +68,8 @@
     {
       "k": 5,
       "riskOrder": {
-        "found": 0,
-        "tokens": 11757
+        "found": 1,
+        "tokens": 6202
       },
       "directoryOrder": {
         "found": 0,
@@ -79,8 +80,8 @@
     {
       "k": 10,
       "riskOrder": {
-        "found": 0,
-        "tokens": 22902
+        "found": 2,
+        "tokens": 13507
       },
       "directoryOrder": {
         "found": 1,
@@ -91,8 +92,8 @@
     {
       "k": 15,
       "riskOrder": {
-        "found": 2,
-        "tokens": 28012
+        "found": 4,
+        "tokens": 18041
       },
       "directoryOrder": {
         "found": 2,
@@ -103,8 +104,8 @@
     {
       "k": 20,
       "riskOrder": {
-        "found": 3,
-        "tokens": 32085
+        "found": 4,
+        "tokens": 21125
       },
       "directoryOrder": {
         "found": 3,
@@ -113,24 +114,67 @@
       "randomExpected": 3
     }
   ],
+  "tokenBudgets": [
+    {
+      "budget": 5000,
+      "riskOrder": {
+        "found": 1,
+        "filesRead": 4,
+        "tokensSpent": 3817
+      },
+      "directoryOrder": {
+        "found": 0,
+        "filesRead": 3,
+        "tokensSpent": 4774
+      }
+    },
+    {
+      "budget": 10000,
+      "riskOrder": {
+        "found": 1,
+        "filesRead": 7,
+        "tokensSpent": 8831
+      },
+      "directoryOrder": {
+        "found": 0,
+        "filesRead": 5,
+        "tokensSpent": 9081
+      }
+    },
+    {
+      "budget": 20000,
+      "riskOrder": {
+        "found": 4,
+        "filesRead": 18,
+        "tokensSpent": 19827
+      },
+      "directoryOrder": {
+        "found": 3,
+        "filesRead": 19,
+        "tokensSpent": 19808
+      }
+    }
+  ],
   "bugRanks": [
+    {
+      "file": "src/lib/retry.js",
+      "line": 7,
+      "pattern": "async-misuse",
+      "complexity": "low",
+      "summary": "The final attempt's rejection is swallowed, so retry resolves undefined instead of throwing.",
+      "rank": 4,
+      "riskScore": 0.19,
+      "riskDensity": 0.73
+    },
     {
       "file": "src/workers/reconciliationWorker.js",
       "line": 28,
       "pattern": "race-condition",
       "complexity": "high",
       "summary": "Balance is read before the awaits and written back after, so concurrent ticks lose updates.",
-      "rank": 11,
-      "riskScore": 0.6376811594202898
-    },
-    {
-      "file": "src/services/pricingService.js",
-      "line": 34,
-      "pattern": "off-by-one",
-      "complexity": "high",
-      "summary": "Tier loop reads tiers[i + 1] without bounding i, so the last tier dereferences undefined.",
-      "rank": 14,
-      "riskScore": 0.6206373292867982
+      "rank": 9,
+      "riskScore": 0.64,
+      "riskDensity": 0.69
     },
     {
       "file": "src/services/inventoryService.js",
@@ -138,17 +182,19 @@
       "pattern": "async-misuse",
       "complexity": "high",
       "summary": "await inside forEach is not awaited, so reserve() returns before any stock is decremented.",
-      "rank": 17,
-      "riskScore": 0.558303886925795
+      "rank": 11,
+      "riskScore": 0.56,
+      "riskDensity": 0.66
     },
     {
-      "file": "src/lib/retry.js",
-      "line": 7,
-      "pattern": "async-misuse",
-      "complexity": "low",
-      "summary": "The final attempt's rejection is swallowed, so retry resolves undefined instead of throwing.",
-      "rank": 38,
-      "riskScore": 0.19093851132686088
+      "file": "src/services/pricingService.js",
+      "line": 34,
+      "pattern": "off-by-one",
+      "complexity": "high",
+      "summary": "Tier loop reads tiers[i + 1] without bounding i, so the last tier dereferences undefined.",
+      "rank": 12,
+      "riskScore": 0.62,
+      "riskDensity": 0.56
     },
     {
       "file": "src/lib/dateWindow.js",
@@ -157,7 +203,8 @@
       "complexity": "low",
       "summary": "Loop bound is <= days, so every window contains one extra day.",
       "rank": 39,
-      "riskScore": 0.08759124087591241
+      "riskScore": 0.09,
+      "riskDensity": 0.14
     },
     {
       "file": "src/models/cartTotals.js",
@@ -166,46 +213,27 @@
       "complexity": "low",
       "summary": "discount is optional on the row but dereferenced unguarded, throwing for carts with no coupon.",
       "rank": 40,
-      "riskScore": 0.04580152671755725
+      "riskScore": 0.05,
+      "riskDensity": 0.09
     }
   ],
   "ranked": [
     {
-      "file": "src/services/orderService.js",
-      "riskScore": 0.8698594482040604,
+      "file": "src/services/auditService.js",
+      "riskScore": 0.42,
+      "riskDensity": 0.75,
+      "lines": 50,
       "signals": [
-        "58 mutation(s) of existing state",
-        "44 async boundary/boundaries (await, timers)",
-        "55 branch(es)",
-        "11 nested loop(s)",
-        "cyclomatic complexity 78"
-      ]
-    },
-    {
-      "file": "src/services/taxService.js",
-      "riskScore": 0.8693834900731453,
-      "signals": [
-        "67 mutation(s) of existing state",
-        "16 nested loop(s)",
-        "64 branch(es)",
-        "cyclomatic complexity 97",
-        "16 async boundary/boundaries (await, timers)"
-      ]
-    },
-    {
-      "file": "src/services/refundService.js",
-      "riskScore": 0.8459642637091805,
-      "signals": [
-        "48 mutation(s) of existing state",
-        "36 async boundary/boundaries (await, timers)",
-        "45 branch(es)",
-        "9 nested loop(s)",
-        "cyclomatic complexity 64"
+        "15 async boundary/boundaries (await, timers)",
+        "3 mutation(s) of existing state",
+        "cyclomatic complexity 1"
       ]
     },
     {
       "file": "src/services/shipmentService.js",
-      "riskScore": 0.8275862068965517,
+      "riskScore": 0.83,
+      "riskDensity": 0.74,
+      "lines": 226,
       "signals": [
         "35 mutation(s) of existing state",
         "16 nested loop(s)",
@@ -215,8 +243,72 @@
       ]
     },
     {
+      "file": "src/services/notificationService.js",
+      "riskScore": 0.66,
+      "riskDensity": 0.74,
+      "lines": 94,
+      "signals": [
+        "24 async boundary/boundaries (await, timers)",
+        "15 mutation(s) of existing state",
+        "12 branch(es)",
+        "cyclomatic complexity 13"
+      ]
+    },
+    {
+      "file": "src/lib/retry.js",
+      "riskScore": 0.19,
+      "riskDensity": 0.73,
+      "lines": 14,
+      "signals": [
+        "3 async boundary/boundaries (await, timers)",
+        "2 mutation(s) of existing state",
+        "1 try/catch block(s)",
+        "cyclomatic complexity 2"
+      ]
+    },
+    {
+      "file": "src/services/orderService.js",
+      "riskScore": 0.87,
+      "riskDensity": 0.73,
+      "lines": 296,
+      "signals": [
+        "58 mutation(s) of existing state",
+        "44 async boundary/boundaries (await, timers)",
+        "55 branch(es)",
+        "11 nested loop(s)",
+        "cyclomatic complexity 78"
+      ]
+    },
+    {
+      "file": "src/services/refundService.js",
+      "riskScore": 0.85,
+      "riskDensity": 0.72,
+      "lines": 244,
+      "signals": [
+        "48 mutation(s) of existing state",
+        "36 async boundary/boundaries (await, timers)",
+        "45 branch(es)",
+        "9 nested loop(s)",
+        "cyclomatic complexity 64"
+      ]
+    },
+    {
+      "file": "src/services/customerService.js",
+      "riskScore": 0.62,
+      "riskDensity": 0.7,
+      "lines": 88,
+      "signals": [
+        "18 async boundary/boundaries (await, timers)",
+        "15 mutation(s) of existing state",
+        "12 branch(es)",
+        "cyclomatic complexity 13"
+      ]
+    },
+    {
       "file": "src/services/invoiceService.js",
-      "riskScore": 0.8206599713055954,
+      "riskScore": 0.82,
+      "riskDensity": 0.7,
+      "lines": 210,
       "signals": [
         "43 mutation(s) of existing state",
         "24 async boundary/boundaries (await, timers)",
@@ -226,62 +318,10 @@
       ]
     },
     {
-      "file": "src/api/adminController.js",
-      "riskScore": 0.7441146366427841,
-      "signals": [
-        "65 branch(es)",
-        "16 async boundary/boundaries (await, timers)",
-        "cyclomatic complexity 66",
-        "16 try/catch block(s)",
-        "3 mutation(s) of existing state"
-      ]
-    },
-    {
-      "file": "src/api/orderController.js",
-      "riskScore": 0.7194163860830528,
-      "signals": [
-        "57 branch(es)",
-        "14 async boundary/boundaries (await, timers)",
-        "cyclomatic complexity 58",
-        "14 try/catch block(s)",
-        "3 mutation(s) of existing state"
-      ]
-    },
-    {
-      "file": "src/api/refundController.js",
-      "riskScore": 0.6831432192648923,
-      "signals": [
-        "51 branch(es)",
-        "cyclomatic complexity 52",
-        "10 async boundary/boundaries (await, timers)",
-        "10 try/catch block(s)",
-        "3 mutation(s) of existing state"
-      ]
-    },
-    {
-      "file": "src/api/shipmentController.js",
-      "riskScore": 0.6719160104986877,
-      "signals": [
-        "45 branch(es)",
-        "11 async boundary/boundaries (await, timers)",
-        "cyclomatic complexity 46",
-        "11 try/catch block(s)",
-        "3 mutation(s) of existing state"
-      ]
-    },
-    {
-      "file": "src/services/notificationService.js",
-      "riskScore": 0.6556473829201102,
-      "signals": [
-        "24 async boundary/boundaries (await, timers)",
-        "15 mutation(s) of existing state",
-        "12 branch(es)",
-        "cyclomatic complexity 13"
-      ]
-    },
-    {
       "file": "src/workers/reconciliationWorker.js",
-      "riskScore": 0.6376811594202898,
+      "riskScore": 0.64,
+      "riskDensity": 0.69,
+      "lines": 117,
       "signals": [
         "17 async boundary/boundaries (await, timers)",
         "14 mutation(s) of existing state",
@@ -292,57 +332,23 @@
       ]
     },
     {
-      "file": "src/lib/strings.js",
-      "riskScore": 0.6334310850439883,
+      "file": "src/services/taxService.js",
+      "riskScore": 0.87,
+      "riskDensity": 0.68,
+      "lines": 298,
       "signals": [
-        "60 branch(es)",
-        "cyclomatic complexity 61",
-        "1 mutation(s) of existing state"
-      ]
-    },
-    {
-      "file": "src/services/customerService.js",
-      "riskScore": 0.6246246246246246,
-      "signals": [
-        "18 async boundary/boundaries (await, timers)",
-        "15 mutation(s) of existing state",
-        "12 branch(es)",
-        "cyclomatic complexity 13"
-      ]
-    },
-    {
-      "file": "src/services/pricingService.js",
-      "riskScore": 0.6206373292867982,
-      "signals": [
-        "16 async boundary/boundaries (await, timers)",
-        "14 mutation(s) of existing state",
-        "13 branch(es)",
-        "cyclomatic complexity 22"
-      ]
-    },
-    {
-      "file": "src/api/invoiceController.js",
-      "riskScore": 0.5921696574225123,
-      "signals": [
-        "28 branch(es)",
-        "9 async boundary/boundaries (await, timers)",
-        "cyclomatic complexity 29",
-        "9 try/catch block(s)",
-        "3 mutation(s) of existing state"
-      ]
-    },
-    {
-      "file": "src/lib/serialise.js",
-      "riskScore": 0.5819397993311037,
-      "signals": [
-        "48 branch(es)",
-        "cyclomatic complexity 49",
-        "1 mutation(s) of existing state"
+        "67 mutation(s) of existing state",
+        "16 nested loop(s)",
+        "64 branch(es)",
+        "cyclomatic complexity 97",
+        "16 async boundary/boundaries (await, timers)"
       ]
     },
     {
       "file": "src/services/inventoryService.js",
-      "riskScore": 0.558303886925795,
+      "riskScore": 0.56,
+      "riskDensity": 0.66,
+      "lines": 113,
       "signals": [
         "20 async boundary/boundaries (await, timers)",
         "5 mutation(s) of existing state",
@@ -351,36 +357,88 @@
       ]
     },
     {
-      "file": "src/lib/currency.js",
-      "riskScore": 0.5387453874538746,
+      "file": "src/services/pricingService.js",
+      "riskScore": 0.62,
+      "riskDensity": 0.56,
+      "lines": 151,
       "signals": [
-        "40 branch(es)",
-        "cyclomatic complexity 41",
-        "1 mutation(s) of existing state"
+        "16 async boundary/boundaries (await, timers)",
+        "14 mutation(s) of existing state",
+        "13 branch(es)",
+        "cyclomatic complexity 22"
       ]
     },
     {
-      "file": "src/api/customerController.js",
-      "riskScore": 0.5378927911275416,
+      "file": "src/repositories/orderRepository.js",
+      "riskScore": 0.43,
+      "riskDensity": 0.55,
+      "lines": 142,
       "signals": [
-        "22 branch(es)",
+        "17 async boundary/boundaries (await, timers)",
+        "2 mutation(s) of existing state",
+        "cyclomatic complexity 1"
+      ]
+    },
+    {
+      "file": "src/repositories/customerRepository.js",
+      "riskScore": 0.39,
+      "riskDensity": 0.55,
+      "lines": 118,
+      "signals": [
+        "14 async boundary/boundaries (await, timers)",
+        "2 mutation(s) of existing state",
+        "cyclomatic complexity 1"
+      ]
+    },
+    {
+      "file": "src/repositories/invoiceRepository.js",
+      "riskScore": 0.38,
+      "riskDensity": 0.55,
+      "lines": 110,
+      "signals": [
+        "13 async boundary/boundaries (await, timers)",
+        "2 mutation(s) of existing state",
+        "cyclomatic complexity 1"
+      ]
+    },
+    {
+      "file": "src/repositories/paymentRepository.js",
+      "riskScore": 0.35,
+      "riskDensity": 0.54,
+      "lines": 94,
+      "signals": [
+        "11 async boundary/boundaries (await, timers)",
+        "2 mutation(s) of existing state",
+        "cyclomatic complexity 1"
+      ]
+    },
+    {
+      "file": "src/repositories/shipmentRepository.js",
+      "riskScore": 0.33,
+      "riskDensity": 0.54,
+      "lines": 86,
+      "signals": [
+        "10 async boundary/boundaries (await, timers)",
+        "2 mutation(s) of existing state",
+        "cyclomatic complexity 1"
+      ]
+    },
+    {
+      "file": "src/repositories/auditRepository.js",
+      "riskScore": 0.27,
+      "riskDensity": 0.54,
+      "lines": 62,
+      "signals": [
         "7 async boundary/boundaries (await, timers)",
-        "cyclomatic complexity 23",
-        "7 try/catch block(s)",
-        "3 mutation(s) of existing state"
-      ]
-    },
-    {
-      "file": "src/models/order.js",
-      "riskScore": 0.48132780082987553,
-      "signals": [
-        "23 mutation(s) of existing state",
+        "2 mutation(s) of existing state",
         "cyclomatic complexity 1"
       ]
     },
     {
       "file": "src/api/webhookController.js",
-      "riskScore": 0.46004319654427644,
+      "riskScore": 0.46,
+      "riskDensity": 0.48,
+      "lines": 117,
       "signals": [
         "13 branch(es)",
         "6 async boundary/boundaries (await, timers)",
@@ -390,130 +448,10 @@
       ]
     },
     {
-      "file": "src/lib/env.js",
-      "riskScore": 0.45414847161572053,
-      "signals": [
-        "28 branch(es)",
-        "cyclomatic complexity 29",
-        "1 mutation(s) of existing state"
-      ]
-    },
-    {
-      "file": "src/models/customer.js",
-      "riskScore": 0.44690265486725667,
-      "signals": [
-        "20 mutation(s) of existing state",
-        "cyclomatic complexity 1"
-      ]
-    },
-    {
-      "file": "src/lib/headers.js",
-      "riskScore": 0.4456762749445677,
-      "signals": [
-        "27 branch(es)",
-        "cyclomatic complexity 28",
-        "1 mutation(s) of existing state"
-      ]
-    },
-    {
-      "file": "src/models/invoice.js",
-      "riskScore": 0.4343891402714933,
-      "signals": [
-        "19 mutation(s) of existing state",
-        "cyclomatic complexity 1"
-      ]
-    },
-    {
-      "file": "src/repositories/orderRepository.js",
-      "riskScore": 0.4343891402714933,
-      "signals": [
-        "17 async boundary/boundaries (await, timers)",
-        "2 mutation(s) of existing state",
-        "cyclomatic complexity 1"
-      ]
-    },
-    {
-      "file": "src/services/auditService.js",
-      "riskScore": 0.4212962962962963,
-      "signals": [
-        "15 async boundary/boundaries (await, timers)",
-        "3 mutation(s) of existing state",
-        "cyclomatic complexity 1"
-      ]
-    },
-    {
-      "file": "src/models/payment.js",
-      "riskScore": 0.3932038834951456,
-      "signals": [
-        "16 mutation(s) of existing state",
-        "cyclomatic complexity 1"
-      ]
-    },
-    {
-      "file": "src/repositories/customerRepository.js",
-      "riskScore": 0.3932038834951456,
-      "signals": [
-        "14 async boundary/boundaries (await, timers)",
-        "2 mutation(s) of existing state",
-        "cyclomatic complexity 1"
-      ]
-    },
-    {
-      "file": "src/models/shipment.js",
-      "riskScore": 0.37810945273631846,
-      "signals": [
-        "15 mutation(s) of existing state",
-        "cyclomatic complexity 1"
-      ]
-    },
-    {
-      "file": "src/repositories/invoiceRepository.js",
-      "riskScore": 0.37810945273631846,
-      "signals": [
-        "13 async boundary/boundaries (await, timers)",
-        "2 mutation(s) of existing state",
-        "cyclomatic complexity 1"
-      ]
-    },
-    {
-      "file": "src/lib/ids.js",
-      "riskScore": 0.35567010309278346,
-      "signals": [
-        "18 branch(es)",
-        "cyclomatic complexity 19",
-        "1 mutation(s) of existing state"
-      ]
-    },
-    {
-      "file": "src/repositories/paymentRepository.js",
-      "riskScore": 0.34554973821989526,
-      "signals": [
-        "11 async boundary/boundaries (await, timers)",
-        "2 mutation(s) of existing state",
-        "cyclomatic complexity 1"
-      ]
-    },
-    {
-      "file": "src/repositories/shipmentRepository.js",
-      "riskScore": 0.32795698924731187,
-      "signals": [
-        "10 async boundary/boundaries (await, timers)",
-        "2 mutation(s) of existing state",
-        "cyclomatic complexity 1"
-      ]
-    },
-    {
-      "file": "src/lib/paging.js",
-      "riskScore": 0.3188010899182561,
-      "signals": [
-        "15 branch(es)",
-        "cyclomatic complexity 16",
-        "1 mutation(s) of existing state"
-      ]
-    },
-    {
       "file": "src/api/healthController.js",
-      "riskScore": 0.295774647887324,
+      "riskScore": 0.3,
+      "riskDensity": 0.47,
+      "lines": 60,
       "signals": [
         "3 async boundary/boundaries (await, timers)",
         "3 mutation(s) of existing state",
@@ -523,27 +461,215 @@
       ]
     },
     {
-      "file": "src/repositories/auditRepository.js",
-      "riskScore": 0.2690058479532164,
+      "file": "src/api/invoiceController.js",
+      "riskScore": 0.59,
+      "riskDensity": 0.46,
+      "lines": 192,
       "signals": [
+        "28 branch(es)",
+        "9 async boundary/boundaries (await, timers)",
+        "cyclomatic complexity 29",
+        "9 try/catch block(s)",
+        "3 mutation(s) of existing state"
+      ]
+    },
+    {
+      "file": "src/api/customerController.js",
+      "riskScore": 0.54,
+      "riskDensity": 0.46,
+      "lines": 154,
+      "signals": [
+        "22 branch(es)",
         "7 async boundary/boundaries (await, timers)",
-        "2 mutation(s) of existing state",
+        "cyclomatic complexity 23",
+        "7 try/catch block(s)",
+        "3 mutation(s) of existing state"
+      ]
+    },
+    {
+      "file": "src/api/adminController.js",
+      "riskScore": 0.74,
+      "riskDensity": 0.45,
+      "lines": 373,
+      "signals": [
+        "65 branch(es)",
+        "16 async boundary/boundaries (await, timers)",
+        "cyclomatic complexity 66",
+        "16 try/catch block(s)",
+        "3 mutation(s) of existing state"
+      ]
+    },
+    {
+      "file": "src/api/orderController.js",
+      "riskScore": 0.72,
+      "riskDensity": 0.45,
+      "lines": 329,
+      "signals": [
+        "57 branch(es)",
+        "14 async boundary/boundaries (await, timers)",
+        "cyclomatic complexity 58",
+        "14 try/catch block(s)",
+        "3 mutation(s) of existing state"
+      ]
+    },
+    {
+      "file": "src/api/shipmentController.js",
+      "riskScore": 0.67,
+      "riskDensity": 0.45,
+      "lines": 263,
+      "signals": [
+        "45 branch(es)",
+        "11 async boundary/boundaries (await, timers)",
+        "cyclomatic complexity 46",
+        "11 try/catch block(s)",
+        "3 mutation(s) of existing state"
+      ]
+    },
+    {
+      "file": "src/api/refundController.js",
+      "riskScore": 0.68,
+      "riskDensity": 0.43,
+      "lines": 271,
+      "signals": [
+        "51 branch(es)",
+        "cyclomatic complexity 52",
+        "10 async boundary/boundaries (await, timers)",
+        "10 try/catch block(s)",
+        "3 mutation(s) of existing state"
+      ]
+    },
+    {
+      "file": "src/models/order.js",
+      "riskScore": 0.48,
+      "riskDensity": 0.41,
+      "lines": 34,
+      "signals": [
+        "23 mutation(s) of existing state",
         "cyclomatic complexity 1"
       ]
     },
     {
-      "file": "src/lib/retry.js",
-      "riskScore": 0.19093851132686088,
+      "file": "src/models/customer.js",
+      "riskScore": 0.45,
+      "riskDensity": 0.4,
+      "lines": 31,
       "signals": [
-        "3 async boundary/boundaries (await, timers)",
-        "2 mutation(s) of existing state",
-        "1 try/catch block(s)",
-        "cyclomatic complexity 2"
+        "20 mutation(s) of existing state",
+        "cyclomatic complexity 1"
+      ]
+    },
+    {
+      "file": "src/models/invoice.js",
+      "riskScore": 0.43,
+      "riskDensity": 0.39,
+      "lines": 30,
+      "signals": [
+        "19 mutation(s) of existing state",
+        "cyclomatic complexity 1"
+      ]
+    },
+    {
+      "file": "src/models/payment.js",
+      "riskScore": 0.39,
+      "riskDensity": 0.38,
+      "lines": 27,
+      "signals": [
+        "16 mutation(s) of existing state",
+        "cyclomatic complexity 1"
+      ]
+    },
+    {
+      "file": "src/models/shipment.js",
+      "riskScore": 0.38,
+      "riskDensity": 0.37,
+      "lines": 26,
+      "signals": [
+        "15 mutation(s) of existing state",
+        "cyclomatic complexity 1"
+      ]
+    },
+    {
+      "file": "src/lib/currency.js",
+      "riskScore": 0.54,
+      "riskDensity": 0.24,
+      "lines": 132,
+      "signals": [
+        "40 branch(es)",
+        "cyclomatic complexity 41",
+        "1 mutation(s) of existing state"
+      ]
+    },
+    {
+      "file": "src/lib/env.js",
+      "riskScore": 0.45,
+      "riskDensity": 0.24,
+      "lines": 95,
+      "signals": [
+        "28 branch(es)",
+        "cyclomatic complexity 29",
+        "1 mutation(s) of existing state"
+      ]
+    },
+    {
+      "file": "src/lib/serialise.js",
+      "riskScore": 0.58,
+      "riskDensity": 0.24,
+      "lines": 160,
+      "signals": [
+        "48 branch(es)",
+        "cyclomatic complexity 49",
+        "1 mutation(s) of existing state"
+      ]
+    },
+    {
+      "file": "src/lib/strings.js",
+      "riskScore": 0.63,
+      "riskDensity": 0.24,
+      "lines": 199,
+      "signals": [
+        "60 branch(es)",
+        "cyclomatic complexity 61",
+        "1 mutation(s) of existing state"
+      ]
+    },
+    {
+      "file": "src/lib/paging.js",
+      "riskScore": 0.32,
+      "riskDensity": 0.23,
+      "lines": 54,
+      "signals": [
+        "15 branch(es)",
+        "cyclomatic complexity 16",
+        "1 mutation(s) of existing state"
+      ]
+    },
+    {
+      "file": "src/lib/ids.js",
+      "riskScore": 0.36,
+      "riskDensity": 0.23,
+      "lines": 64,
+      "signals": [
+        "18 branch(es)",
+        "cyclomatic complexity 19",
+        "1 mutation(s) of existing state"
+      ]
+    },
+    {
+      "file": "src/lib/headers.js",
+      "riskScore": 0.45,
+      "riskDensity": 0.23,
+      "lines": 94,
+      "signals": [
+        "27 branch(es)",
+        "cyclomatic complexity 28",
+        "1 mutation(s) of existing state"
       ]
     },
     {
       "file": "src/lib/dateWindow.js",
-      "riskScore": 0.08759124087591241,
+      "riskScore": 0.09,
+      "riskDensity": 0.14,
+      "lines": 18,
       "signals": [
         "2 mutation(s) of existing state",
         "cyclomatic complexity 2"
@@ -551,7 +677,9 @@
     },
     {
       "file": "src/models/cartTotals.js",
-      "riskScore": 0.04580152671755725,
+      "riskScore": 0.05,
+      "riskDensity": 0.09,
+      "lines": 16,
       "signals": [
         "1 mutation(s) of existing state",
         "cyclomatic complexity 1"

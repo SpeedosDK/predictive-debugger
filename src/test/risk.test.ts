@@ -4,7 +4,13 @@ import os from "node:os";
 import path from "node:path";
 import { describe, it } from "node:test";
 import { emptyMetrics } from "../core/analysis/ast";
-import { analyzeFile, analyzeSource, calculateRisk, explainRisk } from "../core/analysis/risk";
+import {
+    analyzeFile,
+    analyzeSource,
+    calculateRisk,
+    calculateRiskDensity,
+    explainRisk
+} from "../core/analysis/risk";
 
 describe("calculateRisk", () => {
     it("scores an empty file near zero", () => {
@@ -27,7 +33,8 @@ describe("calculateRisk", () => {
             nestedLoops: 100,
             mutations: 100,
             tryCatch: 100,
-            cyclomatic: 500
+            cyclomatic: 500,
+            lines: 800
         };
         const score = calculateRisk(extreme);
         assert.ok(score < 1, "score must stay below 1");
@@ -59,6 +66,35 @@ describe("calculateRisk", () => {
                 `increasing ${key} lowered the score`
             );
         }
+    });
+});
+
+describe("calculateRiskDensity", () => {
+    it("does not reward a file for being long", () => {
+        // Same code, twice over: the total risk doubles, the density does not.
+        const single = { ...emptyMetrics(), asyncCalls: 4, nestedLoops: 1, lines: 50 };
+        const doubled = { ...emptyMetrics(), asyncCalls: 8, nestedLoops: 2, lines: 100 };
+        assert.ok(calculateRisk(doubled) > calculateRisk(single));
+        assert.ok(Math.abs(calculateRiskDensity(doubled) - calculateRiskDensity(single)) < 0.01);
+    });
+
+    it("ranks a dense short file above a long plain one", () => {
+        // The case the size-driven total gets wrong: a 20-line file full of
+        // await inside nested loops versus a 400-line row mapper.
+        const dense = { ...emptyMetrics(), asyncCalls: 6, nestedLoops: 2, lines: 20 };
+        const plain = { ...emptyMetrics(), mutations: 200, branches: 20, cyclomatic: 21, lines: 400 };
+        assert.ok(calculateRisk(plain) > calculateRisk(dense), "precondition: the total prefers the long file");
+        assert.ok(calculateRiskDensity(dense) > calculateRiskDensity(plain));
+    });
+
+    it("does not let a tiny file spike on a single signal", () => {
+        const tiny = { ...emptyMetrics(), asyncCalls: 1, lines: 3 };
+        assert.ok(calculateRiskDensity(tiny) < 0.6, "a 3-line file with one await is not maximal risk");
+    });
+
+    it("stays in range for a file with no lines counted", () => {
+        const score = calculateRiskDensity(emptyMetrics());
+        assert.ok(score >= 0 && score < 1, `density out of range: ${score}`);
     });
 });
 

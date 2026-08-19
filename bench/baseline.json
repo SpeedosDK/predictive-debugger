@@ -1,0 +1,136 @@
+{
+ "label": "Before: build of 2026-08-17",
+ "description": "The measurements this repository shipped before the density ranking, the combinedScore re-weighting and the payload trim. Extracted from the results files at commit 3c633b1 so the comparison in RESULTS.md cannot drift from what was actually recorded. The three separation figures are recomputed from those runs' own scores under that build's 0.4/0.4/0.2 blend, because the harness did not report them at the time.",
+ "commit": "3c633b1",
+ "perFile": {
+  "meanAnswerTokens": 251,
+  "baselineTokens": 10228,
+  "toolTokens": 3007,
+  "filesCheaperToAsk": 8,
+  "filesTotal": 12,
+  "hit": 17,
+  "buggyRuns": 18,
+  "missed": 1,
+  "falsePositives": 13,
+  "cleanRuns": 18,
+  "meanMsPerFile": 4425,
+  "lowestCleanCut": 0.65,
+  "foundAtLowestCleanCut": 15,
+  "noiseCeiling": 0.6,
+  "separation": {
+   "aiScore": 0.91,
+   "combinedScore": 0.735,
+   "staticRisk": 0.333
+  }
+ },
+ "project": {
+  "scanTokens": 6512,
+  "shortlistTokens": 1755,
+  "orderedBy": "riskScore",
+  "sizeCorrelation": 0.824,
+  "bugRanks": [
+   11,
+   14,
+   17,
+   38,
+   39,
+   40
+  ],
+  "budgets": [
+   {
+    "k": 5,
+    "riskOrder": 0,
+    "directoryOrder": 0
+   },
+   {
+    "k": 10,
+    "riskOrder": 0,
+    "directoryOrder": 1
+   },
+   {
+    "k": 15,
+    "riskOrder": 2,
+    "directoryOrder": 2
+   },
+   {
+    "k": 20,
+    "riskOrder": 3,
+    "directoryOrder": 3
+   }
+  ]
+ },
+ "ab": {
+  "readTheFileTokens": 23449,
+  "askTheToolTokens": 17395,
+  "readTheFileMs": 47823,
+  "askTheToolMs": 38922,
+  "gate": 0.65,
+  "bugsFound": 2,
+  "bugsTotal": 3,
+  "falseAlarms": 0,
+  "cleanTotal": 1
+ },
+ "fittedCutHistory": {
+  "note": "The lowest threshold producing no false alarms, and the highest score any clean file reached, observed across every recorded run of the same 36 trials against the same corpus. The harness records only the current run, so these are transcribed as they were observed. The point of keeping them is that the cut is not stable: for the first three builds it was refitted noise rather than a property of the tool. The last two entries are different in kind — the evidence policy made the model decline to name anything on a clean file at all, so there is no noise left for a cut to sit on.",
+  "runs": [
+   {
+    "run": "2026-08-17, build 3c633b1",
+    "fittedCut": 0.65,
+    "noiseCeiling": 0.6
+   },
+   {
+    "run": "2026-08-18, after the payload and scoring changes",
+    "fittedCut": 0.6,
+    "noiseCeiling": 0.55
+   },
+   {
+    "run": "2026-08-18, repeat of the same trials",
+    "fittedCut": 0.7,
+    "noiseCeiling": 0.65
+   },
+   {
+    "run": "2026-08-19, after the evidence-policy prompt",
+    "fittedCut": 0.2,
+    "noiseCeiling": 0
+   },
+   {
+    "run": "2026-08-19, evidence policy plus the concurrency clause",
+    "fittedCut": 0.2,
+    "noiseCeiling": 0.0
+   }
+  ]
+ },
+ "precisionTuningBefore": {
+  "label": "Before precision policy: Claude run of 2026-08-18",
+  "note": "Compact preservation of the last valid pre-tuning run. Claude hit its session limit during the attempted post-tuning rerun; measure-file now refuses to overwrite valid data when every provider call fails.",
+  "provider": "claude",
+  "trials": 3,
+  "buggyRuns": 18,
+  "rawHits": 18,
+  "actionableHitsAt070": 15,
+  "cleanRuns": 18,
+  "rawFalsePositives": 11,
+  "problemsPanelFalsePositives": 12,
+  "actionableFalsePositivesAt070": 0,
+  "meanAnswerTokens": 123,
+  "aiScoreAuc": 0.961,
+  "combinedScoreAuc": 0.951
+ },
+ "concurrencyClauseBefore": {
+  "note": "The evidence-policy run before the concurrency clause was added to the prompt. Same build, same corpus, same trial count; the only difference is the clause stating that a function on a timer, in a poll loop, or exported as a service method can be re-entered before an earlier call finishes.",
+  "ranAt": "2026-08-19T13:25:40.112Z",
+  "buggyRuns": 18,
+  "cleanRuns": 18,
+  "rawHits": 14,
+  "wrongLocation": 1,
+  "missed": 3,
+  "rawFalsePositives": 0,
+  "separation": {
+   "note": "P(buggy run scores above clean run); 0.5 = chance",
+   "aiScore": 0.917,
+   "combinedScore": 0.944,
+   "staticRisk": 0.333
+  },
+  "meanMsPerFile": 4891
+ }
+}

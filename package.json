@@ -46,7 +46,8 @@
     "mcp": "node ./dist/mcp-server.js",
     "package": "npm run build && vsce package --allow-missing-repository --skip-license",
     "vscode:prepublish": "npm run build",
-    "bundle:dev": "node esbuild.mjs"
+    "bundle:dev": "node esbuild.mjs",
+    "bench": "node bench/generate-corpus.mjs && node bench/measure.mjs && node bench/measure-file.mjs && node bench/markdown.mjs"
   },
   "engines": {
     "vscode": "^1.85.0",
@@ -112,7 +113,10 @@
     "@types/node": "^26.2.0",
     "@types/vscode": "~1.85.0",
     "esbuild": "^0.28.2",
-    "typescript": "^5.9.3"
+    "gpt-tokenizer": "^3.0.1",
+    "typescript": "^5.9.3",
+    "vega": "^6.4.0",
+    "vega-lite": "^6.4.3"
   },
   "capabilities": {
     "untrustedWorkspaces": {

@@ -4,6 +4,11 @@ import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js"
 import { z } from "zod";
 import { analyzeFile } from "../core/analysis/risk";
 import { analyzeLogs } from "../core/logs/analyzeLogs";
+import {
+    isActionablePrediction,
+    MIN_ACTIONABLE_SCORE,
+    predictionStatus
+} from "../core/prediction/confidence";
 import { predictFile } from "../core/prediction/predictFile";
 import { collectSourceFiles } from "../core/sourceFiles";
 import { ProviderRegistry } from "../providers/registry";
@@ -18,6 +23,11 @@ const server = new McpServer({
 
 function json(value: unknown) {
     return { content: [{ type: "text" as const, text: JSON.stringify(value, null, 2) }] };
+}
+
+/** Two decimals is all the precision these heuristics have, and it is shorter. */
+function round(value: number): number {
+    return Math.round(value * 100) / 100;
 }
 
 function failure(message: string) {
@@ -60,8 +70,9 @@ server.registerTool(
     {
         title: "Rank a project's files by risk",
         description:
-            "Walk a directory and rank every JavaScript/TypeScript file by heuristic risk " +
-            "score, highest first. Deterministic and fast — no model call. " +
+            "Walk a directory and rank every JavaScript/TypeScript file by risk density — " +
+            "how concentrated the failure-prone code is, not how big the file is. " +
+            "Deterministic and fast — no model call. " +
             "Call this at the start of a code review to decide which files are worth your " +
             "attention, instead of reading the tree in arbitrary order.",
         inputSchema: {
@@ -72,12 +83,17 @@ server.registerTool(
                 .positive()
                 .max(500)
                 .optional()
-                .describe("Maximum number of files to return (default 50)")
+                .describe("Maximum number of files to return (default 50)"),
+            verbose: z
+                .boolean()
+                .optional()
+                .describe("Include the raw metric counts for every file (default false)")
         }
     },
-    async ({ directory, limit }) => {
+    async ({ directory, limit, verbose }) => {
         try {
-            const files = await collectSourceFiles(path.resolve(directory));
+            const root = path.resolve(directory);
+            const files = await collectSourceFiles(root);
             const analyses = await Promise.all(
                 files.map((file) =>
                     analyzeFile(file).catch((err) => ({
@@ -87,15 +103,31 @@ server.registerTool(
                 )
             );
 
+            // Ranked by density rather than by the size-driven total: the agent
+            // pays per token, so "most risk per line read" is the ordering that
+            // spends its budget best. See bench/RESULTS.md section 5.
             const ranked = analyses
                 .filter((entry): entry is Awaited<ReturnType<typeof analyzeFile>> => "riskScore" in entry)
-                .sort((a, b) => b.riskScore - a.riskScore)
+                .sort((a, b) => b.riskDensity - a.riskDensity)
                 .slice(0, limit ?? 50);
 
             return json({
                 scanned: files.length,
                 returned: ranked.length,
-                files: ranked
+                orderedBy: "riskDensity",
+                // Paths are echoed relative to the scanned root and the metric
+                // counts are dropped by default: this output lands whole in the
+                // caller's context, and the same numbers are already spelled out
+                // in `signals`.
+                files: ranked.map((entry) => ({
+                    file: path.relative(root, entry.file).replace(/\\/g, "/"),
+                    riskDensity: round(entry.riskDensity),
+                    riskScore: round(entry.riskScore),
+                    lines: entry.metrics.lines,
+                    signals: entry.signals,
+                    ...(verbose ? { metrics: entry.metrics } : {}),
+                    ...(entry.parseError ? { parseError: entry.parseError } : {})
+                }))
             });
         } catch (err) {
             return failure(`Could not scan ${directory}: ${message(err)}`);
@@ -144,7 +176,9 @@ server.registerTool(
         description:
             "Combine static analysis with a second-opinion verdict from the signed-in " +
             "Claude Code or Codex CLI, returning the most likely runtime failure with a " +
-            "line number and reason. " +
+            "line number and reason. `status` distinguishes actionable, uncertain, no-finding, " +
+            "and unavailable results. Treat it as a defect only when `actionable` is true; " +
+            `that applies the measured score >= ${MIN_ACTIONABLE_SCORE} precision gate. ` +
             "This spawns another model and takes 5-15 seconds per file, so only call it " +
             "when you specifically want an independent second opinion. If you are yourself " +
             "reviewing the code, use analyze_file and read the source instead.",
@@ -158,10 +192,16 @@ server.registerTool(
             logFile: z
                 .string()
                 .optional()
-                .describe("Optional log file to fold into the combined score")
+                .describe("Optional log file to fold into the combined score"),
+            verbose: z
+                .boolean()
+                .optional()
+                .describe(
+                    "Include the static metric counts and the full log breakdown (default false)"
+                )
         }
     },
-    async ({ file, provider, model, logFile }) => {
+    async ({ file, provider, model, logFile, verbose }) => {
         try {
             const active = await registry.resolveActive(provider as ProviderId | undefined);
             const result = await predictFile(path.resolve(file), {
@@ -170,7 +210,32 @@ server.registerTool(
                 model,
                 logs: logFile ? { logPath: path.resolve(logFile) } : undefined
             });
-            return json({ ...result, viaProvider: active.provider.id });
+
+            // The point of this tool is to cost the caller less context than
+            // reading the file would. Measured on bench/corpus, the verdict is
+            // about a fifth of the response: the rest was the metric block, a
+            // log stanza saying log analysis was not requested, and the absolute
+            // path the caller had just supplied. All three are now opt-in, which
+            // moves the break-even point down to files of roughly 70 tokens.
+            const { pattern, score, line, reason, truncated } = result.aiPrediction;
+
+            return json({
+                // Echoed as given rather than resolved: shorter, and the caller
+                // already knows which file it asked about.
+                file,
+                pattern,
+                score,
+                line: line ?? null,
+                reason,
+                status: predictionStatus(result.aiPrediction),
+                actionable: isActionablePrediction(result.aiPrediction),
+                combinedScore: round(result.combinedScore),
+                staticRisk: round(result.riskScore),
+                viaProvider: active.provider.id,
+                ...(truncated ? { truncated } : {}),
+                ...(verbose ? { metrics: result.metrics, logs: result.logs } : {}),
+                ...(!verbose && logFile ? { logAnomalies: result.logs.anomalyCount } : {})
+            });
         } catch (err) {
             return failure(`Prediction failed for ${file}: ${message(err)}`);
         }
