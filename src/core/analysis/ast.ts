@@ -44,14 +44,28 @@ export async function collectMetrics(code: string): Promise<FileMetrics> {
     const ast = parse(code, {
         sourceType: "unambiguous",
         errorRecovery: true,
-        plugins: ["jsx", "typescript"]
+        // `decorators-legacy` matches what Angular, Nest, TypeORM and MobX emit
+        // today under `experimentalDecorators`. Without it a decorated class is
+        // a parse error, which zeroes the file's metrics and sinks it to the
+        // bottom of the scan_project ranking -- so the tool recommended reading
+        // a Nest project's controllers and services last. `decoratorAutoAccessors`
+        // covers the `accessor` keyword, which neither decorator plugin handles
+        // on its own.
+        plugins: ["jsx", "typescript", "decorators-legacy", "decoratorAutoAccessors"]
     });
 
     const metrics = emptyMetrics();
     metrics.lines = countLines(code);
 
     traverse(ast, {
-        "FunctionDeclaration|FunctionExpression|ArrowFunctionExpression"(path: any) {
+        // Class and object methods have to be listed explicitly: Babel does not
+        // treat them as FunctionExpression. Leaving them out meant `functions`
+        // and `longFunctions` were blind to every method in a class-based
+        // codebase, and `longFunctions` carries 0.15 of the risk weight. Across
+        // the 40-file benchmark corpus it had never once fired.
+        "FunctionDeclaration|FunctionExpression|ArrowFunctionExpression|ClassMethod|ClassPrivateMethod|ObjectMethod"(
+            path: any
+        ) {
             metrics.functions++;
             const body = path.node.body;
             const statements = body && body.type === "BlockStatement" ? body.body.length : 0;

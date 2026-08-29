@@ -40,6 +40,43 @@ describe("collectMetrics", () => {
         assert.equal(metrics.functions, 1);
     });
 
+    it("parses decorated classes", async () => {
+        // Angular, Nest, TypeORM and MobX all emit these. Before the decorator
+        // plugins were enabled this threw, and analyzeSource turned it into a
+        // zero-risk result, so a decorated file sorted last in scan_project.
+        const metrics = await collectMetrics(`
+            @Injectable()
+            export class OrderService {
+                @observable items = [];
+                constructor(@Inject(REPO) private readonly repo: Repo) {}
+                @Get(":id")
+                async find(@Param("id") id: string) {
+                    return await this.repo.get(id);
+                }
+            }
+        `);
+        assert.equal(metrics.asyncCalls, 1);
+        // The constructor and find(), both ClassMethod nodes.
+        assert.equal(metrics.functions, 2);
+    });
+
+    it("counts class and object methods as functions", async () => {
+        // Babel does not report a method as a FunctionExpression, so a visitor
+        // that lists only the function node types is blind to every method in a
+        // class-based codebase. That kept longFunctions at zero for all 40 files
+        // of the benchmark corpus while carrying 0.15 of the risk weight.
+        const cls = await collectMetrics("class A { m() {} n() {} }");
+        assert.equal(cls.functions, 2);
+
+        const obj = await collectMetrics("const o = { m() {}, get n() { return 1; } };");
+        assert.equal(obj.functions, 2);
+    });
+
+    it("parses the accessor keyword", async () => {
+        const metrics = await collectMetrics("class C { @logged accessor x = 1; }");
+        assert.equal(metrics.functions, 0);
+    });
+
     it("throws on input Babel cannot parse", async () => {
         // errorRecovery repairs some damage but not unbalanced braces. This is
         // the raw primitive, so it propagates — analyzeSource is the layer that

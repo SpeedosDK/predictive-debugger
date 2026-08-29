@@ -1,7 +1,18 @@
 import fs from "fs/promises";
 import path from "path";
 
-const SOURCE_EXTENSIONS = new Set([".js", ".jsx", ".mjs", ".cjs", ".ts", ".tsx"]);
+const SOURCE_EXTENSIONS = new Set([
+    ".js",
+    ".jsx",
+    ".mjs",
+    ".cjs",
+    ".ts",
+    ".tsx",
+    // TypeScript's explicit module-kind extensions. Babel parses them like any
+    // other .ts, but a project that uses them was previously invisible to a scan.
+    ".mts",
+    ".cts"
+]);
 
 const SKIP_DIRECTORIES = new Set([
     "node_modules",
