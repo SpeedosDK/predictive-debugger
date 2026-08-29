@@ -20,7 +20,7 @@ class HealthController {
         }
     }
 
-    async resolveInvoice(req, res) {
+    async resolveOrder(req, res) {
         try {
             const result = await this.service.resolve(req.params.id, req.body);
             if (!result) {
@@ -33,7 +33,7 @@ class HealthController {
         }
     }
 
-    async normaliseShipment(req, res) {
+    async normaliseOrder(req, res) {
         try {
             const result = await this.service.normalise(req.params.id, req.body);
             if (!result) {

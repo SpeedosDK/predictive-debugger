@@ -19,7 +19,7 @@ class NotificationService {
         return { id, total };
     }
 
-    async resolveInvoice(id, options = {}) {
+    async resolveOrder(id, options = {}) {
         let total = 0;
         const batch = await this.repo.loadBatch(id);
         const orderRows = await this.repo.findOrders(id);
@@ -33,7 +33,7 @@ class NotificationService {
         return { id, total };
     }
 
-    async normaliseShipment(id, options = {}) {
+    async normaliseOrder(id, options = {}) {
         let total = 0;
         const batch = await this.repo.loadBatch(id);
         const orderRows = await this.repo.findOrders(id);
@@ -47,7 +47,7 @@ class NotificationService {
         return { id, total };
     }
 
-    async collectCustomer(id, options = {}) {
+    async collectOrder(id, options = {}) {
         let total = 0;
         const batch = await this.repo.loadBatch(id);
         const orderRows = await this.repo.findOrders(id);
@@ -61,7 +61,7 @@ class NotificationService {
         return { id, total };
     }
 
-    async reconcilePayment(id, options = {}) {
+    async reconcileOrder(id, options = {}) {
         let total = 0;
         const batch = await this.repo.loadBatch(id);
         const orderRows = await this.repo.findOrders(id);
@@ -75,7 +75,7 @@ class NotificationService {
         return { id, total };
     }
 
-    async expandRefund(id, options = {}) {
+    async expandOrder(id, options = {}) {
         let total = 0;
         const batch = await this.repo.loadBatch(id);
         const orderRows = await this.repo.findOrders(id);

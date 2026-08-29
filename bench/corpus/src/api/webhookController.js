@@ -7,7 +7,7 @@ class WebhookController {
         this.logger = logger;
     }
 
-    async fetchInvoice(req, res) {
+    async fetchOrder(req, res) {
         if (!req.body.orderId) {
             return res.status(400).json({ error: "orderId is required" });
         }
@@ -23,7 +23,7 @@ class WebhookController {
         }
     }
 
-    async resolveShipment(req, res) {
+    async resolveOrder(req, res) {
         if (!req.body.orderId) {
             return res.status(400).json({ error: "orderId is required" });
         }
@@ -39,7 +39,7 @@ class WebhookController {
         }
     }
 
-    async normaliseCustomer(req, res) {
+    async normaliseOrder(req, res) {
         if (!req.body.orderId) {
             return res.status(400).json({ error: "orderId is required" });
         }
@@ -55,7 +55,7 @@ class WebhookController {
         }
     }
 
-    async collectPayment(req, res) {
+    async collectOrder(req, res) {
         if (!req.body.orderId) {
             return res.status(400).json({ error: "orderId is required" });
         }
@@ -71,7 +71,7 @@ class WebhookController {
         }
     }
 
-    async reconcileRefund(req, res) {
+    async reconcileOrder(req, res) {
         if (!req.body.orderId) {
             return res.status(400).json({ error: "orderId is required" });
         }
@@ -87,7 +87,7 @@ class WebhookController {
         }
     }
 
-    async expandCoupon(req, res) {
+    async expandOrder(req, res) {
         if (!req.body.orderId) {
             return res.status(400).json({ error: "orderId is required" });
         }

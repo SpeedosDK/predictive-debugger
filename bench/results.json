@@ -1,39 +1,39 @@
 {
-  "generatedAt": "2026-08-18T17:23:23.095Z",
-  "sizeCorrelation": 0.826,
-  "densitySizeCorrelation": 0.359,
+  "generatedAt": "2026-08-20T13:44:32.365Z",
+  "sizeCorrelation": 0.825,
+  "densitySizeCorrelation": 0.327,
   "tokenizer": "cl100k (gpt-tokenizer) — approximation of Claude's tokenizer",
   "corpus": {
     "files": 40,
-    "totalTokens": 39636,
+    "totalTokens": 39676,
     "bugs": 6
   },
   "scan": {
-    "wallClockMs": 108,
+    "wallClockMs": 109,
     "scanned": 40,
     "returned": 40,
-    "outputTokens": 3307,
+    "outputTokens": 3319,
     "shortlistTokens": 938,
-    "shortlistWallClockMs": 45
+    "shortlistWallClockMs": 46
   },
   "strategies": {
     "readAll": {
       "label": "Read every file",
       "filesRead": 40,
-      "tokens": 39636,
+      "tokens": 39676,
       "foundAll": true
     },
     "arbitrary": {
       "label": "Read in directory order until all bugs seen",
       "filesRead": 40,
-      "tokens": 39636,
+      "tokens": 39676,
       "foundAll": true
     },
     "scanFirst": {
       "label": "scan_project, then read in risk order",
       "filesRead": 40,
-      "tokens": 42943,
-      "scanTokens": 3307,
+      "tokens": 42995,
+      "scanTokens": 3319,
       "foundAll": true
     }
   },
@@ -93,7 +93,7 @@
       "k": 15,
       "riskOrder": {
         "found": 4,
-        "tokens": 18041
+        "tokens": 18075
       },
       "directoryOrder": {
         "found": 2,
@@ -105,7 +105,7 @@
       "k": 20,
       "riskOrder": {
         "found": 4,
-        "tokens": 21125
+        "tokens": 21075
       },
       "directoryOrder": {
         "found": 3,
@@ -146,7 +146,7 @@
       "riskOrder": {
         "found": 4,
         "filesRead": 18,
-        "tokensSpent": 19827
+        "tokensSpent": 19867
       },
       "directoryOrder": {
         "found": 3,
@@ -435,6 +435,17 @@
       ]
     },
     {
+      "file": "src/models/order.js",
+      "riskScore": 0.5,
+      "riskDensity": 0.53,
+      "lines": 34,
+      "signals": [
+        "23 mutation(s) of existing state",
+        "1 function(s) longer than 20 statements",
+        "cyclomatic complexity 1"
+      ]
+    },
+    {
       "file": "src/api/webhookController.js",
       "riskScore": 0.46,
       "riskDensity": 0.48,
@@ -536,16 +547,6 @@
         "10 async boundary/boundaries (await, timers)",
         "10 try/catch block(s)",
         "3 mutation(s) of existing state"
-      ]
-    },
-    {
-      "file": "src/models/order.js",
-      "riskScore": 0.48,
-      "riskDensity": 0.41,
-      "lines": 34,
-      "signals": [
-        "23 mutation(s) of existing state",
-        "cyclomatic complexity 1"
       ]
     },
     {

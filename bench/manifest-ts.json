@@ -1,0 +1,130 @@
+{
+  "generatedBy": "bench/generate-corpus-ts.mjs",
+  "language": "typescript",
+  "corpus": "corpus-ts",
+  "fileCount": 12,
+  "controls": [
+    "src/api/order.controller.ts",
+    "src/services/report.service.ts",
+    "src/repositories/customer.repository.ts",
+    "src/models/receipt.entity.ts",
+    "src/lib/money.ts",
+    "src/lib/headers.mts"
+  ],
+  "bugs": [
+    {
+      "file": "src/models/invoice.entity.ts",
+      "pattern": "null-vs-undefined",
+      "inCatalogue": true,
+      "complexity": "low",
+      "discovered": true,
+      "summary": "settledAt is a nullable TypeORM column, so an unsettled row loads as null rather than undefined, and isSettled() returns true for every unsettled invoice.",
+      "line": 28,
+      "acceptableLines": [
+        28
+      ],
+      "acceptableRanges": [
+        [
+          27,
+          29
+        ]
+      ],
+      "anchor": "return this.settledAt !== undefined;"
+    },
+    {
+      "file": "src/services/cache.service.ts",
+      "pattern": "resource-leak",
+      "inCatalogue": true,
+      "complexity": "high",
+      "summary": "The sweep interval started in the constructor is never cleared on destroy, so the timer keeps the process alive after shutdown.",
+      "line": 20,
+      "acceptableLines": [
+        20,
+        24
+      ],
+      "acceptableRanges": [
+        [
+          19,
+          21
+        ],
+        [
+          23,
+          25
+        ]
+      ],
+      "anchor": "this.sweep = setInterval("
+    },
+    {
+      "file": "src/services/supplier.service.ts",
+      "pattern": "inverted-condition",
+      "inCatalogue": false,
+      "complexity": "low",
+      "summary": "eligible() returns the inactive suppliers, the exact opposite of what its documentation and name promise. No exception is thrown; the caller sends purchase orders to suspended suppliers.",
+      "line": 15,
+      "acceptableLines": [
+        15
+      ],
+      "acceptableRanges": [
+        [
+          14,
+          16
+        ]
+      ],
+      "anchor": "return suppliers.filter((supplier) => !supplier.active);"
+    },
+    {
+      "file": "src/models/cart.model.ts",
+      "pattern": "null-reference",
+      "inCatalogue": true,
+      "complexity": "low",
+      "summary": "discount is declared optional on CartRow and dereferenced without a guard, while the equally optional lines is guarded one line above.",
+      "line": 28,
+      "acceptableLines": [
+        28
+      ],
+      "acceptableRanges": [
+        [
+          25,
+          35
+        ]
+      ],
+      "anchor": "const discount = row.discount.amount;"
+    },
+    {
+      "file": "src/lib/paginate.mts",
+      "pattern": "off-by-one",
+      "inCatalogue": true,
+      "complexity": "low",
+      "summary": "The loop bound is <= lastPage, so pageBounds returns one more page than the documented ceil(total / pageSize), and the extra page is empty.",
+      "line": 23,
+      "acceptableLines": [
+        23
+      ],
+      "acceptableRanges": [
+        [
+          15,
+          32
+        ]
+      ],
+      "anchor": "for (let page = 0; page <= lastPage; page++) {"
+    },
+    {
+      "file": "src/services/sync.service.ts",
+      "pattern": "wrong-field",
+      "inCatalogue": false,
+      "complexity": "low",
+      "summary": "modifiedSince filters on createdAt instead of updatedAt, so an incremental sync silently skips every record that was edited after it was created.",
+      "line": 16,
+      "acceptableLines": [
+        16
+      ],
+      "acceptableRanges": [
+        [
+          14,
+          17
+        ]
+      ],
+      "anchor": "return rows.filter((row) => row.createdAt > since);"
+    }
+  ]
+}

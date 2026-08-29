@@ -7,7 +7,7 @@ class ShipmentController {
         this.logger = logger;
     }
 
-    async fetchShipment(req, res) {
+    async fetchOrder(req, res) {
         if (!req.body.orderId) {
             return res.status(400).json({ error: "orderId is required" });
         }
@@ -29,7 +29,7 @@ class ShipmentController {
         }
     }
 
-    async resolveCustomer(req, res) {
+    async resolveOrder(req, res) {
         if (!req.body.orderId) {
             return res.status(400).json({ error: "orderId is required" });
         }
@@ -51,7 +51,7 @@ class ShipmentController {
         }
     }
 
-    async normalisePayment(req, res) {
+    async normaliseOrder(req, res) {
         if (!req.body.orderId) {
             return res.status(400).json({ error: "orderId is required" });
         }
@@ -73,7 +73,7 @@ class ShipmentController {
         }
     }
 
-    async collectRefund(req, res) {
+    async collectOrder(req, res) {
         if (!req.body.orderId) {
             return res.status(400).json({ error: "orderId is required" });
         }
@@ -95,7 +95,7 @@ class ShipmentController {
         }
     }
 
-    async reconcileCoupon(req, res) {
+    async reconcileOrder(req, res) {
         if (!req.body.orderId) {
             return res.status(400).json({ error: "orderId is required" });
         }
@@ -117,7 +117,7 @@ class ShipmentController {
         }
     }
 
-    async expandAddress(req, res) {
+    async expandOrder(req, res) {
         if (!req.body.orderId) {
             return res.status(400).json({ error: "orderId is required" });
         }
@@ -161,7 +161,7 @@ class ShipmentController {
         }
     }
 
-    async mergeInvoice(req, res) {
+    async mergeOrder(req, res) {
         if (!req.body.orderId) {
             return res.status(400).json({ error: "orderId is required" });
         }
@@ -183,7 +183,7 @@ class ShipmentController {
         }
     }
 
-    async fetchShipment(req, res) {
+    async fetchInvoice(req, res) {
         if (!req.body.orderId) {
             return res.status(400).json({ error: "orderId is required" });
         }
@@ -205,7 +205,7 @@ class ShipmentController {
         }
     }
 
-    async resolveCustomer(req, res) {
+    async resolveInvoice(req, res) {
         if (!req.body.orderId) {
             return res.status(400).json({ error: "orderId is required" });
         }
@@ -227,7 +227,7 @@ class ShipmentController {
         }
     }
 
-    async normalisePayment(req, res) {
+    async normaliseInvoice(req, res) {
         if (!req.body.orderId) {
             return res.status(400).json({ error: "orderId is required" });
         }

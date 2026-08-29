@@ -10,6 +10,7 @@
 import fs from "fs/promises";
 import path from "path";
 import { fileURLToPath } from "url";
+import { acceptableRanges } from "./enclosing-function.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.join(here, "corpus");
@@ -23,17 +24,37 @@ const srcRoot = path.join(root, "src");
 const pick = (arr, i) => arr[i % arr.length];
 const NOUNS = ["order", "invoice", "shipment", "customer", "payment", "refund", "coupon", "address"];
 const VERBS = ["fetch", "resolve", "normalise", "collect", "reconcile", "expand", "flatten", "merge"];
+const QUALIFIERS = ["", "ById", "ForOwner", "Recent", "Pending", "Archived", "ForExport", "Stale"];
 const cap = (s) => s[0].toUpperCase() + s.slice(1);
+
+/**
+ * A distinct method name for every index.
+ *
+ * Both word lists have eight entries, and every name used to be built from a
+ * single index into both of them, so a class with more than eight members
+ * defined the same method twice. `adminController.js` had eight duplicated
+ * names out of nineteen members, `orderRepository.js` eight out of eighteen.
+ *
+ * That was not cosmetic. Those files are clean controls, and the duplication is
+ * a real defect the tool reports, so the answer key called a correct finding a
+ * false alarm. It also inflated the "cost of reading the file" baseline with
+ * dead code. It confused five separate measurements before it was fixed.
+ *
+ * Cycling the second word only after the first has wrapped gives 64 distinct
+ * names, past any file here.
+ */
+const memberName = (i) => `${pick(VERBS, i)}${cap(NOUNS[Math.floor(i / VERBS.length) % NOUNS.length])}`;
+const queryName = (i) =>
+    `find${cap(pick(NOUNS, i))}s${QUALIFIERS[Math.floor(i / NOUNS.length) % QUALIFIERS.length]}`;
 
 function controller(name, { routes, guards }) {
     const body = Array.from({ length: routes }, (_, r) => {
-        const noun = pick(NOUNS, r + name.length);
         const checks = Array.from({ length: guards }, (_, g) => `
         if (!req.body.${pick(NOUNS, g)}Id) {
             return res.status(400).json({ error: "${pick(NOUNS, g)}Id is required" });
         }`).join("");
         return `
-    async ${pick(VERBS, r)}${cap(noun)}(req, res) {${checks}
+    async ${memberName(r)}(req, res) {${checks}
         try {
             const result = await this.service.${pick(VERBS, r)}(req.params.id, req.body);
             if (!result) {
@@ -91,7 +112,7 @@ function service(name, { methods, loops, awaits, branches }) {
         }`).join("");
 
         return `
-    async ${pick(VERBS, m)}${cap(pick(NOUNS, m))}(id, options = {}) {
+    async ${memberName(m)}(id, options = {}) {
         let total = 0;
         const batch = await this.repo.loadBatch(id);${waits}${inner}${ifs}
         return { id, total };
@@ -113,7 +134,7 @@ module.exports = { ${name} };
 
 function repository(name, { queries }) {
     const body = Array.from({ length: queries }, (_, q) => `
-    async find${cap(pick(NOUNS, q))}s(id) {
+    async ${queryName(q)}(id) {
         const rows = await this.db.query(
             "SELECT * FROM ${pick(NOUNS, q)}s WHERE owner_id = $1 ORDER BY created_at DESC",
             [id]
@@ -701,6 +722,14 @@ module.exports = { retry };
 
 /* ---------------------------------------------------------------- */
 
+function lineOf(source, anchor, file) {
+    const index = source.indexOf(anchor);
+    if (index === -1) {
+        throw new Error(`anchor not found in ${file}: ${anchor}`);
+    }
+    return source.slice(0, index).split("\n").length;
+}
+
 async function main() {
     await fs.rm(root, { recursive: true, force: true });
 
@@ -724,13 +753,35 @@ async function main() {
     // the manifest cannot drift out of sync with the source it describes.
     const manifest = {
         generatedBy: "bench/generate-corpus.mjs",
+        language: "javascript",
+        corpus: "corpus",
         fileCount: written.length,
-        bugs: bugs.map(({ source, anchor, ...rest }) => {
-            const index = source.split("\n").findIndex((text) => text.includes(anchor));
-            if (index === -1) {
-                throw new Error(`anchor not found in ${rest.file}: ${anchor}`);
-            }
-            return { ...rest, line: index + 1, anchor: anchor.trim() };
+        // The per-file harness used to hardcode these. Naming them here keeps
+        // the answer key and the control group in one file, so a corpus can be
+        // measured without the harness knowing anything about it.
+        controls: [
+            "src/services/orderService.js",
+            "src/api/adminController.js",
+            "src/repositories/orderRepository.js",
+            "src/lib/paging.js",
+            "src/models/payment.js",
+            "src/services/auditService.js"
+        ],
+        bugs: bugs.map(({ source, anchor, alsoAnchor, ...rest }) => {
+            const line = lineOf(source, anchor, rest.file);
+            const acceptableLines = alsoAnchor
+                ? [line, lineOf(source, alsoAnchor, rest.file)]
+                : [line];
+            return {
+                ...rest,
+                line,
+                acceptableLines,
+                // The function the defect lives in, so grading can ask whether
+                // the prediction sent a reader to the right place rather than
+                // whether it landed inside an arbitrary line tolerance.
+                acceptableRanges: acceptableRanges(source, acceptableLines),
+                anchor: anchor.trim()
+            };
         })
     };
 

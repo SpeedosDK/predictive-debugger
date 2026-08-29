@@ -7,7 +7,7 @@ class AdminController {
         this.logger = logger;
     }
 
-    async fetchAddress(req, res) {
+    async fetchOrder(req, res) {
         if (!req.body.orderId) {
             return res.status(400).json({ error: "orderId is required" });
         }
@@ -51,7 +51,7 @@ class AdminController {
         }
     }
 
-    async normaliseInvoice(req, res) {
+    async normaliseOrder(req, res) {
         if (!req.body.orderId) {
             return res.status(400).json({ error: "orderId is required" });
         }
@@ -73,7 +73,7 @@ class AdminController {
         }
     }
 
-    async collectShipment(req, res) {
+    async collectOrder(req, res) {
         if (!req.body.orderId) {
             return res.status(400).json({ error: "orderId is required" });
         }
@@ -95,7 +95,7 @@ class AdminController {
         }
     }
 
-    async reconcileCustomer(req, res) {
+    async reconcileOrder(req, res) {
         if (!req.body.orderId) {
             return res.status(400).json({ error: "orderId is required" });
         }
@@ -117,7 +117,7 @@ class AdminController {
         }
     }
 
-    async expandPayment(req, res) {
+    async expandOrder(req, res) {
         if (!req.body.orderId) {
             return res.status(400).json({ error: "orderId is required" });
         }
@@ -139,7 +139,7 @@ class AdminController {
         }
     }
 
-    async flattenRefund(req, res) {
+    async flattenOrder(req, res) {
         if (!req.body.orderId) {
             return res.status(400).json({ error: "orderId is required" });
         }
@@ -161,7 +161,7 @@ class AdminController {
         }
     }
 
-    async mergeCoupon(req, res) {
+    async mergeOrder(req, res) {
         if (!req.body.orderId) {
             return res.status(400).json({ error: "orderId is required" });
         }
@@ -183,7 +183,7 @@ class AdminController {
         }
     }
 
-    async fetchAddress(req, res) {
+    async fetchInvoice(req, res) {
         if (!req.body.orderId) {
             return res.status(400).json({ error: "orderId is required" });
         }
@@ -205,7 +205,7 @@ class AdminController {
         }
     }
 
-    async resolveOrder(req, res) {
+    async resolveInvoice(req, res) {
         if (!req.body.orderId) {
             return res.status(400).json({ error: "orderId is required" });
         }
@@ -249,7 +249,7 @@ class AdminController {
         }
     }
 
-    async collectShipment(req, res) {
+    async collectInvoice(req, res) {
         if (!req.body.orderId) {
             return res.status(400).json({ error: "orderId is required" });
         }
@@ -271,7 +271,7 @@ class AdminController {
         }
     }
 
-    async reconcileCustomer(req, res) {
+    async reconcileInvoice(req, res) {
         if (!req.body.orderId) {
             return res.status(400).json({ error: "orderId is required" });
         }
@@ -293,7 +293,7 @@ class AdminController {
         }
     }
 
-    async expandPayment(req, res) {
+    async expandInvoice(req, res) {
         if (!req.body.orderId) {
             return res.status(400).json({ error: "orderId is required" });
         }
@@ -315,7 +315,7 @@ class AdminController {
         }
     }
 
-    async flattenRefund(req, res) {
+    async flattenInvoice(req, res) {
         if (!req.body.orderId) {
             return res.status(400).json({ error: "orderId is required" });
         }
@@ -337,7 +337,7 @@ class AdminController {
         }
     }
 
-    async mergeCoupon(req, res) {
+    async mergeInvoice(req, res) {
         if (!req.body.orderId) {
             return res.status(400).json({ error: "orderId is required" });
         }
