@@ -14,11 +14,18 @@ import { collectSourceFiles } from "../core/sourceFiles";
 import { ProviderRegistry } from "../providers/registry";
 import { ProviderId } from "../providers/types";
 
+/**
+ * Injected by esbuild from package.json. Declared rather than imported because
+ * the tsc build in `out/` emits no JSON; `typeof` on an undeclared name is safe
+ * in JavaScript, so the fallback applies there instead of throwing.
+ */
+declare const __PACKAGE_VERSION__: string | undefined;
+
 const registry = new ProviderRegistry();
 
 const server = new McpServer({
     name: "predictive-debugger",
-    version: "1.0.0"
+    version: typeof __PACKAGE_VERSION__ === "string" ? __PACKAGE_VERSION__ : "0.0.0-dev"
 });
 
 function json(value: unknown) {

@@ -9,7 +9,12 @@
  * ESM/CJS interop dance around @babel/parser and @babel/traverse — they are
  * ESM-only, so unbundled code has to reach them through a dynamic import.
  */
+import { readFileSync } from "fs";
 import esbuild from "esbuild";
+
+// The MCP server reports its version over the wire. Injecting it here keeps that
+// one number in package.json instead of drifting in a second hand-edited literal.
+const { version } = JSON.parse(readFileSync(new URL("./package.json", import.meta.url), "utf8"));
 
 const watch = process.argv.includes("--watch");
 const production = process.argv.includes("--production");
@@ -23,6 +28,7 @@ const shared = {
     target: "node18",
     minify: production,
     sourcemap: production ? false : "linked",
+    define: { __PACKAGE_VERSION__: JSON.stringify(version) },
     logLevel: "info"
 };
 

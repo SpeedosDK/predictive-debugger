@@ -7,6 +7,11 @@
 # Note that .npmignore fully replaces .gitignore for packaging purposes, so
 # dist/ is included here even though git ignores it — that is the shipped build.
 
+# The VS Code bundle ships in the VSIX, not in the npm tarball — an MCP consumer
+# never loads it, and it is ~700 kB.
+dist/extension.js
+dist/extension.js.map
+
 src/
 out/
 esbuild.mjs

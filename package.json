@@ -1,7 +1,7 @@
 {
   "name": "predictive-debugger",
   "displayName": "Predictive Debugger",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Predicts where code is likely to fail. Ships as a VS Code extension and as an MCP server that coding agents can call while reviewing code. Auth is borrowed from the Claude Code CLI or Codex CLI you are already signed in to.",
   "author": "SpeedosDK",
   "license": "MIT",
@@ -44,10 +44,12 @@
     "pretest": "npm run compile",
     "test": "node --test \"out/test/**/*.test.js\"",
     "mcp": "node ./dist/mcp-server.js",
+    "prepack": "npm run build",
     "package": "npm run build && vsce package --allow-missing-repository --skip-license",
     "vscode:prepublish": "npm run build",
     "bundle:dev": "node esbuild.mjs",
-    "bench": "node bench/generate-corpus.mjs && node bench/measure.mjs && node bench/measure-file.mjs && node bench/markdown.mjs"
+    "bench": "node bench/generate-corpus.mjs && node bench/measure.mjs && node bench/measure-file.mjs && node bench/markdown.mjs",
+    "bench:ts": "node bench/generate-corpus-ts.mjs && node bench/measure-file.mjs --corpus=corpus-ts --manifest=manifest-ts.json --output=results-file-ts.json"
   },
   "engines": {
     "vscode": "^1.85.0",
