@@ -6,11 +6,31 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
-Three changes driven by the benchmark in `bench/`, each with the measurement that
-motivated it.
+## [0.2.0] — 2026-08-29
+
+Changes driven by the benchmark in `bench/`, each with the measurement that
+motivated it, plus the housekeeping a first public repository needs.
 
 ### Changed
 
+- **A prediction is graded against the function the defect lives in**, not a tolerance of
+  three lines. The tolerance measured the wrong thing in both directions. On `lib/retry.js`,
+  thirteen lines long, it accepted most of the file, so a prediction landed inside it by
+  luck. On a defect with two defensible sites, the acquisition of a resource and the teardown
+  that fails to release it, it called a correct answer a miss. `bench/enclosing-function.mjs`
+  derives the range from the source, skipping single-line callbacks so the unit is the method
+  a reader would open. The exact-line count is reported alongside it, and the two disagree:
+  18 of 18 inside the function, 12 of 18 on the line itself.
+- **The pattern catalogue has an `other` id.** It was a closed list of six, and a closed
+  list threw away correct answers: asked about a method filtering on `createdAt` where its
+  own documentation promises every record edited since a timestamp, the model named the
+  line, explained the contradiction, then had to answer `none` because nothing fitted, and
+  `parsePrediction` forces the score to 0 for `none`. That happened on every trial of both
+  defects planted outside the catalogue in the TypeScript corpus, five of fifteen buggy runs.
+  Adding `other` recovered all five. It also started reporting duplicated dead code on the
+  JavaScript corpus, which the model itself described as "redundant but not itself a runtime
+  failure", so the prompt now states that `other` is for runtime failures and not for
+  maintainability.
 - **The classifier prompt treats concurrency as a normal execution.** The evidence policy
   asks the model to disprove a candidate defect before reporting it, and a single
   sequential reading of a file always disproves a race condition — so the policy suppressed
@@ -82,6 +102,44 @@ motivated it.
 
 ### Fixed
 
+- **The corpus generator gives every member a distinct name.** Both word lists held eight
+  entries and every name was built from a single index into both, so a class with more than
+  eight members defined the same method twice: eight duplicated names of nineteen members in
+  `adminController.js`, eight of eighteen in `orderRepository.js`. Those are clean controls,
+  and the duplication is a real defect the tool reports, so the answer key called a correct
+  finding a false alarm. It also padded the "cost of reading the file" baseline with dead
+  code. It confused five separate measurements before it was found.
+- **A partial provider outage no longer destroys the measured results.** The guard fired only
+  when every call failed. A session limit reached partway through let 21 of 36 calls fail,
+  which emptied the control group entirely and still counted as a run, replacing the previous
+  results. Any failure now writes to a `.partial.json` sidecar and leaves the measured file
+  alone.
+- **The source sent to the model carries line numbers.** The prompt asked for a 1-based
+  line number and sent raw source, leaving the model to count newlines by eye. It described
+  the defect correctly and then reported a line six to twelve lines away on the two largest
+  files with a planted defect: five of eighteen runs. Small files were exact, which is the
+  signature of a counting problem rather than a reasoning one. The size cap now applies to
+  the numbered text, so numbering cannot push the prompt past the bound the cap exists to
+  enforce.
+- **A verdict cut off mid-reply is recovered instead of discarded.** `extractJsonObject`
+  took everything from the first `{` to the last `}` and gave up when `JSON.parse` failed,
+  so a complete verdict followed by a truncated key was thrown away as `unknown` and scored
+  as a missed defect. It now closes the object at the last finished pair, and accepts the
+  reconstruction only when it carries both a pattern and a score.
+- **Decorated classes no longer fail to parse.** `@Injectable()` produced a parse error,
+  which zeroed a file's metrics and sank it to the bottom of the `scan_project` ranking, so
+  the tool recommended reading a Nest or Angular project's controllers and services last.
+  The verdict from `predict_failures` was unaffected, since the model receives the raw
+  source either way. Enabling `decorators-legacy` and `decoratorAutoAccessors` covers
+  Angular, Nest, TypeORM, MobX and the `accessor` keyword.
+- **Class and object methods are counted as functions.** Babel does not report a method as
+  a `FunctionExpression`, so the metric visitor was blind to every method in a class-based
+  codebase. `longFunctions` carries 0.15 of the risk weight and had never fired once across
+  the 40 files of the benchmark corpus. The ranking on that corpus is unchanged, since its
+  generated methods are all short, and the rank correlation between `riskDensity` and raw
+  file size improved from 0.359 to 0.326.
+- **`.mts` and `.cts` files are found by a scan.** They were the only TypeScript extensions
+  missing from the source walker.
 - `bench/measure-file.mjs` no longer replaces the last valid result file when every
   provider call fails, and `BENCH_OUTPUT` can keep provider-specific validation runs
   separate. This was found when the Claude CLI hit its session limit during the
@@ -95,6 +153,30 @@ motivated it.
   it, so the documented "run it yourself" steps failed on a clean checkout.
 - A handful of em dashes in this file were stored as CP-1252 bytes rather than
   UTF-8, so they rendered as replacement characters.
+- **The score blend is its own module.** `combineScores` moved out of
+  `predictFile` into `core/prediction/score.ts`. It was a private function
+  reachable only through a live model call, so the weighting the README devotes a
+  section to had no test at all; it now has five. The blend is unchanged except
+  that out-of-range and non-finite inputs clamp to `[0, 1]` instead of only being
+  capped above. The JSDoc for `predictFile` had also drifted onto the private
+  function below it.
+- **The MCP server reports the version from `package.json`.** It announced
+  `1.0.0` over the wire while the package was `0.1.0`. esbuild now injects the
+  real value, so there is one number rather than two.
+- **`prepack` builds before packing.** `vscode:prepublish` covered `vsce` but
+  nothing covered `npm publish`, so publishing without a manual build would have
+  shipped a stale `dist/` — or an empty package, since `dist/` is git-ignored.
+- `dist/extension.js` is excluded from the npm tarball. An MCP consumer never
+  loads the VS Code bundle; the package drops from 515 kB to 335 kB.
+- `SECURITY.md`, `CONTRIBUTING.md`, issue templates and a pull request template.
+- **The benchmark report states that its numbers are in-sample.** The corpora
+  were built alongside the tool and the classifier prompt was revised against
+  them, which the per-corpus caveats said and the headline did not.
+- Corrected figures in the README that had fallen behind the benchmark: the
+  headline context table, the clean-control counts, the flat answer cost, and the
+  test count. The README also still described localisation with the ±3-line
+  tolerance that this release replaced with enclosing-function grading, and
+  claimed no TypeScript had been measured after `npm run bench:ts` was added.
 
 ## [0.1.0] — 2026-08-17
 
@@ -172,5 +254,6 @@ README.
 - `@types/vscode` was newer than the declared `engines.vscode`, which prevented
   packaging and allowed use of APIs missing from the minimum supported version.
 
-[Unreleased]: https://github.com/SpeedosDK/predictive-debugger/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/SpeedosDK/predictive-debugger/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/SpeedosDK/predictive-debugger/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/SpeedosDK/predictive-debugger/releases/tag/v0.1.0

@@ -1,0 +1,68 @@
+name: Bug report
+description: Something behaves differently than documented
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        For anything security-relevant, use
+        [private vulnerability reporting](https://github.com/SpeedosDK/predictive-debugger/security/advisories/new)
+        instead. A wrong or missed prediction is a bug, not a vulnerability — file it here.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What you expected, and what you got instead.
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: How to reproduce
+      description: >
+        The smallest source file that triggers it, if you can share one.
+        Paste it here rather than linking to a repository.
+      render: javascript
+    validations:
+      required: true
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Which surface
+      options:
+        - VS Code extension
+        - MCP server
+        - Both
+        - Not sure
+    validations:
+      required: true
+  - type: dropdown
+    id: provider
+    attributes:
+      label: Which provider CLI
+      options:
+        - Claude Code
+        - Codex
+        - Neither — this is a deterministic tool (analyze_file, scan_project, analyze_logs)
+        - Not sure
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      description: "Extension or npm package version, and the output of `node --version`."
+      placeholder: "0.2.0, Node 22.11.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: Platform
+      description: The project is developed on Windows; the macOS and Linux CLI-discovery paths are less exercised.
+      options:
+        - Windows
+        - macOS
+        - Linux
+    validations:
+      required: true

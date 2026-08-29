@@ -59,7 +59,19 @@ Read this before relying on it.
 - **The static score is a heuristic, not a proof.** It counts structural risk
   factors — it does not know your invariants, and a high score is a hint about
   where to look, not a defect report.
-- Only JavaScript and TypeScript are analysed.
+- **Only JavaScript and TypeScript are analysed**, in these extensions: `.js`,
+  `.jsx`, `.mjs`, `.cjs`, `.ts`, `.tsx`, `.mts`, `.cts`. Decorators parse, so
+  Angular, Nest, TypeORM and MobX sources are analysed rather than skipped.
+  Single-file components are not supported: a `.vue` or `.svelte` file is never
+  read at all.
+- **The benchmark is measured on generated corpora, not real repositories.**
+  The headline figures in [bench/RESULTS.md](bench/RESULTS.md) come from 40
+  generated JavaScript files with 6 planted defects across 4 defect classes. A
+  smaller TypeScript corpus is measured separately (`npm run bench:ts`). Both
+  were built alongside the tool by the same author, and the classifier prompt
+  was revised in response to what they showed — so these are in-sample
+  numbers. See the caveats in the report, which say which corpus drove which
+  change.
 
 ## Security model
 
@@ -83,7 +95,8 @@ Read this before relying on it.
 - **The MCP tools accept absolute paths from the calling agent** and will read
   any file the process can read — by design, since the point is to analyse a
   codebase. Files above 4 MB are skipped rather than loaded.
-- `npm audit` reports 0 vulnerabilities across 111 production dependencies.
+- `npm audit` reported 0 vulnerabilities across 111 production dependencies at
+  the 0.2.0 release. Re-run it rather than trusting this line.
 
 ## Setup
 
@@ -208,7 +221,9 @@ short files. An earlier 0.4/0.4/0.2 blend pulled the combined score down to AUC
 of the six real defects; it also capped the score at 0.8 whenever no log file
 was given, since the log term then contributed nothing.
 
-Static risk and log analysis run locally and cost nothing. Only the model
+The blend lives in `src/core/prediction/score.ts` as `combineScores`, separate
+from the pipeline that calls it, so the weights can be tested without a model
+call. Static risk and log analysis run locally and cost nothing. Only the model
 verdict spawns a CLI.
 
 Two static scores are reported, and they answer different questions.
@@ -253,6 +268,7 @@ To regenerate the benchmark artifacts from a cloned repository:
 npm install
 npm run build                    # build dist/mcp-server.js used by the benchmark
 npm run bench                    # all four steps below, in order
+npm run bench:ts                 # the smaller TypeScript corpus
 
 node bench/generate-corpus.mjs   # generate the 40-file corpus and answer key
 node bench/measure.mjs           # measure scan_project ranking quality
@@ -268,11 +284,18 @@ Headline, over 12 files with 3 trials each against the Claude CLI:
 
 | | |
 |---|---|
-| Context to read the files | 10,228 tokens |
-| Context to ask `predict_failures` | 1,652 tokens |
-| Runs that named the planted line (±3) | 15 of 18 |
+| Context to read the files | 10,244 tokens |
+| Context to ask `predict_failures` | 1,606 tokens |
+| Runs landing inside the defect's own function | 18 of 18 |
+| Runs landing on the exact line | 12 of 18 |
 | False alarms on clean files, raw output | **0 of 18** |
 | Separation between buggy and clean runs (AUC) | 1.000 |
+
+Two localisation numbers, because an agent and a Problems panel need different
+ones: the enclosing function is where a reader would look, the exact line is
+what a panel underlines. This replaced an earlier tolerance of three lines
+either way, which accepted most of a 13-line file and called a defect with two
+defensible sites a miss.
 
 That 0.70 cutoff is now product behaviour, not just advice in this README. Replaying the
 same 36 Claude responses changes VS Code Problems from **12 false alerts to 0**, while
@@ -283,20 +306,20 @@ labelled “not added to Problems” instead of becoming an alert.
 
 That replay measured the reporting gate alone. A provider-matched rerun measures the
 prompt: with the evidence policy and the concurrency clause, Claude names **0 of 18**
-defects in clean controls, down from 13, while naming 15 of 18 planted lines. A
+defects in clean controls, down from 11, while naming all 18 planted lines. A
 three-trial run through the Codex provider on the same build also produced **0 of 18
 false alarms**, with 11 of 18 planted runs on the correct line. See the report for the
 per-provider comparison.
 
 Three findings that should change how the tools are used:
 
-- **The answer costs a flat ~138 tokens**, so asking is only cheaper than
+- **The answer costs a flat ~134 tokens**, so asking is only cheaper than
   reading for files above roughly that size. On an 80-token helper it still
   costs more.
 - **The false alarms were fixed in the prompt, not the threshold.** An evidence
   policy that makes the model disprove a candidate before reporting it, plus a
   clause saying concurrency is a normal execution rather than an invented input,
-  took clean-file alarms from 13 of 18 to 0 of 18. The 0.70 gate now costs
+  took clean-file alarms from 11 of 18 to 0 of 18. The 0.70 gate now costs
   nothing and catches nothing — keep it as a backstop, because the refusal is a
   model behaviour and not a guarantee. Earlier builds put clean-file noise as
   high as 0.65.
@@ -320,7 +343,7 @@ overhead dominates.
 ```bash
 npm run watch     # esbuild in watch mode (unminified, with sourcemaps)
 npm run check     # type-check only — esbuild does not type-check
-npm test          # 48 tests, Node's built-in runner, no test dependencies
+npm test          # 84 tests, Node's built-in runner, no test dependencies
 npm run package   # build and produce a .vsix
 ```
 
@@ -330,14 +353,20 @@ distinguishable from a bundling error. Tests run against the `tsc` output in
 `out/`, not the bundle.
 
 Tests live in `src/test/`. They cover the pure logic — the risk model, AST
-metrics, model-reply parsing, Windows argument quoting, the source-tree walker,
-and the log analyzer's degradation contract. Anything that needs a signed-in CLI
-is deliberately not unit-tested; `.github/scripts/check-mcp.mjs` covers the MCP
-surface end to end without credentials.
+metrics, the score blend, model-reply parsing, Windows argument quoting, the
+source-tree walker, and the log analyzer's degradation contract. Anything that
+needs a signed-in CLI is deliberately not unit-tested;
+`.github/scripts/check-mcp.mjs` covers the MCP surface end to end without
+credentials.
 
 ## Contributing
 
-Issues and pull requests are welcome. Please run `npm test` before opening a PR.
+Issues and pull requests are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md)
+for the setup, what CI checks, and how to change a number that the benchmark
+backs.
+
+For anything security-relevant, follow [SECURITY.md](SECURITY.md) and report it
+privately rather than opening an issue.
 
 ## License
 
