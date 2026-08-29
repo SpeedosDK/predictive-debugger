@@ -7,7 +7,7 @@ class CustomerController {
         this.logger = logger;
     }
 
-    async fetchShipment(req, res) {
+    async fetchOrder(req, res) {
         if (!req.body.orderId) {
             return res.status(400).json({ error: "orderId is required" });
         }
@@ -26,7 +26,7 @@ class CustomerController {
         }
     }
 
-    async resolveCustomer(req, res) {
+    async resolveOrder(req, res) {
         if (!req.body.orderId) {
             return res.status(400).json({ error: "orderId is required" });
         }
@@ -45,7 +45,7 @@ class CustomerController {
         }
     }
 
-    async normalisePayment(req, res) {
+    async normaliseOrder(req, res) {
         if (!req.body.orderId) {
             return res.status(400).json({ error: "orderId is required" });
         }
@@ -64,7 +64,7 @@ class CustomerController {
         }
     }
 
-    async collectRefund(req, res) {
+    async collectOrder(req, res) {
         if (!req.body.orderId) {
             return res.status(400).json({ error: "orderId is required" });
         }
@@ -83,7 +83,7 @@ class CustomerController {
         }
     }
 
-    async reconcileCoupon(req, res) {
+    async reconcileOrder(req, res) {
         if (!req.body.orderId) {
             return res.status(400).json({ error: "orderId is required" });
         }
@@ -102,7 +102,7 @@ class CustomerController {
         }
     }
 
-    async expandAddress(req, res) {
+    async expandOrder(req, res) {
         if (!req.body.orderId) {
             return res.status(400).json({ error: "orderId is required" });
         }

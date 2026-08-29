@@ -68,7 +68,7 @@ class CustomerRepository {
         return rows.map((row) => ({ id: row.id, createdAt: row.created_at }));
     }
 
-    async findOrders(id) {
+    async findOrdersById(id) {
         const rows = await this.db.query(
             "SELECT * FROM orders WHERE owner_id = $1 ORDER BY created_at DESC",
             [id]
@@ -76,7 +76,7 @@ class CustomerRepository {
         return rows.map((row) => ({ id: row.id, createdAt: row.created_at }));
     }
 
-    async findInvoices(id) {
+    async findInvoicesById(id) {
         const rows = await this.db.query(
             "SELECT * FROM invoices WHERE owner_id = $1 ORDER BY created_at DESC",
             [id]
@@ -84,7 +84,7 @@ class CustomerRepository {
         return rows.map((row) => ({ id: row.id, createdAt: row.created_at }));
     }
 
-    async findShipments(id) {
+    async findShipmentsById(id) {
         const rows = await this.db.query(
             "SELECT * FROM shipments WHERE owner_id = $1 ORDER BY created_at DESC",
             [id]
@@ -92,7 +92,7 @@ class CustomerRepository {
         return rows.map((row) => ({ id: row.id, createdAt: row.created_at }));
     }
 
-    async findCustomers(id) {
+    async findCustomersById(id) {
         const rows = await this.db.query(
             "SELECT * FROM customers WHERE owner_id = $1 ORDER BY created_at DESC",
             [id]
@@ -100,7 +100,7 @@ class CustomerRepository {
         return rows.map((row) => ({ id: row.id, createdAt: row.created_at }));
     }
 
-    async findPayments(id) {
+    async findPaymentsById(id) {
         const rows = await this.db.query(
             "SELECT * FROM payments WHERE owner_id = $1 ORDER BY created_at DESC",
             [id]

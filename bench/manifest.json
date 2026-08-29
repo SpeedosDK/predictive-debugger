@@ -1,6 +1,16 @@
 {
   "generatedBy": "bench/generate-corpus.mjs",
+  "language": "javascript",
+  "corpus": "corpus",
   "fileCount": 40,
+  "controls": [
+    "src/services/orderService.js",
+    "src/api/adminController.js",
+    "src/repositories/orderRepository.js",
+    "src/lib/paging.js",
+    "src/models/payment.js",
+    "src/services/auditService.js"
+  ],
   "bugs": [
     {
       "file": "src/services/pricingService.js",
@@ -8,6 +18,15 @@
       "complexity": "high",
       "summary": "Tier loop reads tiers[i + 1] without bounding i, so the last tier dereferences undefined.",
       "line": 34,
+      "acceptableLines": [
+        34
+      ],
+      "acceptableRanges": [
+        [
+          29,
+          55
+        ]
+      ],
       "anchor": "const next = tiers[i + 1];"
     },
     {
@@ -16,6 +35,15 @@
       "complexity": "high",
       "summary": "Balance is read before the awaits and written back after, so concurrent ticks lose updates.",
       "line": 28,
+      "acceptableLines": [
+        28
+      ],
+      "acceptableRanges": [
+        [
+          24,
+          43
+        ]
+      ],
       "anchor": "const balance = await this.ledger.balanceOf(account.id);"
     },
     {
@@ -24,6 +52,15 @@
       "complexity": "high",
       "summary": "await inside forEach is not awaited, so reserve() returns before any stock is decremented.",
       "line": 28,
+      "acceptableLines": [
+        28
+      ],
+      "acceptableRanges": [
+        [
+          28,
+          36
+        ]
+      ],
       "anchor": "lines.forEach(async (line) => {"
     },
     {
@@ -32,6 +69,15 @@
       "complexity": "low",
       "summary": "Loop bound is <= days, so every window contains one extra day.",
       "line": 7,
+      "acceptableLines": [
+        7
+      ],
+      "acceptableRanges": [
+        [
+          5,
+          11
+        ]
+      ],
       "anchor": "for (let i = 0; i <= days; i++) {"
     },
     {
@@ -40,6 +86,15 @@
       "complexity": "low",
       "summary": "discount is optional on the row but dereferenced unguarded, throwing for carts with no coupon.",
       "line": 6,
+      "acceptableLines": [
+        6
+      ],
+      "acceptableRanges": [
+        [
+          3,
+          13
+        ]
+      ],
       "anchor": "const discount = row.discount.amount;"
     },
     {
@@ -48,6 +103,15 @@
       "complexity": "low",
       "summary": "The final attempt's rejection is swallowed, so retry resolves undefined instead of throwing.",
       "line": 7,
+      "acceptableLines": [
+        7
+      ],
+      "acceptableRanges": [
+        [
+          3,
+          11
+        ]
+      ],
       "anchor": "} catch (err) {"
     }
   ]

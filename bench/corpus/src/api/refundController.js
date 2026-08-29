@@ -32,7 +32,7 @@ class RefundController {
         }
     }
 
-    async resolveInvoice(req, res) {
+    async resolveOrder(req, res) {
         if (!req.body.orderId) {
             return res.status(400).json({ error: "orderId is required" });
         }
@@ -57,7 +57,7 @@ class RefundController {
         }
     }
 
-    async normaliseShipment(req, res) {
+    async normaliseOrder(req, res) {
         if (!req.body.orderId) {
             return res.status(400).json({ error: "orderId is required" });
         }
@@ -82,7 +82,7 @@ class RefundController {
         }
     }
 
-    async collectCustomer(req, res) {
+    async collectOrder(req, res) {
         if (!req.body.orderId) {
             return res.status(400).json({ error: "orderId is required" });
         }
@@ -107,7 +107,7 @@ class RefundController {
         }
     }
 
-    async reconcilePayment(req, res) {
+    async reconcileOrder(req, res) {
         if (!req.body.orderId) {
             return res.status(400).json({ error: "orderId is required" });
         }
@@ -132,7 +132,7 @@ class RefundController {
         }
     }
 
-    async expandRefund(req, res) {
+    async expandOrder(req, res) {
         if (!req.body.orderId) {
             return res.status(400).json({ error: "orderId is required" });
         }
@@ -157,7 +157,7 @@ class RefundController {
         }
     }
 
-    async flattenCoupon(req, res) {
+    async flattenOrder(req, res) {
         if (!req.body.orderId) {
             return res.status(400).json({ error: "orderId is required" });
         }
@@ -182,7 +182,7 @@ class RefundController {
         }
     }
 
-    async mergeAddress(req, res) {
+    async mergeOrder(req, res) {
         if (!req.body.orderId) {
             return res.status(400).json({ error: "orderId is required" });
         }
@@ -207,7 +207,7 @@ class RefundController {
         }
     }
 
-    async fetchOrder(req, res) {
+    async fetchInvoice(req, res) {
         if (!req.body.orderId) {
             return res.status(400).json({ error: "orderId is required" });
         }

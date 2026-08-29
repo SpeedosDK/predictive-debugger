@@ -7,7 +7,7 @@ import { collectSourceFiles, isSourceFile } from "../core/sourceFiles";
 
 describe("isSourceFile", () => {
     it("accepts the JavaScript and TypeScript extensions", () => {
-        for (const name of ["a.js", "a.jsx", "a.mjs", "a.cjs", "a.ts", "a.tsx"]) {
+        for (const name of ["a.js", "a.jsx", "a.mjs", "a.cjs", "a.ts", "a.tsx", "a.mts", "a.cts"]) {
             assert.ok(isSourceFile(name), `${name} should be a source file`);
         }
     });

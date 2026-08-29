@@ -31,7 +31,24 @@ import { encode } from "gpt-tokenizer";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.join(here, "..");
-const corpus = path.join(here, "corpus");
+/**
+ * Which corpus to measure. The JavaScript and TypeScript corpora are kept apart
+ * so a change can be shown to help one without quietly hurting the other, and
+ * so a figure recorded last week stays comparable to one recorded today.
+ *
+ * Command-line flags win over environment variables, because an npm script
+ * cannot set an environment variable portably across cmd.exe and sh without
+ * pulling in a dependency for it.
+ */
+function flag(name, fallback) {
+    const prefix = `--${name}=`;
+    const match = process.argv.find((arg) => arg.startsWith(prefix));
+    return match ? match.slice(prefix.length) : fallback;
+}
+
+const CORPUS_DIR = flag("corpus", process.env.BENCH_CORPUS ?? "corpus");
+const MANIFEST_FILE = flag("manifest", process.env.BENCH_MANIFEST ?? "manifest.json");
+const corpus = path.join(here, CORPUS_DIR);
 
 const tokens = (text) => encode(text).length;
 
@@ -39,10 +56,42 @@ const tokens = (text) => encode(text).length;
 const LINE_TOLERANCE = 3;
 
 /**
- * Clean controls, chosen to span the same size range as the buggy files so
- * that "flags the big ones" cannot masquerade as accuracy.
+ * A defect can have more than one defensible line.
+ *
+ * A leaked resource is the clearest case: the acquisition and the teardown that
+ * fails to release it sit in different methods, and either is a correct answer.
+ * Grading only the one the corpus author happened to pick measures the
+ * benchmark's taste rather than the tool's accuracy. Manifests without the field
+ * fall back to the single planted line.
  */
-const CONTROLS = [
+function isNear(predicted, target) {
+    if (predicted == null) {
+        return false;
+    }
+    // Graded against the function the defect lives in. The old line tolerance
+    // measured the wrong thing in both directions: on a thirteen-line file three
+    // lines either way accepts most of it, so a prediction lands inside by luck;
+    // and on a defect with two defensible sites, the acquisition of a resource
+    // and the teardown that fails to release it, three lines is too strict and a
+    // correct answer scored as a miss. The exact-line count in the summary is
+    // the strict companion, and the two are reported together because they
+    // disagree.
+    const ranges = target.acceptableRanges ?? [];
+    if (ranges.length > 0) {
+        return ranges.some(([start, end]) => predicted >= start && predicted <= end);
+    }
+    // Module-level defects have no function to name, and older manifests have no
+    // ranges at all.
+    const accepted = target.acceptableLines ?? [target.line];
+    return accepted.some((line) => Math.abs(predicted - line) <= LINE_TOLERANCE);
+}
+
+/**
+ * Clean controls, chosen to span the same size range as the buggy files so
+ * that "flags the big ones" cannot masquerade as accuracy. Newer manifests
+ * carry their own list; this is the fallback for the original JavaScript one.
+ */
+const DEFAULT_CONTROLS = [
     "src/services/orderService.js",
     "src/api/adminController.js",
     "src/repositories/orderRepository.js",
@@ -53,18 +102,19 @@ const CONTROLS = [
 
 const TRIALS = Number(process.env.BENCH_TRIALS ?? 3);
 const PROVIDER = process.env.BENCH_PROVIDER ?? "claude";
-const OUTPUT_FILE = process.env.BENCH_OUTPUT ?? "results-file.json";
+const OUTPUT_FILE = flag("output", process.env.BENCH_OUTPUT ?? "results-file.json");
 
 if (path.basename(OUTPUT_FILE) !== OUTPUT_FILE || !OUTPUT_FILE.endsWith(".json")) {
     throw new Error("BENCH_OUTPUT must be a .json filename inside bench/");
 }
 
 async function main() {
-    const manifest = JSON.parse(await fs.readFile(path.join(here, "manifest.json"), "utf8"));
+    const manifest = JSON.parse(await fs.readFile(path.join(here, MANIFEST_FILE), "utf8"));
+    const controls = manifest.controls ?? DEFAULT_CONTROLS;
 
     const targets = [
         ...manifest.bugs.map((bug) => ({ ...bug, kind: "buggy" })),
-        ...CONTROLS.map((file) => ({ file, kind: "clean", line: null, pattern: null }))
+        ...controls.map((file) => ({ file, kind: "clean", line: null, pattern: null }))
     ];
 
     for (const target of targets) {
@@ -135,7 +185,7 @@ async function main() {
                 outcome = saysClean ? "true-negative" : "false-positive";
             } else if (saysClean) {
                 outcome = "false-negative";
-            } else if (predictedLine != null && Math.abs(predictedLine - target.line) <= LINE_TOLERANCE) {
+            } else if (isNear(predictedLine, target)) {
                 outcome = "hit";
             } else {
                 outcome = "wrong-location";
@@ -146,7 +196,7 @@ async function main() {
                 actionableOutcome = actionable ? "false-positive" : "true-negative";
             } else if (!actionable) {
                 actionableOutcome = "false-negative";
-            } else if (predictedLine != null && Math.abs(predictedLine - target.line) <= LINE_TOLERANCE) {
+            } else if (isNear(predictedLine, target)) {
                 actionableOutcome = "hit";
             } else {
                 actionableOutcome = "wrong-location";
@@ -196,9 +246,25 @@ async function main() {
     // JSON file containing only failures. Keep the measured baseline intact so
     // a rate limit or expired login cannot destroy the data it was meant to
     // compare against.
-    if (ok.length === 0) {
+    //
+    // "All calls failed" was too narrow a guard. A session limit reached partway
+    // through let 21 of 36 calls fail, which cleared the whole control group and
+    // still counted as a successful run, and the previous results were gone. A
+    // partial result cannot answer the questions this file exists to answer, so
+    // it is written to a sidecar for inspection and the measured file is left
+    // alone.
+    const failed = runs.filter((run) => run.error);
+    if (failed.length > 0) {
+        const sidecar = OUTPUT_FILE.replace(/\.json$/, ".partial.json");
+        await fs.writeFile(
+            path.join(here, sidecar),
+            JSON.stringify({ generatedAt: new Date().toISOString(), runs }, null, 2),
+            "utf8"
+        );
+        const reason = String(failed[0].error).split("\n")[0];
         throw new Error(
-            `All ${runs.length} prediction calls failed; keeping the existing ${OUTPUT_FILE}`
+            `${failed.length} of ${runs.length} prediction calls failed, so ${OUTPUT_FILE} was ` +
+                `left untouched. Partial output is in bench/${sidecar}.\nFirst failure: ${reason}`
         );
     }
 
@@ -238,6 +304,9 @@ async function main() {
         buggy: {
             runs: buggyRuns.length,
             hit: count(buggyRuns, "hit"),
+            // The strict measure, alongside the one graded by enclosing function.
+            // A panel that underlines a single line needs this number.
+            exactLine: buggyRuns.filter((run) => run.predictedLine === run.plantedLine).length,
             wrongLocation: count(buggyRuns, "wrong-location"),
             missed: count(buggyRuns, "false-negative")
         },
@@ -307,7 +376,8 @@ async function main() {
         );
     }
 
-    console.log(`\n  Buggy files:  ${summary.buggy.hit}/${summary.buggy.runs} hit the planted line (+-${LINE_TOLERANCE}), ` +
+    console.log(`\n  Buggy files:  ${summary.buggy.hit}/${summary.buggy.runs} inside the defect's function ` +
+        `(${summary.buggy.exactLine} exactly on the line), ` +
         `${summary.buggy.wrongLocation} pointed elsewhere, ${summary.buggy.missed} reported clean`);
     console.log(`  Clean files:  ${summary.clean.falsePositive}/${summary.clean.runs} false positives`);
     console.log(`  Actionable:   ${summary.actionable.buggy.hit}/${buggyRuns.length} planted lines, ` +

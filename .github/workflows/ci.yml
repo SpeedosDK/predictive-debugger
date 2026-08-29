@@ -2,7 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [main, master]
+    # master is the released line; develop is where a version is assembled and
+    # tested before it gets there.
+    branches: [master, develop]
   pull_request:
   workflow_dispatch:
 

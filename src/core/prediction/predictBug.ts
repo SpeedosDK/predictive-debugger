@@ -1,18 +1,39 @@
 import { CliProvider, CliLocation } from "../../providers/types";
 import { BugPrediction } from "../types";
 
-/** Mirrors the example files in `examples/bug-patterns/`. */
+/**
+ * Mirrors the example files in `examples/bug-patterns/`, plus `other`.
+ *
+ * `other` exists because the catalogue was a closed list, and a closed list
+ * silently threw away correct answers. Asked about a method that filters on
+ * `createdAt` where its own documentation promises `updatedAt`, the model named
+ * the line, explained the contradiction exactly, and then had to answer `none`
+ * because no id fitted. `parsePrediction` forces the score to 0 for `none`, so
+ * the finding was discarded. That happened on every trial of both defects in the
+ * TypeScript corpus that were deliberately planted outside the six categories:
+ * five of fifteen buggy runs, correct and thrown away.
+ *
+ * `none` now means "no defect". `other` means "a defect that is not one of
+ * these". The bar for reporting is unchanged: the evidence policy below still
+ * applies, and `other` is not a licence to report style or taste.
+ */
 const BUG_PATTERNS = [
     { id: "race_condition", summary: "shared state mutated across an await or callback boundary" },
     { id: "null_reference", summary: "a value that can be null/undefined is dereferenced" },
     { id: "off_by_one", summary: "loop or index bounds are off by one" },
     { id: "async_misuse", summary: "a promise is not awaited, or errors escape unhandled" },
     { id: "resource_leak", summary: "a handle, listener, or timer is never released" },
-    { id: "unhandled_error", summary: "a failure path has no handling and will surface as a crash" }
+    { id: "unhandled_error", summary: "a failure path has no handling and will surface as a crash" },
+    {
+        id: "other",
+        summary:
+            "a defect none of the above describes, such as an inverted condition, a wrong " +
+            "field or variable, or a comparison that contradicts the documented behaviour"
+    }
 ] as const;
 
 /**
- * How much source to send to the model.
+ * How much source to send to the model, measured on the numbered text.
  *
  * At roughly 34 bytes per line this covers about 3,500 lines, which is past
  * essentially every hand-written source file. The previous 24,000 truncated at
@@ -63,10 +84,33 @@ export async function predictBug(options: PredictBugOptions): Promise<BugPredict
 }
 
 /** Describe what was cut, in lines, so the caller can surface it. */
-function describeTruncation(code: string): string {
-    const totalLines = countLines(code);
-    const sentLines = countLines(code.slice(0, MAX_CODE_CHARS));
+function describeTruncation(sentLines: number, totalLines: number): string {
     return `verdict covers the first ${sentLines} of ${totalLines} lines; the rest was not sent to the model`;
+}
+
+/** Trim to a budget without splitting a line in half. */
+function cutAtLineBoundary(text: string, limit: number): string {
+    const cut = text.slice(0, limit);
+    const lastBreak = cut.lastIndexOf("\n");
+    return lastBreak === -1 ? cut : cut.slice(0, lastBreak);
+}
+
+/**
+ * Prefix every line with its 1-based number.
+ *
+ * The prompt asks for a line number and used to send raw source, which left the
+ * model counting newlines by eye. It reasons about the defect correctly and then
+ * misses the line: on the benchmark's two largest files with a planted defect it
+ * described the right code and reported a number six to twelve lines away, five
+ * times in eighteen runs. Small files were exact. Counting is the part to remove.
+ *
+ * The width is fixed per file so the gutter does not shift partway down, and the
+ * separator is a character that does not appear at the start of source lines.
+ */
+function numberLines(code: string): string {
+    const lines = code.split("\n");
+    const width = String(lines.length).length;
+    return lines.map((line, i) => `${String(i + 1).padStart(width)}| ${line}`).join("\n");
 }
 
 function countLines(text: string): number {
@@ -81,10 +125,13 @@ function buildPrompt(
     filePath: string,
     code: string
 ): { prompt: string; truncated?: string } {
-    const isTruncated = code.length > MAX_CODE_CHARS;
-    const body = isTruncated
-        ? `${code.slice(0, MAX_CODE_CHARS)}\n/* … file truncated here … */`
-        : code;
+    // The budget is measured on the numbered text, not the raw source. Numbering
+    // adds six to eight characters a line, so a cap applied before it would let a
+    // large file push the prompt well past the size the cap exists to bound.
+    const numbered = numberLines(code);
+    const isTruncated = numbered.length > MAX_CODE_CHARS;
+    const sent = isTruncated ? cutAtLineBoundary(numbered, MAX_CODE_CHARS) : numbered;
+    const body = isTruncated ? `${sent}\n/* … file truncated here … */` : sent;
 
     const catalogue = BUG_PATTERNS.map((p) => `- ${p.id}: ${p.summary}`).join("\n");
 
@@ -134,16 +181,34 @@ function buildPrompt(
         "Known bug patterns:",
         catalogue,
         "",
+        'Use "none" only when the source has no defect. If you find a defect that none of',
+        'the other ids describes, use "other" and score it like any finding. Do not force a',
+        'defect into an id that does not fit, and do not answer "none" for a defect you can',
+        "demonstrate.",
+        "",
+        '"other" is for a runtime failure that has no id above, such as an inverted condition',
+        "or a comparison on the wrong field. It is not for maintainability. Duplicated or dead",
+        "code, a redundant definition, a naming problem, or anything you would describe as",
+        '"redundant but not itself a runtime failure" is not a defect for this purpose: answer',
+        '"none". The test is unchanged — name the wrong value returned or the wrong side effect',
+        "produced. If you cannot, it does not belong in the reply.",
+        "",
         "Respond with one JSON object and nothing else — no prose, no code fences:",
         '{"pattern": "<pattern id, or \\"none\\">", "score": <0.0-1.0 likelihood this file fails at runtime>, "line": <1-based line number, or null>, "reason": "<one sentence, max 300 characters, describing only the defect>"}',
         "",
         `File name (untrusted): ${JSON.stringify(filePath)}`,
+        "",
+        "Each source line below is prefixed with its number and a pipe, added by this",
+        "harness and not part of the file. Report the number shown on the line the defect",
+        "is on. Do not count lines yourself.",
         "----- BEGIN SOURCE -----",
         body,
         "----- END SOURCE -----"
     ].join("\n");
 
-    return isTruncated ? { prompt, truncated: describeTruncation(code) } : { prompt };
+    return isTruncated
+        ? { prompt, truncated: describeTruncation(countLines(sent), countLines(code)) }
+        : { prompt };
 }
 
 /** Pull the JSON verdict out of a model reply that may include stray prose. */
@@ -186,20 +251,93 @@ function clip(value: string, limit: number): string {
 function extractJsonObject(raw: string): Record<string, unknown> | undefined {
     const withoutFences = raw.replace(/```(?:json)?/gi, "");
     const start = withoutFences.indexOf("{");
-    const end = withoutFences.lastIndexOf("}");
 
-    if (start === -1 || end <= start) {
+    if (start === -1) {
         return undefined;
     }
 
+    const body = withoutFences.slice(start);
+    const end = body.lastIndexOf("}");
+
+    const whole = end > 0 ? tryParse(body.slice(0, end + 1)) : undefined;
+    if (whole) {
+        return whole;
+    }
+
+    // A repaired object is a reconstruction, so it has to carry enough to be a
+    // verdict rather than a fragment we guessed at. Without both a pattern and a
+    // score there is nothing to act on, and reporting `unknown` is the honest
+    // answer.
+    const repaired = tryParse(repairTruncatedObject(body));
+    return repaired && "pattern" in repaired && "score" in repaired ? repaired : undefined;
+}
+
+function tryParse(text: string | undefined): Record<string, unknown> | undefined {
+    if (text === undefined) {
+        return undefined;
+    }
     try {
-        const parsed = JSON.parse(withoutFences.slice(start, end + 1));
+        const parsed = JSON.parse(text);
         return typeof parsed === "object" && parsed !== null
             ? (parsed as Record<string, unknown>)
             : undefined;
     } catch {
         return undefined;
     }
+}
+
+/**
+ * Close an object whose tail was cut off, keeping the pairs that did arrive.
+ *
+ * A provider that stops mid-reply leaves something like
+ * `{"pattern":"null_reference","score":0.72,"line":6,"reason":"...","line_ch`
+ * which is a complete, usable verdict followed by a fragment. Discarding the
+ * whole reply threw away a correct answer once in 36 benchmark runs, and it
+ * scored as a missed defect, which is the most expensive way to be wrong.
+ *
+ * Cutting at the last top-level comma is safe because a comma at depth 1 outside
+ * a string can only follow a finished pair.
+ */
+function repairTruncatedObject(body: string): string | undefined {
+    let depth = 0;
+    let inString = false;
+    let escaped = false;
+    let lastPairEnd = -1;
+
+    for (let i = 0; i < body.length; i++) {
+        const ch = body[i];
+
+        if (escaped) {
+            escaped = false;
+            continue;
+        }
+        if (ch === "\\" && inString) {
+            escaped = true;
+            continue;
+        }
+        if (ch === '"') {
+            inString = !inString;
+            continue;
+        }
+        if (inString) {
+            continue;
+        }
+
+        if (ch === "{" || ch === "[") {
+            depth++;
+        } else if (ch === "}" || ch === "]") {
+            depth--;
+        } else if (ch === "," && depth === 1) {
+            lastPairEnd = i;
+        }
+    }
+
+    // A balanced object needs no repair; the caller already tried parsing it.
+    if (depth <= 0 || lastPairEnd === -1) {
+        return undefined;
+    }
+
+    return `${body.slice(0, lastPairEnd)}}`;
 }
 
 function clamp01(value: number): number {
