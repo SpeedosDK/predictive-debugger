@@ -5,6 +5,7 @@ import { z } from "zod";
 import { analyzeFile } from "../core/analysis/risk";
 import { analyzeLogs } from "../core/logs/analyzeLogs";
 import {
+    assessmentStatus,
     isActionablePrediction,
     MIN_ACTIONABLE_SCORE,
     predictionStatus
@@ -184,7 +185,14 @@ server.registerTool(
             "Combine static analysis with a second-opinion verdict from the signed-in " +
             "Claude Code or Codex CLI, returning the most likely runtime failure with a " +
             "line number and reason. `status` distinguishes actionable, uncertain, no-finding, " +
-            "and unavailable results. Treat it as a defect only when `actionable` is true; " +
+            "and unavailable results. `checked` lists the bug categories the model reports " +
+            "having considered, so a clean file weighed against the whole catalogue is " +
+            "distinguishable from one where it stopped early; it is a self-report, and an " +
+            "empty list means no coverage was reported. Pass `multi: true` to get every " +
+            "finding the model can demonstrate, ranked, in a `findings` array instead of " +
+            "one verdict — experimental, and more findings per call is also more surface " +
+            "for false positives per call. Treat it as a defect only when " +
+            "`actionable` is true; " +
             `that applies the measured score >= ${MIN_ACTIONABLE_SCORE} precision gate. ` +
             "This spawns another model and takes 5-15 seconds per file, so only call it " +
             "when you specifically want an independent second opinion. If you are yourself " +
@@ -196,6 +204,24 @@ server.registerTool(
                 .optional()
                 .describe("Which CLI to ask (default: whichever is installed)"),
             model: z.string().optional().describe("Model override passed to the CLI"),
+            calleeContext: z
+                .boolean()
+                .optional()
+                .describe(
+                    "Also send the definitions of imported functions the file calls, one " +
+                        "level deep, so the model can see whether a callee already handles " +
+                        "the case it is about to flag (default true). Turning this off is " +
+                        "cheaper per call and measurably less accurate."
+                ),
+            multi: z
+                .boolean()
+                .optional()
+                .describe(
+                    "Return every finding the model can demonstrate, ranked by score, " +
+                        "rather than the single most likely one (default false). " +
+                        "Experimental: the precision gate was measured on one-finding " +
+                        "replies, so `actionable` is less well characterised here."
+                ),
             logFile: z
                 .string()
                 .optional()
@@ -208,13 +234,15 @@ server.registerTool(
                 )
         }
     },
-    async ({ file, provider, model, logFile, verbose }) => {
+    async ({ file, provider, model, logFile, verbose, calleeContext, multi }) => {
         try {
             const active = await registry.resolveActive(provider as ProviderId | undefined);
             const result = await predictFile(path.resolve(file), {
                 provider: active.provider,
                 location: active.location,
                 model,
+                calleeContext,
+                multi,
                 logs: logFile ? { logPath: path.resolve(logFile) } : undefined
             });
 
@@ -224,18 +252,43 @@ server.registerTool(
             // log stanza saying log analysis was not requested, and the absolute
             // path the caller had just supplied. All three are now opt-in, which
             // moves the break-even point down to files of roughly 70 tokens.
-            const { pattern, score, line, reason, truncated } = result.aiPrediction;
+            const { findings, truncated, checked } = result.ai;
+            const [top, ...rest] = findings;
 
             return json({
                 // Echoed as given rather than resolved: shorter, and the caller
                 // already knows which file it asked about.
                 file,
-                pattern,
-                score,
-                line: line ?? null,
-                reason,
-                status: predictionStatus(result.aiPrediction),
-                actionable: isActionablePrediction(result.aiPrediction),
+                // The top finding stays at the top level whatever the mode. A
+                // caller that asked one question gets one answer, and the array
+                // is there for the caller that asked for the list.
+                pattern: top.pattern,
+                score: top.score,
+                line: top.line ?? null,
+                reason: top.reason,
+                status: assessmentStatus(result.ai),
+                actionable: isActionablePrediction(top),
+                // Emitted when there is more than one finding even if `multi`
+                // was not set: a model that volunteers a second demonstrable
+                // defect has done work, and dropping it silently would be the
+                // one-per-file behaviour this replaced.
+                ...(rest.length > 0
+                    ? {
+                          findings: findings.map((finding) => ({
+                              pattern: finding.pattern,
+                              score: finding.score,
+                              line: finding.line ?? null,
+                              reason: finding.reason,
+                              status: predictionStatus(finding),
+                              actionable: isActionablePrediction(finding)
+                          }))
+                      }
+                    : {}),
+                // Always present, and empty when the model named nothing:
+                // being able to see that coverage was not reported is the
+                // point of the field, so hiding it behind `verbose` would
+                // defeat it.
+                checked: checked ?? [],
                 combinedScore: round(result.combinedScore),
                 staticRisk: round(result.riskScore),
                 viaProvider: active.provider.id,

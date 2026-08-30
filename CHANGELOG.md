@@ -6,6 +6,60 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- **`predict_failures` can return a ranked list of findings per file** instead of
+  one verdict, behind `multi: true` on the MCP tool and
+  `predictiveDebugger.multipleFindings` in the extension. One finding per file
+  meant fixing the reported issue and calling again to see whether there was
+  another, at 5–15 seconds a call. Off by default because it is not a free win:
+  more findings per call is also more surface for a false positive per call, and
+  the precision gate in `confidence.ts` was measured on single-verdict replies.
+  The gate now applies per finding rather than per file, the Problems panel gets
+  one diagnostic per finding, and `findings` appears in the MCP response whenever
+  a reply carried more than one — including when `multi` was not set, since
+  dropping a volunteered second defect is the behaviour this replaces.
+  Unmeasured: whether asking for a list costs precision is a benchmark question,
+  and `bench/measure-file.mjs` now records the finding count so it can be
+  answered from a normal run. Resolves #7.
+
+- **`predict_failures` reports which bug categories were checked**, not only
+  which one was found. Nothing in the response distinguished "I checked for this
+  and found nothing" from "I never considered it": both come back as
+  `pattern: "none"`, `score: 0`. The new `checked` field lists the catalogue ids
+  the model says it weighed, always present in the MCP response and empty when
+  the model reported none. It is a self-report, not a proof — it makes coverage
+  visible instead of assumed, which is what makes a bias like the
+  `race_condition` monoculture legible in the reply rather than silent. Distinct
+  from `status: "unavailable"`, which continues to mean no verdict could be
+  parsed at all. Resolves #12.
+
+- **The classifier prompt carries the definitions of functions the file calls**,
+  resolved one level deep through relative imports. The motivating false
+  positive was attributable to single-file scope entirely: the disproof of the
+  reported claim was that a callee was idempotent, and that callee was one
+  import away, so the model had no way to see it. The evidence policy already
+  asks the model to disprove a candidate before reporting it; this gives it the
+  material to do so instead of assuming the worst about code it cannot see. One
+  hop only, relative specifiers only — `node_modules` is never read — and both
+  the per-callee and the total size are capped, so the added cost is bounded at
+  roughly an eighth of what a large file already costs. Off via
+  `calleeContext: false` on `predict_failures`. Resolves #4.
+
+### Changed
+
+- **The model-reply parser recovers more from a truncated response.** It cut at
+  the last top-level comma, a rule written for one object, which threw away
+  complete findings when a list was cut off two levels down. It now cuts back to
+  the last value boundary at any depth and closes whatever is still open, so a
+  reply that stops inside the third finding keeps the first two, and a verdict
+  whose `checked` list was cut mid-id keeps the ids that did arrive. Nothing is
+  invented: everything before the cut is what the model sent.
+- **`BugPrediction` is one finding; `BugAssessment` is what a call establishes
+  about a file.** `checked` and `truncated` moved to the assessment, because both
+  describe the examination rather than any defect it turned up, and
+  `FilePrediction.aiPrediction` became `FilePrediction.ai`.
+
 ## [0.2.0] — 2026-08-29
 
 Changes driven by the benchmark in `bench/`, each with the measurement that
