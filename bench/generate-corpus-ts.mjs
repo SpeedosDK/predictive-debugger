@@ -393,7 +393,10 @@ export class Invoice {
     {
         file: "src/services/cache.service.ts",
         anchor: "this.sweep = setInterval(",
-        alsoAnchor: "this.entries.clear();",
+        // The teardown was already accepted, but only by its body. The
+        // declaration is where a reader is told "this method never releases the
+        // timer", so it is the same answer.
+        alsoAnchor: ["onModuleDestroy(): void {", "this.entries.clear();"],
         pattern: "resource-leak",
         inCatalogue: true,
         complexity: "high",
@@ -671,9 +674,13 @@ async function main() {
         controls: controls.map(([rel]) => rel),
         bugs: bugs.map(({ source, anchor, alsoAnchor, ...rest }) => {
             const line = lineOf(source, anchor, rest.file);
-            const acceptableLines = alsoAnchor
-                ? [line, lineOf(source, alsoAnchor, rest.file)]
-                : [line];
+            // One anchor or several: a defect with two loci has two correct
+            // answers, and a few have three.
+            const also = alsoAnchor == null ? [] : [alsoAnchor].flat();
+            const acceptableLines = [
+                line,
+                ...also.map((text) => lineOf(source, text, rest.file))
+            ];
             return {
                 ...rest,
                 line,

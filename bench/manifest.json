@@ -19,7 +19,8 @@
       "summary": "Tier loop reads tiers[i + 1] without bounding i, so the last tier dereferences undefined.",
       "line": 34,
       "acceptableLines": [
-        34
+        34,
+        36
       ],
       "acceptableRanges": [
         [
@@ -36,7 +37,8 @@
       "summary": "Balance is read before the awaits and written back after, so concurrent ticks lose updates.",
       "line": 28,
       "acceptableLines": [
-        28
+        28,
+        40
       ],
       "acceptableRanges": [
         [

@@ -156,7 +156,14 @@ async function main() {
     // The tolerance the harness grades with, restated here so the report can say
     // what it is rather than implying the hit count is exact.
     const LINE_TOLERANCE = 3;
-    const exactLine = buggyRuns.filter((r) => r.predictedLine === r.plantedLine).length;
+    // Graded against the whole accepted set, matching `isExactLine` in
+    // measure-file.mjs. A defect with two loci has two correct answers, and
+    // grading against whichever anchor the corpus author typed first made a
+    // model that switched between them read as a regression. Older result files
+    // carry no `acceptableLines`, so they fall back to the planted line.
+    const exactLine = buggyRuns.filter((r) =>
+        (r.acceptableLines ?? [r.plantedLine]).includes(r.predictedLine)
+    ).length;
     const cleanRuns = ok.filter((r) => r.kind === "clean");
 
     const sweep = [0.2, 0.3, 0.4, 0.5, 0.6, 0.65, 0.7, 0.8].map((t) => ({
