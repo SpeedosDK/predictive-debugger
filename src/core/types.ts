@@ -32,6 +32,7 @@ export interface StaticAnalysis {
     parseError?: string;
 }
 
+/** One defect the model reports. */
 export interface BugPrediction {
     /** Identifier from the bug pattern catalogue, or "none". */
     pattern: string;
@@ -41,6 +42,25 @@ export interface BugPrediction {
     reason: string;
     /** 1-based line the model points at, when it identifies one. */
     line?: number;
+}
+
+/**
+ * Everything one model call establishes about one file.
+ *
+ * `checked` and `truncated` live here rather than on a finding because both
+ * describe the examination, not any defect it turned up: a truncated file is
+ * truncated for every finding, and coverage is a property of the pass.
+ */
+export interface BugAssessment {
+    /**
+     * Findings, most likely first.
+     *
+     * Never empty. A clean file yields a single `none` finding and an
+     * unparseable reply a single `unknown` one, so `findings[0]` is always the
+     * verdict — which is what lets the single-finding surfaces keep working
+     * unchanged while a caller that wants the whole list reads the array.
+     */
+    findings: BugPrediction[];
     /**
      * Which catalogue patterns the model reports having considered for this
      * file, in catalogue order.
@@ -55,8 +75,8 @@ export interface BugPrediction {
      */
     checked?: string[];
     /**
-     * Set when the file was too large to send in full. The verdict is then based
-     * on a prefix of the file, which the caller should make visible.
+     * Set when the file was too large to send in full. The findings are then
+     * based on a prefix of the file, which the caller should make visible.
      */
     truncated?: string;
 }
@@ -82,7 +102,7 @@ export interface FilePrediction {
     file: string;
     metrics: FileMetrics;
     riskScore: number;
-    aiPrediction: BugPrediction;
+    ai: BugAssessment;
     logs: LogSignal;
     combinedScore: number;
 }

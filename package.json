@@ -103,6 +103,11 @@
           "scope": "machine",
           "markdownDescription": "Python interpreter used for the log analyzer. Leave empty to auto-detect. This is a machine-scoped setting: a workspace cannot override it, because the value is executed."
         },
+        "predictiveDebugger.multipleFindings": {
+          "type": "boolean",
+          "default": false,
+          "description": "Ask the model for every runtime failure it can demonstrate in a file, ranked, instead of the single most likely one. Experimental: the confidence gate that decides what reaches the Problems panel was measured on single-verdict replies."
+        },
         "predictiveDebugger.maxFiles": {
           "type": "number",
           "default": 25,

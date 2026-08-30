@@ -1,4 +1,4 @@
-import { BugPrediction } from "../types";
+import { BugAssessment, BugPrediction } from "../types";
 
 /**
  * Minimum model confidence for presenting a prediction as a defect.
@@ -29,4 +29,26 @@ export function isActionablePrediction(
     prediction: Pick<BugPrediction, "pattern" | "score">
 ): boolean {
     return predictionStatus(prediction) === "actionable";
+}
+
+/**
+ * The findings past the precision gate, ranked.
+ *
+ * The gate is per finding, not per file: a strong first finding does not vouch
+ * for a weak second one, and the measurement behind MIN_ACTIONABLE_SCORE was
+ * made on individual verdicts.
+ */
+export function actionableFindings(assessment: BugAssessment): BugPrediction[] {
+    return assessment.findings.filter(isActionablePrediction);
+}
+
+/**
+ * The file-level state, which is the state of its top finding.
+ *
+ * `findings` is ranked and never empty, so the head is both the most likely
+ * defect and — when there is none — the `none` or `unknown` verdict that says
+ * so. Nothing about the file is more actionable than its best finding.
+ */
+export function assessmentStatus(assessment: BugAssessment): PredictionStatus {
+    return predictionStatus(assessment.findings[0]);
 }

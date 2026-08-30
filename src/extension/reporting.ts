@@ -1,7 +1,7 @@
 import * as vscode from "vscode";
 import {
-    isActionablePrediction,
-    predictionStatus
+    actionableFindings,
+    assessmentStatus
 } from "../core/prediction/confidence";
 import { FilePrediction } from "../core/types";
 
@@ -16,27 +16,28 @@ export class PredictionReporter {
         this.diagnostics.clear();
     }
 
-    /** Put the model's verdict on the line it points at. */
+    /**
+     * Put each finding on the line it points at.
+     *
+     * One diagnostic per finding rather than one per file: the Problems panel
+     * is a list of things to fix, and collapsing several into the first would
+     * hide the rest behind a fix for something else.
+     */
     publish(uri: vscode.Uri, result: FilePrediction): void {
-        const { pattern, score, reason, line } = result.aiPrediction;
+        const partial = result.ai.truncated ? ` [${result.ai.truncated}]` : "";
 
-        if (!isActionablePrediction(result.aiPrediction)) {
-            this.diagnostics.set(uri, []);
-            return;
-        }
+        const diagnostics = actionableFindings(result.ai).map((finding) => {
+            const zeroBased = Math.max(0, (finding.line ?? 1) - 1);
+            const diagnostic = new vscode.Diagnostic(
+                new vscode.Range(zeroBased, 0, zeroBased, Number.MAX_SAFE_INTEGER),
+                `${finding.pattern} (${percent(finding.score)}): ${finding.reason}${partial}`,
+                vscode.DiagnosticSeverity.Warning
+            );
+            diagnostic.source = "Predictive Debugger";
+            return diagnostic;
+        });
 
-        const zeroBased = Math.max(0, (line ?? 1) - 1);
-        const partial = result.aiPrediction.truncated
-            ? ` [${result.aiPrediction.truncated}]`
-            : "";
-        const diagnostic = new vscode.Diagnostic(
-            new vscode.Range(zeroBased, 0, zeroBased, Number.MAX_SAFE_INTEGER),
-            `${pattern} (${percent(score)}): ${reason}${partial}`,
-            vscode.DiagnosticSeverity.Warning
-        );
-        diagnostic.source = "Predictive Debugger";
-
-        this.diagnostics.set(uri, [diagnostic]);
+        this.diagnostics.set(uri, diagnostics);
     }
 
     report(
@@ -48,10 +49,12 @@ export class PredictionReporter {
         for (const result of results) {
             this.output.appendLine(
                 `${percent(result.combinedScore).padStart(4)}  ${result.file}\n` +
-                    `      static ${percent(result.riskScore)} · model ${percent(result.aiPrediction.score)} · ${summarize(result)}` +
-                    (result.aiPrediction.truncated
-                        ? `\n      partial: ${result.aiPrediction.truncated}`
-                        : "") +
+                    `      static ${percent(result.riskScore)} · model ${percent(result.ai.findings[0].score)} · ${summarize(result)}` +
+                    result.ai.findings
+                        .slice(1)
+                        .map((finding) => `\n      also ${describeFinding(finding)}`)
+                        .join("") +
+                    (result.ai.truncated ? `\n      partial: ${result.ai.truncated}` : "") +
                     (result.logs.skipped ? `\n      logs: ${result.logs.skipped}` : "")
             );
         }
@@ -65,8 +68,8 @@ export class PredictionReporter {
 }
 
 export function summarize(result: FilePrediction): string {
-    const { pattern, score, reason, line } = result.aiPrediction;
-    const status = predictionStatus(result.aiPrediction);
+    const { pattern, score, reason, line } = result.ai.findings[0];
+    const status = assessmentStatus(result.ai);
 
     if (status === "none") {
         // The one place the coverage self-report earns its space: a clean
@@ -85,9 +88,16 @@ export function summarize(result: FilePrediction): string {
     return reason ? `${pattern}: ${reason}` : pattern;
 }
 
+/** The one-line form used for the findings below the first. */
+function describeFinding(finding: FilePrediction["ai"]["findings"][number]): string {
+    const at = finding.line ? ` at line ${finding.line}` : "";
+    const detail = finding.reason ? `: ${finding.reason}` : "";
+    return `${finding.pattern}${at} (${percent(finding.score)})${detail}`;
+}
+
 /** Name what the model says it weighed, or say plainly that it said nothing. */
 function describeChecked(result: FilePrediction): string {
-    const checked = result.aiPrediction.checked;
+    const checked = result.ai.checked;
     return checked?.length
         ? ` (checked: ${checked.join(", ")})`
         : " (the model reported no coverage)";

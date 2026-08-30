@@ -8,6 +8,21 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **`predict_failures` can return a ranked list of findings per file** instead of
+  one verdict, behind `multi: true` on the MCP tool and
+  `predictiveDebugger.multipleFindings` in the extension. One finding per file
+  meant fixing the reported issue and calling again to see whether there was
+  another, at 5–15 seconds a call. Off by default because it is not a free win:
+  more findings per call is also more surface for a false positive per call, and
+  the precision gate in `confidence.ts` was measured on single-verdict replies.
+  The gate now applies per finding rather than per file, the Problems panel gets
+  one diagnostic per finding, and `findings` appears in the MCP response whenever
+  a reply carried more than one — including when `multi` was not set, since
+  dropping a volunteered second defect is the behaviour this replaces.
+  Unmeasured: whether asking for a list costs precision is a benchmark question,
+  and `bench/measure-file.mjs` now records the finding count so it can be
+  answered from a normal run. Resolves #7.
+
 - **`predict_failures` reports which bug categories were checked**, not only
   which one was found. Nothing in the response distinguished "I checked for this
   and found nothing" from "I never considered it": both come back as
@@ -30,6 +45,20 @@ All notable changes to this project are documented here. The format follows
   the per-callee and the total size are capped, so the added cost is bounded at
   roughly an eighth of what a large file already costs. Off via
   `calleeContext: false` on `predict_failures`. Resolves #4.
+
+### Changed
+
+- **The model-reply parser recovers more from a truncated response.** It cut at
+  the last top-level comma, a rule written for one object, which threw away
+  complete findings when a list was cut off two levels down. It now cuts back to
+  the last value boundary at any depth and closes whatever is still open, so a
+  reply that stops inside the third finding keeps the first two, and a verdict
+  whose `checked` list was cut mid-id keeps the ids that did arrive. Nothing is
+  invented: everything before the cut is what the model sent.
+- **`BugPrediction` is one finding; `BugAssessment` is what a call establishes
+  about a file.** `checked` and `truncated` moved to the assessment, because both
+  describe the examination rather than any defect it turned up, and
+  `FilePrediction.aiPrediction` became `FilePrediction.ai`.
 
 ## [0.2.0] — 2026-08-29
 

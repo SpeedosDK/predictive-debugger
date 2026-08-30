@@ -104,6 +104,7 @@ async function predictCurrentFile(): Promise<void> {
                 provider: active.provider,
                 location: active.location,
                 model: getConfiguredModel(active.provider.id),
+                multi: multipleFindingsEnabled(),
                 logs: logOptionsFor(editor.document.uri),
                 signal
             });
@@ -137,6 +138,7 @@ async function predictWorkspace(): Promise<void> {
                 provider: active.provider,
                 location: active.location,
                 model: getConfiguredModel(active.provider.id),
+                multi: multipleFindingsEnabled(),
                 logs: logOptionsFor(folder.uri),
                 signal,
                 maxFiles: vscode.workspace
@@ -187,6 +189,19 @@ async function withCancellableProgress(
             }
         }
     );
+}
+
+/**
+ * Ask for every demonstrable finding rather than the single most likely one.
+ *
+ * Off by default: the precision gate in `confidence.ts` was measured on
+ * one-finding replies, and more findings per call is also more surface for a
+ * false positive per call. See issue #7.
+ */
+function multipleFindingsEnabled(): boolean {
+    return vscode.workspace
+        .getConfiguration("predictiveDebugger")
+        .get<boolean>("multipleFindings", false);
 }
 
 function logOptionsFor(resource: vscode.Uri) {

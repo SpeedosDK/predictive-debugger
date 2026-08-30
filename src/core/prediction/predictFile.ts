@@ -19,6 +19,11 @@ export interface PredictOptions {
      * cheaper per call and measurably less accurate — see issue #4.
      */
     calleeContext?: boolean;
+    /**
+     * Ask for every demonstrable finding rather than the single most likely one
+     * (default false). See `PredictBugOptions.multi` and issue #7.
+     */
+    multi?: boolean;
 }
 
 /**
@@ -40,12 +45,13 @@ export async function predictFile(
     const callees =
         options.calleeContext === false ? [] : await collectCalleeContext(filePath, code);
 
-    const aiPrediction = await predictBug({
+    const ai = await predictBug({
         provider: options.provider,
         location: options.location,
         filePath,
         code,
         callees,
+        multi: options.multi,
         model: options.model,
         signal: options.signal
     });
@@ -54,13 +60,19 @@ export async function predictFile(
         ? await analyzeLogs(options.logs)
         : { score: 1, anomalyCount: 0, anomalies: [], skipped: "log analysis not requested" };
 
-    const combinedScore = combineScores(staticAnalysis.riskScore, aiPrediction.score, logs);
+    // The headline score follows the top finding. A file's risk is set by its
+    // worst demonstrable defect, not by how many the model chose to list.
+    const combinedScore = combineScores(
+        staticAnalysis.riskScore,
+        ai.findings[0].score,
+        logs
+    );
 
     return {
         file: filePath,
         metrics: staticAnalysis.metrics,
         riskScore: staticAnalysis.riskScore,
-        aiPrediction,
+        ai,
         logs,
         combinedScore
     };
