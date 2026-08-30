@@ -29,8 +29,23 @@ const server = new McpServer({
     version: typeof __PACKAGE_VERSION__ === "string" ? __PACKAGE_VERSION__ : "0.0.0-dev"
 });
 
+/**
+ * Serialise a reply, compactly.
+ *
+ * The reader is a model, and every space and newline in the indentation is
+ * billed to it. Two-space indent cost 46 of the 161 tokens in a typical
+ * `predict_failures` reply -- 29% of the response, spent entirely on making the
+ * raw transcript pleasant for a human who is not the audience. Pretty-printing
+ * an array is the worst of it: `checked` puts each pattern id on its own
+ * indented line, which is most of what the coverage field appeared to cost when
+ * it was added.
+ *
+ * This is the whole point of the tool. It is worth calling instead of reading
+ * the file only while the answer is much smaller than the file, so the
+ * response budget is the product, not a detail of it.
+ */
 function json(value: unknown) {
-    return { content: [{ type: "text" as const, text: JSON.stringify(value, null, 2) }] };
+    return { content: [{ type: "text" as const, text: JSON.stringify(value) }] };
 }
 
 /** Two decimals is all the precision these heuristics have, and it is shorter. */

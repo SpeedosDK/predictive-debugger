@@ -11,12 +11,12 @@ The per-file test covers 12 of them: 6 buggy files and
 
 | Question | Measured answer |
 |---|---|
-| Does the tool reduce context? | Yes. 2,124 tokens instead of 10,244, 79% less file content. |
-| Does it point to the planted line? | 18 of 18 bug trials land inside the defect's own function, 9 of 18 on the exact line. 0 pointed elsewhere. |
+| Does the tool reduce context? | Yes. 1,554 tokens instead of 10,344, 85% less file content. |
+| Does it point to the planted line? | 18 of 18 bug trials land inside the defect's own function, 15 of 18 on the exact line. 0 pointed elsewhere. |
 | Does it accuse clean files? | 0 of 18 raw trials, 0 after the 0.7 gate. |
 | Does it help a real agent? | 26% fewer tokens in the A/B. Both arms found 2 of 3 bugs. |
 | Does project ranking help? | At 15 files, risk order contains 4 of 6 bugs. Directory order contains 2. |
-| What does one prediction cost in time? | 5.7 s mean, 26.2 s worst. |
+| What does one prediction cost in time? | 5.6 s mean, 19.2 s worst. |
 
 This run has a clean precision result. No clean control received a defect.
 Every prediction landed inside the function containing the defect. The tool saves context, but the extra model call means it did not make the A/B faster.
@@ -24,7 +24,7 @@ Every prediction landed inside the function containing the defect. The tool save
 Two numbers are given for localisation because they answer different questions, and an
 agent and a Problems panel need different ones. **18 of
 18 predictions land inside the function the defect is in**, which is what
-an agent needs to know where to look. **9 of 18 land on the
+an agent needs to know where to look. **15 of 18 land on the
 line itself**, which is what a panel that underlines one line needs.
 
 Grading by the enclosing function replaced a tolerance of three lines either way. That
@@ -165,10 +165,10 @@ finishes, unless the source shows it cannot. That is one clause, and it costs no
 | Planted lines named | 14 of 18 | 18 of 18 | +4 |
 | Buggy files reported clean | 3 of 18 | 0 of 18 | −3 |
 | Separation (AUC) | 0.917 | 1.000 | n/a |
-| Latency per file | 4.9 s | 5.7 s | +16% |
+| Latency per file | 4.9 s | 5.6 s | +14% |
 
 Nothing is reported clean any more, and no clean file is accused. Latency rose because the model reasons for longer. The
-worst single call took 26.2 s.
+worst single call took 19.2 s.
 
 Section 4 puts the two providers side by side on the same policy.
 
@@ -187,14 +187,14 @@ right. This keeps both sides tied to measured data.
 
 | Measure | Before | After | Change |
 |---|---|---|---|
-| Answer size, mean tokens per call | 251 | 177 | −29% |
-| Context to ask about all 12 files | 3,007 (29%) | 2,124 (21%) | −29% |
+| Answer size, mean tokens per call | 251 | 130 | −48% |
+| Context to ask about all 12 files | 3,007 (29%) | 1,554 (15%) | −48% |
 | Files where asking beats reading | 8 of 12 | 9 of 12 | +1 |
-| `scan_project` output, 40 files | 6,512 | 3,319 | −49% |
-| `scan_project` shortlist, limit 10 | 1,755 | 938 | −47% |
-| Where the 6 bugs rank in the scan | 11, 14, 17, 38, 39, 40 | 4, 9, 11, 12, 39, 40 | n/a |
+| `scan_project` output, 40 files | 6,512 | 2,277 | −65% |
+| `scan_project` shortlist, limit 10 | 1,755 | 659 | −62% |
+| Where the 6 bugs rank in the scan | 11, 14, 17, 38, 39, 40 | 2, 8, 11, 12, 39, 40 | n/a |
 | Bugs inside the first 15 files | 2 of 6 | 4 of 6 | +2 |
-| ρ between the ranking score and file size | 0.824 | 0.327 | n/a |
+| ρ between the ranking score and file size | 0.824 | 0.366 | n/a |
 | Trials landing in the defect's function | 17 of 18 | 18 of 18 | +1 |
 | Buggy files reported clean | 1 of 18 | 0 of 18 | −1 |
 | False alarms on clean code, raw output | 13 of 18 | 0 of 18 | −13 |
@@ -211,7 +211,7 @@ assumed:
 |---|---|---|---|
 | `score`, the model verdict | 0.910 | 1.000 | n/a |
 | `combinedScore`, the reported score | 0.735 | 1.000 | n/a |
-| `riskScore`, static complexity | 0.333 | 0.333 | n/a |
+| `riskScore`, static complexity | 0.333 | 0.306 | n/a |
 
 The static complexity score is worse than chance at telling a buggy file from a clean one,
 and the old blend gave it 0.4 of the vote. That is the entire reason `combinedScore`
@@ -229,7 +229,7 @@ The comparison also exposes three limits:
 - **Precision was bought with recall, and the corpus cannot price that trade.** Naming the
   planted line went from 17 of 18 to
   18, and latency per file from
-  4.4 s to 5.7 s.
+  4.4 s to 5.6 s.
   Whether a wasted investigation costs more than a missed defect is a question about the
   person reading the output, not about this benchmark.
 - **The smallest files still cost more to ask about than to read**, and always will: an
@@ -242,27 +242,27 @@ The comparison also exposes three limits:
 
 ### 1. Context cost: cheaper on 9 of 12 files
 
-The answer costs roughly the same regardless of file size: 177 tokens on
+The answer costs roughly the same regardless of file size: 130 tokens on
 average. It contains one line number, one pattern, one rationale and two scores.
 The metric block and the log stanza are behind a `verbose` flag, and the path is
 echoed as given rather than resolved; before that they were four fifths of the reply.
 This creates a break-even point: the tool is cheaper only for files above roughly
-177 tokens, which is 9 of the 12 files here. For `models/cartTotals.js`, at 81 tokens, asking still costs more than reading.
+130 tokens, which is 9 of the 12 files here. For `models/cartTotals.js`, at 81 tokens, asking still costs more than reading.
 
 | File | Type | Read the file | Ask the tool | Context change |
 |---|---|---|---|---|
-| `api/adminController.js` | clean | 3,145 | 173 | Saves 2,972 |
-| `services/orderService.js` | clean | 2,385 | 175 | Saves 2,210 |
-| `repositories/orderRepository.js` | clean | 1,099 | 163 | Saves 936 |
-| `services/pricingService.js` | bug | 983 | 198 | Saves 785 |
-| `services/inventoryService.js` | bug | 749 | 192 | Saves 557 |
-| `workers/reconciliationWorker.js` | bug | 714 | 211 | Saves 503 |
-| `services/auditService.js` | clean | 346 | 189 | Saves 157 |
-| `lib/paging.js` | clean | 313 | 158 | Saves 155 |
-| `models/payment.js` | clean | 229 | 151 | Saves 78 |
-| `lib/dateWindow.js` | bug | 113 | 171 | Costs 58 |
-| `lib/retry.js` | bug | 87 | 178 | Costs 91 |
-| `models/cartTotals.js` | bug | 81 | 165 | Costs 84 |
+| `api/adminController.js` | clean | 3,145 | 120 | Saves 3,025 |
+| `services/orderService.js` | clean | 2,385 | 127 | Saves 2,258 |
+| `repositories/orderRepository.js` | clean | 1,099 | 125 | Saves 974 |
+| `services/pricingService.js` | bug | 983 | 138 | Saves 845 |
+| `services/inventoryService.js` | bug | 749 | 146 | Saves 603 |
+| `workers/reconciliationWorker.js` | bug | 714 | 158 | Saves 556 |
+| `services/auditService.js` | clean | 446 | 132 | Saves 314 |
+| `lib/paging.js` | clean | 313 | 115 | Saves 198 |
+| `models/payment.js` | clean | 229 | 112 | Saves 117 |
+| `lib/dateWindow.js` | bug | 113 | 118 | Costs 5 |
+| `lib/retry.js` | bug | 87 | 136 | Costs 49 |
+| `models/cartTotals.js` | bug | 81 | 127 | Costs 46 |
 
 ### 2. Accuracy: 18 correct lines and 0 wrong locations
 
@@ -289,7 +289,7 @@ whether it becomes an actionable Problem.
 | `lib/paging.js` | Clean | Not applicable | Correctly clean | Correctly clean | Correctly clean |
 | `models/payment.js` | Clean | Not applicable | Correctly clean | Correctly clean | Correctly clean |
 | `lib/dateWindow.js` | Bug | 7 | Hit (line 7) | Hit (line 7) | Hit (line 7) |
-| `lib/retry.js` | Bug | 7 | Hit (line 11) | Hit (line 11) | Hit (line 11) |
+| `lib/retry.js` | Bug | 7 | Hit (line 11) | Hit (line 11) | Hit (line 8) |
 | `models/cartTotals.js` | Bug | 6 | Hit (line 6) | Hit (line 6) | Hit (line 6) |
 
 ### 3. Confidence: clean and buggy scores do not overlap
@@ -385,7 +385,7 @@ They do not fail the same way, and picking whichever one looks better would hide
 
 | Provider | Planted lines, raw | Planted lines, gated | False alarms, raw | False alarms, gated | Separation | Latency |
 |---|---|---|---|---|---|---|
-| `claude` | 18 of 18 | 18 of 18 | 0 of 18 | 0 of 18 | 1 | 5.7 s |
+| `claude` | 18 of 18 | 18 of 18 | 0 of 18 | 0 of 18 | 1 | 5.6 s |
 | `codex` | 11 of 18 | 11 of 18 | 0 of 18 | 0 of 18 | 0.861 | 7.0 s |
 
 **Claude wins on both counts** in this run. It finds 18 of 18 planted lines at the gate and 0 of 18 false alarms. One run per provider is not enough to call that a property of the models rather than of this corpus.
@@ -421,7 +421,7 @@ at all, and took the same wall-clock time. The tool's model call costs roughly w
 | `services/orderService.js` | clean | Line 14, wrong location | No finding, correct (score 0) |
 
 The saving here is much smaller: 26% versus
-79% in section 1. The difference is the agent's own
+85% in section 1. The difference is the agent's own
 overhead: its system prompt, reasoning, and response dominate, while file content is
 only part of the bill. **Section 1 measures savings on file content; section 5 measures
 the savings in practice.**
@@ -468,20 +468,20 @@ The same question at an equal *token* budget, which is what the agent actually p
 
 | Budget | Risk order | Directory order |
 |---|---|---|
-| 5,000 tokens | 1 of 6 (4 files) | 0 of 6 (3 files) |
+| 5,000 tokens | 1 of 6 (3 files) | 0 of 6 (3 files) |
 | 10,000 tokens | 1 of 6 (7 files) | 0 of 6 (5 files) |
 | 20,000 tokens | 4 of 6 (18 files) | 3 of 6 (19 files) |
 
 The ranking uses **risk density**, weighted signals per 100 lines, rather than the total.
 Ranking by the total is close to ranking by size: its rank correlation with raw file
-size is ρ = 0.825, against ρ = 0.327
+size is ρ = 0.817, against ρ = 0.366
 for density. That distinction is the whole result here. Mutations, branches and
 cyclomatic complexity accumulate in step with file length, so at full weight a per-line
 score just measures how assignment-heavy a file is and puts plain row mappers on top;
 they are damped to a tenth of their weight, and the signals that do not scale with
 length. Nested loops, async boundaries, long functions and try/catch carry the order.
 
-The planted bugs land at ranks 4, 9, 11, 12, 39, 40 of 40, so 4 of 6 are inside the first 15 files. The 2 at the bottom, `lib/dateWindow.js` and `models/cartTotals.js`, show the limit of the method. A missing null check in a short mapper has no structural signature at all, and no complexity heuristic will rank it. Reading them costs almost nothing, which is the argument for a density ordering rather than an excuse for missing them.
+The planted bugs land at ranks 2, 8, 11, 12, 39, 40 of 40, so 4 of 6 are inside the first 15 files. The 2 at the bottom, `lib/dateWindow.js` and `models/cartTotals.js`, show the limit of the method. A missing null check in a short mapper has no structural signature at all, and no complexity heuristic will rank it. Reading them costs almost nothing, which is the argument for a density ordering rather than an excuse for missing them.
 
 > **These weights were fitted on this corpus.** Six bugs is not enough to fit anything
 > safely; what supports the change is that the improvement is monotone in how much the
@@ -491,7 +491,7 @@ The planted bugs land at ranks 4, 9, 11, 12, 39, 40 of 40, so 4 of 6 are inside 
 
 - **Tokens do not disappear; they move.** `predict_failures` spawns another model that
   reads the entire file. The saving is in the calling agent's *context window*, not total
-  consumption. The cost is 5.7 s of latency per file.
+  consumption. The cost is 5.6 s of latency per file.
 - **The corpus is generated, and its generator has a defect.** Files with more than eight
   methods receive duplicate method names because the name generator cycles.
   `orderService.js` defines three methods twice. This makes the "clean" controls less
@@ -532,4 +532,4 @@ node bench/measure-file.mjs      # per file (real CLI calls; takes a few minutes
 node bench/markdown.mjs          # this file + charts
 ```
 
-Generated 2026-08-30T09:36:32.553Z.
+Generated 2026-08-30T14:28:29.625Z.

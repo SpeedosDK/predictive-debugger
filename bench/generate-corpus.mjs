@@ -111,10 +111,23 @@ function service(name, { methods, loops, awaits, branches }) {
             total = Math.floor(total);
         }`).join("");
 
+        // With no loops, nothing accumulated into `total`, so every method
+        // returned the 0 it was initialised to and every awaited value went
+        // unread. That is a real defect — an unconditionally zero return and
+        // three dead fetches — and `auditService.js` (loops: 0, branches: 0) is
+        // graded as a clean control, so the answer key scored a correct finding
+        // as a false alarm in two of three trials. It is the same trap as the
+        // duplicated member names above: filler that accidentally contains a
+        // bug measures the benchmark, not the tool. A method with no loop folds
+        // what it fetched into the total instead of discarding it.
+        const fold = loops > 0 ? "" : [`
+        total += batch.length;`, ...Array.from({ length: awaits }, (_, a) => `
+        total += ${pick(NOUNS, a)}Rows.length;`)].join("");
+
         return `
     async ${memberName(m)}(id, options = {}) {
         let total = 0;
-        const batch = await this.repo.loadBatch(id);${waits}${inner}${ifs}
+        const batch = await this.repo.loadBatch(id);${waits}${inner}${fold}${ifs}
         return { id, total };
     }`;
     }).join("\n");
@@ -250,6 +263,11 @@ const bugs = [
     {
         file: "src/services/pricingService.js",
         anchor: "const next = tiers[i + 1];",
+        // The read that goes out of bounds and the dereference that throws on
+        // it are both correct answers. For a panel that underlines one line the
+        // dereference is arguably the better one: line 34 is valid on its own,
+        // and line 36 is where the TypeError comes from.
+        alsoAnchor: "if (line.quantity >= tier.minQuantity && line.quantity < next.minQuantity) {",
         pattern: "off-by-one",
         complexity: "high",
         summary: "Tier loop reads tiers[i + 1] without bounding i, so the last tier dereferences undefined.",
@@ -408,6 +426,10 @@ module.exports = { PricingService };
     {
         file: "src/workers/reconciliationWorker.js",
         anchor: "const balance = await this.ledger.balanceOf(account.id);",
+        // A lost update has a read and a write, and the write is where the
+        // stale value actually lands. Neither end of the window is the wrong
+        // place to send a reader.
+        alsoAnchor: "await this.ledger.write(account.id, adjusted);",
         pattern: "race-condition",
         complexity: "high",
         summary: "Balance is read before the awaits and written back after, so concurrent ticks lose updates.",
@@ -769,9 +791,13 @@ async function main() {
         ],
         bugs: bugs.map(({ source, anchor, alsoAnchor, ...rest }) => {
             const line = lineOf(source, anchor, rest.file);
-            const acceptableLines = alsoAnchor
-                ? [line, lineOf(source, alsoAnchor, rest.file)]
-                : [line];
+            // One anchor or several: a defect with two loci has two correct
+            // answers, and a few have three.
+            const also = alsoAnchor == null ? [] : [alsoAnchor].flat();
+            const acceptableLines = [
+                line,
+                ...also.map((text) => lineOf(source, text, rest.file))
+            ];
             return {
                 ...rest,
                 line,

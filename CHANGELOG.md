@@ -6,6 +6,77 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.3.1] — 2026-08-30
+
+### Fixed
+
+- **The benchmark's exact-line score was grading against one anchor when the
+  corpus already recorded several.** `isNear` has graded against
+  `acceptableLines` since the enclosing-function change, on the stated grounds
+  that a defect with two loci has two correct answers and the anchor the corpus
+  author typed first is not privileged among them. `exactLine` never got the
+  same treatment — it stayed a strict `predictedLine === plantedLine` — so a
+  model that switched between two equally correct sites read as a regression.
+  That is exactly what the 0.3.0 entry below recorded as a drop from 12→9 and
+  17→15. Re-grading the same recorded runs against `acceptableLines` gives 15
+  and 18; re-grading the pre-#13 runs the same way gives 15 and 18 as well.
+  Like for like, exact-line accuracy did not move. The measurement did.
+
+  Three labels were widened to match, each a defect whose two loci sit on
+  different lines: `pricingService.js` now accepts the dereference that throws
+  (36) as well as the out-of-bounds read that feeds it (34); the lost update in
+  `reconciliationWorker.js` accepts the write the stale value lands in (40) as
+  well as the read that goes stale (28); and `cache.service.ts`, which already
+  accepted the teardown body, now also accepts the `onModuleDestroy`
+  declaration, since that is the line a reader is told never releases the timer.
+  `alsoAnchor` takes a list rather than a single anchor to allow it. Runs now
+  carry `acceptableLines`, so a recorded result can be re-graded without the
+  manifest it came from.
+
+  This does not settle which line the Problems panel should underline. It says
+  the benchmark should not decide it by accident.
+
+- **`auditService.js` was not a clean control.** The `service()` generator
+  emitted methods that initialise `total` to 0, await three values, use none of
+  them, and return `{ id, total }` — an unconditionally zero result and three
+  dead fetches, whenever it was parameterised with no loops. The tool reported
+  it, correctly, at score 0.75 in two of three trials, and the answer key scored
+  that as a false alarm. It is the same trap as the duplicated member names
+  fixed earlier in the same file: filler that accidentally contains a bug
+  measures the benchmark rather than the tool.
+
+  A method with no loop now folds what it fetched into the total instead of
+  discarding it. Three generated files change (`auditService`, `customerService`,
+  `notificationService`); no file carrying a planted defect is touched. Clean
+  controls go from 16 of 18 to **18 of 18**, and separation from 0.988 to
+  **1.000**.
+
+  Worth stating plainly: this defect predates every measurement in this file. The
+  0.3.0 entry below records 18 of 18 true negatives on this corpus, and that run
+  simply did not happen to flag `auditService.js` — the file was already broken.
+  Clean-file behaviour varies more between runs than a single three-trial run can
+  establish, so the claim that the callee context "fixed" the one recorded false
+  alarm is weaker than it reads there.
+
+### Changed
+
+- **MCP replies are no longer pretty-printed.** The reader is a model and every
+  space in a two-space indent is billed to it: 46 of the 161 tokens in a typical
+  `predict_failures` reply, 29% of the response, spent on making a raw transcript
+  pleasant for a human who is not the audience. Arrays were the worst of it —
+  `checked` put each pattern id on its own indented line, which is most of what
+  that field appeared to cost when it was added. The tool is worth calling
+  instead of reading the file only while the answer is much smaller than the
+  file, so the response budget is the product rather than a detail of it. No
+  field changed; only the whitespace between them.
+
+  Measured across both corpora: the mean reply fell from 177 to 129 tokens on
+  `bench/corpus` and from 169 to 126 on `bench/corpus-ts`, a 27% cut. That is
+  below where the reply sat before 0.3.0 (134 and 133) while still carrying the
+  `checked` field and the callee context that had pushed it up — so the ~30%
+  those added is repaid, with interest, and the README's cost-per-answer figure
+  is right again rather than merely stale.
+
 ## [0.3.0] — 2026-08-30
 
 ### Added
@@ -325,6 +396,8 @@ README.
 - `@types/vscode` was newer than the declared `engines.vscode`, which prevented
   packaging and allowed use of APIs missing from the minimum supported version.
 
-[Unreleased]: https://github.com/SpeedosDK/predictive-debugger/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/SpeedosDK/predictive-debugger/compare/v0.3.1...HEAD
+[0.3.1]: https://github.com/SpeedosDK/predictive-debugger/compare/v0.3.0...v0.3.1
+[0.3.0]: https://github.com/SpeedosDK/predictive-debugger/compare/v0.2.0...v0.3.0
 [0.2.0]: https://github.com/SpeedosDK/predictive-debugger/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/SpeedosDK/predictive-debugger/releases/tag/v0.1.0

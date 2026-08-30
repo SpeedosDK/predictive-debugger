@@ -11,6 +11,10 @@ class NotificationService {
         const orderRows = await this.repo.findOrders(id);
         const invoiceRows = await this.repo.findInvoices(id);
         const shipmentRows = await this.repo.findShipments(id);
+        total += batch.length;
+        total += orderRows.length;
+        total += invoiceRows.length;
+        total += shipmentRows.length;
         if (options.fetch === true) {
             total = Math.round(total * 100) / 100;
         } else if (options.fetch === "strict") {
@@ -25,6 +29,10 @@ class NotificationService {
         const orderRows = await this.repo.findOrders(id);
         const invoiceRows = await this.repo.findInvoices(id);
         const shipmentRows = await this.repo.findShipments(id);
+        total += batch.length;
+        total += orderRows.length;
+        total += invoiceRows.length;
+        total += shipmentRows.length;
         if (options.fetch === true) {
             total = Math.round(total * 100) / 100;
         } else if (options.fetch === "strict") {
@@ -39,6 +47,10 @@ class NotificationService {
         const orderRows = await this.repo.findOrders(id);
         const invoiceRows = await this.repo.findInvoices(id);
         const shipmentRows = await this.repo.findShipments(id);
+        total += batch.length;
+        total += orderRows.length;
+        total += invoiceRows.length;
+        total += shipmentRows.length;
         if (options.fetch === true) {
             total = Math.round(total * 100) / 100;
         } else if (options.fetch === "strict") {
@@ -53,6 +65,10 @@ class NotificationService {
         const orderRows = await this.repo.findOrders(id);
         const invoiceRows = await this.repo.findInvoices(id);
         const shipmentRows = await this.repo.findShipments(id);
+        total += batch.length;
+        total += orderRows.length;
+        total += invoiceRows.length;
+        total += shipmentRows.length;
         if (options.fetch === true) {
             total = Math.round(total * 100) / 100;
         } else if (options.fetch === "strict") {
@@ -67,6 +83,10 @@ class NotificationService {
         const orderRows = await this.repo.findOrders(id);
         const invoiceRows = await this.repo.findInvoices(id);
         const shipmentRows = await this.repo.findShipments(id);
+        total += batch.length;
+        total += orderRows.length;
+        total += invoiceRows.length;
+        total += shipmentRows.length;
         if (options.fetch === true) {
             total = Math.round(total * 100) / 100;
         } else if (options.fetch === "strict") {
@@ -81,6 +101,10 @@ class NotificationService {
         const orderRows = await this.repo.findOrders(id);
         const invoiceRows = await this.repo.findInvoices(id);
         const shipmentRows = await this.repo.findShipments(id);
+        total += batch.length;
+        total += orderRows.length;
+        total += invoiceRows.length;
+        total += shipmentRows.length;
         if (options.fetch === true) {
             total = Math.round(total * 100) / 100;
         } else if (options.fetch === "strict") {

@@ -10,6 +10,9 @@ class CustomerService {
         const batch = await this.repo.loadBatch(id);
         const orderRows = await this.repo.findOrders(id);
         const invoiceRows = await this.repo.findInvoices(id);
+        total += batch.length;
+        total += orderRows.length;
+        total += invoiceRows.length;
         if (options.fetch === true) {
             total = Math.round(total * 100) / 100;
         } else if (options.fetch === "strict") {
@@ -23,6 +26,9 @@ class CustomerService {
         const batch = await this.repo.loadBatch(id);
         const orderRows = await this.repo.findOrders(id);
         const invoiceRows = await this.repo.findInvoices(id);
+        total += batch.length;
+        total += orderRows.length;
+        total += invoiceRows.length;
         if (options.fetch === true) {
             total = Math.round(total * 100) / 100;
         } else if (options.fetch === "strict") {
@@ -36,6 +42,9 @@ class CustomerService {
         const batch = await this.repo.loadBatch(id);
         const orderRows = await this.repo.findOrders(id);
         const invoiceRows = await this.repo.findInvoices(id);
+        total += batch.length;
+        total += orderRows.length;
+        total += invoiceRows.length;
         if (options.fetch === true) {
             total = Math.round(total * 100) / 100;
         } else if (options.fetch === "strict") {
@@ -49,6 +58,9 @@ class CustomerService {
         const batch = await this.repo.loadBatch(id);
         const orderRows = await this.repo.findOrders(id);
         const invoiceRows = await this.repo.findInvoices(id);
+        total += batch.length;
+        total += orderRows.length;
+        total += invoiceRows.length;
         if (options.fetch === true) {
             total = Math.round(total * 100) / 100;
         } else if (options.fetch === "strict") {
@@ -62,6 +74,9 @@ class CustomerService {
         const batch = await this.repo.loadBatch(id);
         const orderRows = await this.repo.findOrders(id);
         const invoiceRows = await this.repo.findInvoices(id);
+        total += batch.length;
+        total += orderRows.length;
+        total += invoiceRows.length;
         if (options.fetch === true) {
             total = Math.round(total * 100) / 100;
         } else if (options.fetch === "strict") {
@@ -75,6 +90,9 @@ class CustomerService {
         const batch = await this.repo.loadBatch(id);
         const orderRows = await this.repo.findOrders(id);
         const invoiceRows = await this.repo.findInvoices(id);
+        total += batch.length;
+        total += orderRows.length;
+        total += invoiceRows.length;
         if (options.fetch === true) {
             total = Math.round(total * 100) / 100;
         } else if (options.fetch === "strict") {

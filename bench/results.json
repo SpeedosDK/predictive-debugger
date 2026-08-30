@@ -1,39 +1,39 @@
 {
-  "generatedAt": "2026-08-30T09:33:07.575Z",
-  "sizeCorrelation": 0.825,
-  "densitySizeCorrelation": 0.327,
+  "generatedAt": "2026-08-30T14:25:07.807Z",
+  "sizeCorrelation": 0.817,
+  "densitySizeCorrelation": 0.366,
   "tokenizer": "cl100k (gpt-tokenizer) — approximation of Claude's tokenizer",
   "corpus": {
     "files": 40,
-    "totalTokens": 39676,
+    "totalTokens": 40058,
     "bugs": 6
   },
   "scan": {
-    "wallClockMs": 103,
+    "wallClockMs": 112,
     "scanned": 40,
     "returned": 40,
-    "outputTokens": 3319,
-    "shortlistTokens": 938,
-    "shortlistWallClockMs": 38
+    "outputTokens": 2277,
+    "shortlistTokens": 659,
+    "shortlistWallClockMs": 46
   },
   "strategies": {
     "readAll": {
       "label": "Read every file",
       "filesRead": 40,
-      "tokens": 39676,
+      "tokens": 40058,
       "foundAll": true
     },
     "arbitrary": {
       "label": "Read in directory order until all bugs seen",
       "filesRead": 40,
-      "tokens": 39676,
+      "tokens": 40058,
       "foundAll": true
     },
     "scanFirst": {
       "label": "scan_project, then read in risk order",
       "filesRead": 40,
-      "tokens": 42995,
-      "scanTokens": 3319,
+      "tokens": 42335,
+      "scanTokens": 2277,
       "foundAll": true
     }
   },
@@ -45,7 +45,7 @@
     },
     {
       "k": 3,
-      "found": 0,
+      "found": 1,
       "of": 6
     },
     {
@@ -69,7 +69,7 @@
       "k": 5,
       "riskOrder": {
         "found": 1,
-        "tokens": 6202
+        "tokens": 7232
       },
       "directoryOrder": {
         "found": 0,
@@ -81,7 +81,7 @@
       "k": 10,
       "riskOrder": {
         "found": 2,
-        "tokens": 13507
+        "tokens": 13610
       },
       "directoryOrder": {
         "found": 1,
@@ -93,7 +93,7 @@
       "k": 15,
       "riskOrder": {
         "found": 4,
-        "tokens": 18075
+        "tokens": 18178
       },
       "directoryOrder": {
         "found": 2,
@@ -105,7 +105,7 @@
       "k": 20,
       "riskOrder": {
         "found": 4,
-        "tokens": 21075
+        "tokens": 21178
       },
       "directoryOrder": {
         "found": 3,
@@ -119,8 +119,8 @@
       "budget": 5000,
       "riskOrder": {
         "found": 1,
-        "filesRead": 4,
-        "tokensSpent": 3817
+        "filesRead": 3,
+        "tokensSpent": 4828
       },
       "directoryOrder": {
         "found": 0,
@@ -133,7 +133,7 @@
       "riskOrder": {
         "found": 1,
         "filesRead": 7,
-        "tokensSpent": 8831
+        "tokensSpent": 9784
       },
       "directoryOrder": {
         "found": 0,
@@ -146,7 +146,7 @@
       "riskOrder": {
         "found": 4,
         "filesRead": 18,
-        "tokensSpent": 19867
+        "tokensSpent": 19970
       },
       "directoryOrder": {
         "found": 3,
@@ -162,7 +162,7 @@
       "pattern": "async-misuse",
       "complexity": "low",
       "summary": "The final attempt's rejection is swallowed, so retry resolves undefined instead of throwing.",
-      "rank": 4,
+      "rank": 2,
       "riskScore": 0.19,
       "riskDensity": 0.73
     },
@@ -172,7 +172,7 @@
       "pattern": "race-condition",
       "complexity": "high",
       "summary": "Balance is read before the awaits and written back after, so concurrent ticks lose updates.",
-      "rank": 9,
+      "rank": 8,
       "riskScore": 0.64,
       "riskDensity": 0.69
     },
@@ -219,17 +219,6 @@
   ],
   "ranked": [
     {
-      "file": "src/services/auditService.js",
-      "riskScore": 0.42,
-      "riskDensity": 0.75,
-      "lines": 50,
-      "signals": [
-        "15 async boundary/boundaries (await, timers)",
-        "3 mutation(s) of existing state",
-        "cyclomatic complexity 1"
-      ]
-    },
-    {
       "file": "src/services/shipmentService.js",
       "riskScore": 0.83,
       "riskDensity": 0.74,
@@ -240,18 +229,6 @@
         "24 async boundary/boundaries (await, timers)",
         "32 branch(es)",
         "cyclomatic complexity 65"
-      ]
-    },
-    {
-      "file": "src/services/notificationService.js",
-      "riskScore": 0.66,
-      "riskDensity": 0.74,
-      "lines": 94,
-      "signals": [
-        "24 async boundary/boundaries (await, timers)",
-        "15 mutation(s) of existing state",
-        "12 branch(es)",
-        "cyclomatic complexity 13"
       ]
     },
     {
@@ -293,13 +270,24 @@
       ]
     },
     {
-      "file": "src/services/customerService.js",
-      "riskScore": 0.62,
-      "riskDensity": 0.7,
-      "lines": 88,
+      "file": "src/services/auditService.js",
+      "riskScore": 0.57,
+      "riskDensity": 0.72,
+      "lines": 65,
       "signals": [
-        "18 async boundary/boundaries (await, timers)",
-        "15 mutation(s) of existing state",
+        "18 mutation(s) of existing state",
+        "15 async boundary/boundaries (await, timers)",
+        "cyclomatic complexity 1"
+      ]
+    },
+    {
+      "file": "src/services/notificationService.js",
+      "riskScore": 0.74,
+      "riskDensity": 0.71,
+      "lines": 118,
+      "signals": [
+        "39 mutation(s) of existing state",
+        "24 async boundary/boundaries (await, timers)",
         "12 branch(es)",
         "cyclomatic complexity 13"
       ]
@@ -329,6 +317,18 @@
         "6 branch(es)",
         "cyclomatic complexity 15",
         "2 try/catch block(s)"
+      ]
+    },
+    {
+      "file": "src/services/customerService.js",
+      "riskScore": 0.7,
+      "riskDensity": 0.68,
+      "lines": 106,
+      "signals": [
+        "33 mutation(s) of existing state",
+        "18 async boundary/boundaries (await, timers)",
+        "12 branch(es)",
+        "cyclomatic complexity 13"
       ]
     },
     {

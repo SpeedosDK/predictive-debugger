@@ -64,6 +64,30 @@ const LINE_TOLERANCE = 3;
  * benchmark's taste rather than the tool's accuracy. Manifests without the field
  * fall back to the single planted line.
  */
+/**
+ * The strict companion to `isNear`: did the prediction name a defensible line,
+ * not merely a defensible function?
+ *
+ * Graded against `acceptableLines` rather than the single planted anchor, for
+ * the same reason `isNear` is. A defect with two loci — the line where a bad
+ * value originates and the line where it is used, the acquisition of a resource
+ * and the teardown that fails to release it — has two correct answers, and the
+ * anchor the corpus author typed first is not privileged among them. Measured
+ * against one anchor, a model that switches between two equally correct sites
+ * reads as a regression; the measurement moved, not the accuracy.
+ *
+ * Exact means exact: no tolerance window. A panel that underlines one line
+ * needs to know the prediction landed on a line a reader would accept, and
+ * "three lines away" is not that.
+ */
+function isExactLine(predicted, target) {
+    if (predicted == null) {
+        return false;
+    }
+    const accepted = target.acceptableLines ?? [target.line];
+    return accepted.includes(predicted);
+}
+
 function isNear(predicted, target) {
     if (predicted == null) {
         return false;
@@ -207,6 +231,11 @@ async function main() {
                 kind: target.kind,
                 trial,
                 plantedLine: target.line,
+                // The full set the strict grade accepts, recorded so a run can
+                // be re-graded later without re-reading the manifest it came
+                // from — and so a widened set is visible in the results file
+                // rather than only in the generator.
+                acceptableLines: target.acceptableLines ?? (target.line == null ? null : [target.line]),
                 plantedPattern: target.pattern,
                 fileTokens: target.fileTokens,
                 fileLines: target.fileLines,
@@ -313,7 +342,9 @@ async function main() {
             hit: count(buggyRuns, "hit"),
             // The strict measure, alongside the one graded by enclosing function.
             // A panel that underlines a single line needs this number.
-            exactLine: buggyRuns.filter((run) => run.predictedLine === run.plantedLine).length,
+            exactLine: buggyRuns.filter((run) =>
+                isExactLine(run.predictedLine, { line: run.plantedLine, acceptableLines: run.acceptableLines })
+            ).length,
             wrongLocation: count(buggyRuns, "wrong-location"),
             missed: count(buggyRuns, "false-negative")
         },

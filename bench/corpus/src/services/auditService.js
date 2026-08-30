@@ -10,6 +10,9 @@ class AuditService {
         const batch = await this.repo.loadBatch(id);
         const orderRows = await this.repo.findOrders(id);
         const invoiceRows = await this.repo.findInvoices(id);
+        total += batch.length;
+        total += orderRows.length;
+        total += invoiceRows.length;
         return { id, total };
     }
 
@@ -18,6 +21,9 @@ class AuditService {
         const batch = await this.repo.loadBatch(id);
         const orderRows = await this.repo.findOrders(id);
         const invoiceRows = await this.repo.findInvoices(id);
+        total += batch.length;
+        total += orderRows.length;
+        total += invoiceRows.length;
         return { id, total };
     }
 
@@ -26,6 +32,9 @@ class AuditService {
         const batch = await this.repo.loadBatch(id);
         const orderRows = await this.repo.findOrders(id);
         const invoiceRows = await this.repo.findInvoices(id);
+        total += batch.length;
+        total += orderRows.length;
+        total += invoiceRows.length;
         return { id, total };
     }
 
@@ -34,6 +43,9 @@ class AuditService {
         const batch = await this.repo.loadBatch(id);
         const orderRows = await this.repo.findOrders(id);
         const invoiceRows = await this.repo.findInvoices(id);
+        total += batch.length;
+        total += orderRows.length;
+        total += invoiceRows.length;
         return { id, total };
     }
 
@@ -42,6 +54,9 @@ class AuditService {
         const batch = await this.repo.loadBatch(id);
         const orderRows = await this.repo.findOrders(id);
         const invoiceRows = await this.repo.findInvoices(id);
+        total += batch.length;
+        total += orderRows.length;
+        total += invoiceRows.length;
         return { id, total };
     }
 }
