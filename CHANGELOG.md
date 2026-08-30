@@ -8,6 +8,17 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- **`predict_failures` reports which bug categories were checked**, not only
+  which one was found. Nothing in the response distinguished "I checked for this
+  and found nothing" from "I never considered it": both come back as
+  `pattern: "none"`, `score: 0`. The new `checked` field lists the catalogue ids
+  the model says it weighed, always present in the MCP response and empty when
+  the model reported none. It is a self-report, not a proof — it makes coverage
+  visible instead of assumed, which is what makes a bias like the
+  `race_condition` monoculture legible in the reply rather than silent. Distinct
+  from `status: "unavailable"`, which continues to mean no verdict could be
+  parsed at all. Resolves #12.
+
 - **The classifier prompt carries the definitions of functions the file calls**,
   resolved one level deep through relative imports. The motivating false
   positive was attributable to single-file scope entirely: the disproof of the

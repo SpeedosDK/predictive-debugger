@@ -184,7 +184,11 @@ server.registerTool(
             "Combine static analysis with a second-opinion verdict from the signed-in " +
             "Claude Code or Codex CLI, returning the most likely runtime failure with a " +
             "line number and reason. `status` distinguishes actionable, uncertain, no-finding, " +
-            "and unavailable results. Treat it as a defect only when `actionable` is true; " +
+            "and unavailable results. `checked` lists the bug categories the model reports " +
+            "having considered, so a clean file weighed against the whole catalogue is " +
+            "distinguishable from one where it stopped early; it is a self-report, and an " +
+            "empty list means no coverage was reported. Treat it as a defect only when " +
+            "`actionable` is true; " +
             `that applies the measured score >= ${MIN_ACTIONABLE_SCORE} precision gate. ` +
             "This spawns another model and takes 5-15 seconds per file, so only call it " +
             "when you specifically want an independent second opinion. If you are yourself " +
@@ -234,7 +238,7 @@ server.registerTool(
             // log stanza saying log analysis was not requested, and the absolute
             // path the caller had just supplied. All three are now opt-in, which
             // moves the break-even point down to files of roughly 70 tokens.
-            const { pattern, score, line, reason, truncated } = result.aiPrediction;
+            const { pattern, score, line, reason, truncated, checked } = result.aiPrediction;
 
             return json({
                 // Echoed as given rather than resolved: shorter, and the caller
@@ -246,6 +250,11 @@ server.registerTool(
                 reason,
                 status: predictionStatus(result.aiPrediction),
                 actionable: isActionablePrediction(result.aiPrediction),
+                // Always present, and empty when the model named nothing:
+                // being able to see that coverage was not reported is the
+                // point of the field, so hiding it behind `verbose` would
+                // defeat it.
+                checked: checked ?? [],
                 combinedScore: round(result.combinedScore),
                 staticRisk: round(result.riskScore),
                 viaProvider: active.provider.id,

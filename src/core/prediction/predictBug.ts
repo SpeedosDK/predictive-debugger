@@ -247,8 +247,15 @@ function buildPrompt(
         '"none". The test is unchanged — name the wrong value returned or the wrong side effect',
         "produced. If you cannot, it does not belong in the reply.",
         "",
+        '"checked" is a coverage record. List every pattern id above you actually',
+        "considered for this file, including the one you report if you report one, and",
+        "leave out the ones you did not consider. Without it, a file you weighed against",
+        "the whole catalogue and a file where you stopped at the first plausible-looking",
+        "issue produce the same reply. Do not pad the list: an id you did not actually",
+        "weigh makes the field worse than absent. It does not affect the score.",
+        "",
         "Respond with one JSON object and nothing else — no prose, no code fences:",
-        '{"pattern": "<pattern id, or \\"none\\">", "score": <0.0-1.0 likelihood this file fails at runtime>, "line": <1-based line number, or null>, "reason": "<one sentence, max 300 characters, describing only the defect>"}',
+        '{"pattern": "<pattern id, or \\"none\\">", "score": <0.0-1.0 likelihood this file fails at runtime>, "line": <1-based line number, or null>, "reason": "<one sentence, max 300 characters, describing only the defect>", "checked": ["<pattern ids you considered>"]}',
         "",
         `File name (untrusted): ${JSON.stringify(filePath)}`,
         "",
@@ -289,14 +296,42 @@ export function parsePrediction(raw: string): BugPrediction {
             ? Math.floor(json.line)
             : undefined;
 
+    const checked = parseChecked(json.checked);
+
     return {
         pattern: clip(pattern, MAX_PATTERN_CHARS),
         score: pattern === "none" ? 0 : score,
         // Bounded because the reply is model output shaped by untrusted source
         // text. A capped field cannot flood the UI or carry a large payload.
         reason: clip(typeof json.reason === "string" ? json.reason.trim() : "", MAX_REASON_CHARS),
-        line
+        line,
+        ...(checked ? { checked } : {})
     };
+}
+
+/**
+ * Normalise the model's coverage self-report against the catalogue.
+ *
+ * Filtered to known ids and re-ordered to catalogue order rather than kept as
+ * written: the value of the field is the *set* that was considered, and a
+ * stable order is what makes two responses comparable. An invented id is
+ * dropped, which also bounds the field without a length cap.
+ *
+ * `undefined` when the model said nothing, which is what a caller reading this
+ * as a disclosure needs to see — an empty list would claim the model reported
+ * checking nothing, and that is a different statement.
+ */
+function parseChecked(value: unknown): string[] | undefined {
+    if (!Array.isArray(value)) {
+        return undefined;
+    }
+
+    const named = new Set(
+        value.filter((id): id is string => typeof id === "string").map((id) => id.trim())
+    );
+    const checked = BUG_PATTERNS.map((p) => p.id).filter((id) => named.has(id));
+
+    return checked.length > 0 ? checked : undefined;
 }
 
 function clip(value: string, limit: number): string {

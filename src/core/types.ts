@@ -42,6 +42,19 @@ export interface BugPrediction {
     /** 1-based line the model points at, when it identifies one. */
     line?: number;
     /**
+     * Which catalogue patterns the model reports having considered for this
+     * file, in catalogue order.
+     *
+     * A disclosure, not a guarantee: it is the model's own account of its
+     * coverage, and it could name a category it did not really weigh. It exists
+     * because nothing else in the reply separates "checked for this and found
+     * nothing" from "never considered it" — `pattern: "none"` with `score: 0`
+     * looks identical either way. Undefined means the model reported nothing,
+     * which is distinct from `status: "unavailable"`, where no verdict could be
+     * parsed at all.
+     */
+    checked?: string[];
+    /**
      * Set when the file was too large to send in full. The verdict is then based
      * on a prefix of the file, which the caller should make visible.
      */

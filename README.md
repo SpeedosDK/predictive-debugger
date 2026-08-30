@@ -182,7 +182,7 @@ already a model, so it needs facts, not a second opinion.
 | `analyze_file` | Complexity metrics + risk score and risk density for one file, with the signals that drove it |
 | `scan_project` | Rank every source file in a directory by risk density — risk per line, not per file |
 | `analyze_logs` | Score log lines by severity and unusual wording, return the anomalies |
-| `predict_failures` | Full pipeline including a second-opinion model verdict and an `actionable` precision gate — spawns a CLI, 5–15s per file |
+| `predict_failures` | Full pipeline including a second-opinion model verdict, an `actionable` precision gate, and a `checked` list of the categories the model says it weighed — spawns a CLI, 5–15s per file |
 | `list_providers` | Which CLIs are installed and signed in (for diagnosing failures) |
 
 `predict_failures` is deliberately the odd one out. When an agent calls it, one

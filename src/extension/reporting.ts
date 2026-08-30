@@ -69,7 +69,10 @@ export function summarize(result: FilePrediction): string {
     const status = predictionStatus(result.aiPrediction);
 
     if (status === "none") {
-        return "no likely failure found";
+        // The one place the coverage self-report earns its space: a clean
+        // verdict is exactly where the reader cannot otherwise tell a thorough
+        // pass from a cursory one.
+        return `no likely failure found${describeChecked(result)}`;
     }
     if (status === "unavailable") {
         return reason ? `prediction unavailable: ${reason}` : "prediction unavailable";
@@ -77,9 +80,17 @@ export function summarize(result: FilePrediction): string {
     if (status === "uncertain") {
         const at = line ? ` at line ${line}` : "";
         const detail = reason ? `: ${reason}` : "";
-        return `uncertain ${pattern}${at} (${percent(score)}, not added to Problems)${detail}`;
+        return `uncertain ${pattern}${at} (${percent(score)}, not added to Problems)${detail}${describeChecked(result)}`;
     }
     return reason ? `${pattern}: ${reason}` : pattern;
+}
+
+/** Name what the model says it weighed, or say plainly that it said nothing. */
+function describeChecked(result: FilePrediction): string {
+    const checked = result.aiPrediction.checked;
+    return checked?.length
+        ? ` (checked: ${checked.join(", ")})`
+        : " (the model reported no coverage)";
 }
 
 export function percent(value: number): string {

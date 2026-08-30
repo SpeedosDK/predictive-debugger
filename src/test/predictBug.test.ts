@@ -94,6 +94,97 @@ describe("parsePrediction", () => {
     });
 });
 
+describe("parsePrediction — the coverage self-report", () => {
+    // Nothing else in the reply separates "checked for this and found nothing"
+    // from "never considered it": pattern "none" with score 0 looks identical
+    // either way. See issue #12.
+    it("keeps the catalogue ids the model says it considered", () => {
+        const result = parsePrediction(
+            '{"pattern":"none","score":0,"reason":"clean","checked":["race_condition","off_by_one"]}'
+        );
+        assert.deepEqual(result.checked, ["race_condition", "off_by_one"]);
+    });
+
+    it("reports them in catalogue order, so two replies compare directly", () => {
+        const result = parsePrediction(
+            '{"pattern":"none","score":0,"checked":["other","off_by_one","race_condition"]}'
+        );
+        assert.deepEqual(result.checked, ["race_condition", "off_by_one", "other"]);
+    });
+
+    it("drops ids that are not in the catalogue", () => {
+        // Which also bounds the field without a length cap: the model cannot
+        // return more entries than the catalogue has.
+        const result = parsePrediction(
+            '{"pattern":"none","score":0,"checked":["race_condition","sql_injection","","none"]}'
+        );
+        assert.deepEqual(result.checked, ["race_condition"]);
+    });
+
+    it("de-duplicates a repeated id", () => {
+        const result = parsePrediction(
+            '{"pattern":"none","score":0,"checked":["null_reference","null_reference"]}'
+        );
+        assert.deepEqual(result.checked, ["null_reference"]);
+    });
+
+    it("leaves it undefined when the model reported nothing", () => {
+        // Distinct from an empty list, which would claim the model said it
+        // checked nothing.
+        assert.equal(parsePrediction('{"pattern":"none","score":0}').checked, undefined);
+        assert.equal(parsePrediction('{"pattern":"none","score":0,"checked":[]}').checked, undefined);
+        assert.equal(
+            parsePrediction('{"pattern":"none","score":0,"checked":"race_condition"}').checked,
+            undefined
+        );
+    });
+
+    it("keeps the reported pattern alongside the rest of the coverage", () => {
+        const result = parsePrediction(
+            '{"pattern":"race_condition","score":0.8,"checked":["race_condition","resource_leak"]}'
+        );
+        assert.equal(result.pattern, "race_condition");
+        assert.deepEqual(result.checked, ["race_condition", "resource_leak"]);
+    });
+
+    it("still recovers a verdict when the reply was cut off inside checked", () => {
+        // `checked` is last in the response schema precisely so truncation
+        // costs the disclosure and not the verdict.
+        const result = parsePrediction(
+            '{"pattern":"off_by_one","score":0.8,"line":4,"reason":"loop runs one too far","checked":["off_by_one","race_cond'
+        );
+        assert.equal(result.pattern, "off_by_one");
+        assert.equal(result.line, 4);
+        assert.equal(result.checked, undefined);
+    });
+
+    it("does not confuse an absent coverage report with an unavailable verdict", () => {
+        const unavailable = parsePrediction("no idea");
+        assert.equal(unavailable.pattern, "unknown");
+        assert.equal(unavailable.checked, undefined);
+    });
+});
+
+describe("buildPrompt — asking for coverage", () => {
+    it("asks which categories were considered, not only which was found", async () => {
+        const fake = fakeProvider('{"pattern":"none","score":0,"reason":"fine"}');
+        await predictBug({
+            provider: fake.provider,
+            location: { file: "fake" },
+            filePath: "a.js",
+            code: "const x = 1;"
+        });
+
+        assert.ok(fake.lastPrompt.includes('"checked" is a coverage record'));
+        assert.ok(fake.lastPrompt.includes('"checked": ["<pattern ids you considered>"]'));
+        // Padding the list would make the field worse than absent, so the
+        // prompt has to say so.
+        assert.ok(fake.lastPrompt.includes("Do not pad the list"));
+        // It must not read as a lever on the verdict.
+        assert.ok(fake.lastPrompt.includes("It does not affect the score"));
+    });
+});
+
 describe("parsePrediction — bounding untrusted model output", () => {
     it("clips an overlong reason", () => {
         const long = "x".repeat(5000);
