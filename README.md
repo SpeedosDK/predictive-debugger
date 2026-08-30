@@ -290,10 +290,10 @@ Headline, over 12 files with 3 trials each against the Claude CLI:
 
 | | |
 |---|---|
-| Context to read the files | 10,244 tokens |
-| Context to ask `predict_failures` | 1,606 tokens |
+| Context to read the files | 10,344 tokens |
+| Context to ask `predict_failures` | 1,554 tokens |
 | Runs landing inside the defect's own function | 18 of 18 |
-| Runs landing on the exact line | 12 of 18 |
+| Runs landing on the exact line | 15 of 18 |
 | False alarms on clean files, raw output | **0 of 18** |
 | Separation between buggy and clean runs (AUC) | 1.000 |
 
@@ -302,6 +302,13 @@ ones: the enclosing function is where a reader would look, the exact line is
 what a panel underlines. This replaced an earlier tolerance of three lines
 either way, which accepted most of a 13-line file and called a defect with two
 defensible sites a miss.
+
+Both numbers grade against every line the corpus records as defensible, not
+against whichever anchor was typed first. A defect often has two: the read that
+goes out of bounds and the dereference that throws on it, the line that acquires
+a resource and the teardown that fails to release it. Graded against one, a
+model that moves between two equally correct sites reads as a regression when
+nothing has changed.
 
 That 0.70 cutoff is now product behaviour, not just advice in this README. Replaying the
 same 36 Claude responses changes VS Code Problems from **12 false alerts to 0**, while
@@ -319,9 +326,11 @@ per-provider comparison.
 
 Three findings that should change how the tools are used:
 
-- **The answer costs a flat ~134 tokens**, so asking is only cheaper than
+- **The answer costs a flat ~129 tokens**, so asking is only cheaper than
   reading for files above roughly that size. On an 80-token helper it still
-  costs more.
+  costs more. Replies are serialised compactly for this reason: a two-space
+  indent was 29% of the response, spent on making a raw transcript pleasant for
+  a human who is not the audience.
 - **The false alarms were fixed in the prompt, not the threshold.** An evidence
   policy that makes the model disprove a candidate before reporting it, plus a
   clause saying concurrency is a normal execution rather than an invented input,
