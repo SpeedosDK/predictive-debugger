@@ -6,6 +6,8 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.3.0] — 2026-08-30
+
 ### Added
 
 - **`predict_failures` can return a ranked list of findings per file** instead of
