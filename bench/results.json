@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-08-20T13:44:32.365Z",
+  "generatedAt": "2026-08-30T09:33:07.575Z",
   "sizeCorrelation": 0.825,
   "densitySizeCorrelation": 0.327,
   "tokenizer": "cl100k (gpt-tokenizer) — approximation of Claude's tokenizer",
@@ -9,12 +9,12 @@
     "bugs": 6
   },
   "scan": {
-    "wallClockMs": 109,
+    "wallClockMs": 103,
     "scanned": 40,
     "returned": 40,
     "outputTokens": 3319,
     "shortlistTokens": 938,
-    "shortlistWallClockMs": 46
+    "shortlistWallClockMs": 38
   },
   "strategies": {
     "readAll": {

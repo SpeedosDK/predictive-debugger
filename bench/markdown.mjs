@@ -562,10 +562,12 @@ ${table(
     ]
 )}
 
-Nothing is reported clean any more, and no clean file is accused. Of the remaining
-${summary.buggy.wrongLocation} wrong-location runs, two
-them land on \`backfill\`, a second method in the same worker with the same read-await-write
-shape as the planted defect. Latency rose because the model reasons for longer. The
+Nothing is reported clean any more, and no clean file is accused.${
+    summary.buggy.wrongLocation === 0
+        ? ""
+        : ` ${summary.buggy.wrongLocation} of ${buggyRuns.length} buggy runs named a
+real-looking issue outside the defect's function — see the per-file table below for which.`
+} Latency rose because the model reasons for longer. The
 worst single call took ${dec(summary.latency.maxMs / 1000)} s.
 
 Section 4 puts the two providers side by side on the same policy.

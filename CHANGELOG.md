@@ -46,6 +46,21 @@ All notable changes to this project are documented here. The format follows
   roughly an eighth of what a large file already costs. Off via
   `calleeContext: false` on `predict_failures`. Resolves #4.
 
+  Measured on `bench/corpus` and `bench/corpus-ts` after this change (see
+  `bench/RESULTS.md`): function-level hit rate held at 18 of 18 planted defects on
+  both corpora, and the one false alarm in the TypeScript corpus (`lib/headers.mts`,
+  17 of 18 true negatives before) did not reproduce — 18 of 18 after. Exact-line
+  accuracy dropped on both corpora (JS 12→9, TS 17→15), entirely on three files
+  where the model now names a different line inside the same already-correctly-
+  identified function — `reconciliationWorker.js`, `pricingService.js`, and
+  `cache.service.ts`. Nothing moved to a wrong function or a false alarm. Tool
+  tokens per call rose ~30% (JS 4,816→6,369, TS 4,782→6,095), matching the added
+  callee context and the `checked` field from #12. Net: no regression on the
+  metrics the product gates on, a real fix to the one recorded false positive, at
+  a real token cost — worth shipping on by default, worth re-measuring if the
+  exact-line drop turns out to matter to anyone reading the Problems panel rather
+  than an agent.
+
 ### Changed
 
 - **The model-reply parser recovers more from a truncated response.** It cut at
