@@ -11,12 +11,12 @@ The per-file test covers 12 of them: 6 buggy files and
 
 | Question | Measured answer |
 |---|---|
-| Does the tool reduce context? | Yes. 1,606 tokens instead of 10,244, 84% less file content. |
-| Does it point to the planted line? | 18 of 18 bug trials land inside the defect's own function, 12 of 18 on the exact line. 0 pointed elsewhere. |
+| Does the tool reduce context? | Yes. 2,124 tokens instead of 10,244, 79% less file content. |
+| Does it point to the planted line? | 18 of 18 bug trials land inside the defect's own function, 9 of 18 on the exact line. 0 pointed elsewhere. |
 | Does it accuse clean files? | 0 of 18 raw trials, 0 after the 0.7 gate. |
 | Does it help a real agent? | 26% fewer tokens in the A/B. Both arms found 2 of 3 bugs. |
 | Does project ranking help? | At 15 files, risk order contains 4 of 6 bugs. Directory order contains 2. |
-| What does one prediction cost in time? | 5.0 s mean, 16.9 s worst. |
+| What does one prediction cost in time? | 5.7 s mean, 26.2 s worst. |
 
 This run has a clean precision result. No clean control received a defect.
 Every prediction landed inside the function containing the defect. The tool saves context, but the extra model call means it did not make the A/B faster.
@@ -24,7 +24,7 @@ Every prediction landed inside the function containing the defect. The tool save
 Two numbers are given for localisation because they answer different questions, and an
 agent and a Problems panel need different ones. **18 of
 18 predictions land inside the function the defect is in**, which is what
-an agent needs to know where to look. **12 of 18 land on the
+an agent needs to know where to look. **9 of 18 land on the
 line itself**, which is what a panel that underlines one line needs.
 
 Grading by the enclosing function replaced a tolerance of three lines either way. That
@@ -165,13 +165,10 @@ finishes, unless the source shows it cannot. That is one clause, and it costs no
 | Planted lines named | 14 of 18 | 18 of 18 | +4 |
 | Buggy files reported clean | 3 of 18 | 0 of 18 | −3 |
 | Separation (AUC) | 0.917 | 1.000 | n/a |
-| Latency per file | 4.9 s | 5.0 s | +3% |
+| Latency per file | 4.9 s | 5.7 s | +16% |
 
-Nothing is reported clean any more, and no clean file is accused. Of the remaining
-0 wrong-location runs, two
-them land on `backfill`, a second method in the same worker with the same read-await-write
-shape as the planted defect. Latency rose because the model reasons for longer. The
-worst single call took 16.9 s.
+Nothing is reported clean any more, and no clean file is accused. Latency rose because the model reasons for longer. The
+worst single call took 26.2 s.
 
 Section 4 puts the two providers side by side on the same policy.
 
@@ -190,8 +187,8 @@ right. This keeps both sides tied to measured data.
 
 | Measure | Before | After | Change |
 |---|---|---|---|
-| Answer size, mean tokens per call | 251 | 134 | −47% |
-| Context to ask about all 12 files | 3,007 (29%) | 1,606 (16%) | −47% |
+| Answer size, mean tokens per call | 251 | 177 | −29% |
+| Context to ask about all 12 files | 3,007 (29%) | 2,124 (21%) | −29% |
 | Files where asking beats reading | 8 of 12 | 9 of 12 | +1 |
 | `scan_project` output, 40 files | 6,512 | 3,319 | −49% |
 | `scan_project` shortlist, limit 10 | 1,755 | 938 | −47% |
@@ -232,7 +229,7 @@ The comparison also exposes three limits:
 - **Precision was bought with recall, and the corpus cannot price that trade.** Naming the
   planted line went from 17 of 18 to
   18, and latency per file from
-  4.4 s to 5.0 s.
+  4.4 s to 5.7 s.
   Whether a wasted investigation costs more than a missed defect is a question about the
   person reading the output, not about this benchmark.
 - **The smallest files still cost more to ask about than to read**, and always will: an
@@ -245,27 +242,27 @@ The comparison also exposes three limits:
 
 ### 1. Context cost: cheaper on 9 of 12 files
 
-The answer costs roughly the same regardless of file size: 134 tokens on
+The answer costs roughly the same regardless of file size: 177 tokens on
 average. It contains one line number, one pattern, one rationale and two scores.
 The metric block and the log stanza are behind a `verbose` flag, and the path is
 echoed as given rather than resolved; before that they were four fifths of the reply.
 This creates a break-even point: the tool is cheaper only for files above roughly
-134 tokens, which is 9 of the 12 files here. For `models/cartTotals.js`, at 81 tokens, asking still costs more than reading.
+177 tokens, which is 9 of the 12 files here. For `models/cartTotals.js`, at 81 tokens, asking still costs more than reading.
 
 | File | Type | Read the file | Ask the tool | Context change |
 |---|---|---|---|---|
-| `api/adminController.js` | clean | 3,145 | 123 | Saves 3,022 |
-| `services/orderService.js` | clean | 2,385 | 127 | Saves 2,258 |
-| `repositories/orderRepository.js` | clean | 1,099 | 128 | Saves 971 |
-| `services/pricingService.js` | bug | 983 | 139 | Saves 844 |
-| `services/inventoryService.js` | bug | 749 | 141 | Saves 608 |
-| `workers/reconciliationWorker.js` | bug | 714 | 155 | Saves 559 |
-| `services/auditService.js` | clean | 346 | 141 | Saves 205 |
-| `lib/paging.js` | clean | 313 | 123 | Saves 190 |
-| `models/payment.js` | clean | 229 | 124 | Saves 105 |
-| `lib/dateWindow.js` | bug | 113 | 133 | Costs 20 |
-| `lib/retry.js` | bug | 87 | 135 | Costs 48 |
-| `models/cartTotals.js` | bug | 81 | 137 | Costs 56 |
+| `api/adminController.js` | clean | 3,145 | 173 | Saves 2,972 |
+| `services/orderService.js` | clean | 2,385 | 175 | Saves 2,210 |
+| `repositories/orderRepository.js` | clean | 1,099 | 163 | Saves 936 |
+| `services/pricingService.js` | bug | 983 | 198 | Saves 785 |
+| `services/inventoryService.js` | bug | 749 | 192 | Saves 557 |
+| `workers/reconciliationWorker.js` | bug | 714 | 211 | Saves 503 |
+| `services/auditService.js` | clean | 346 | 189 | Saves 157 |
+| `lib/paging.js` | clean | 313 | 158 | Saves 155 |
+| `models/payment.js` | clean | 229 | 151 | Saves 78 |
+| `lib/dateWindow.js` | bug | 113 | 171 | Costs 58 |
+| `lib/retry.js` | bug | 87 | 178 | Costs 91 |
+| `models/cartTotals.js` | bug | 81 | 165 | Costs 84 |
 
 ### 2. Accuracy: 18 correct lines and 0 wrong locations
 
@@ -285,9 +282,9 @@ whether it becomes an actionable Problem.
 | `api/adminController.js` | Clean | Not applicable | Correctly clean | Correctly clean | Correctly clean |
 | `services/orderService.js` | Clean | Not applicable | Correctly clean | Correctly clean | Correctly clean |
 | `repositories/orderRepository.js` | Clean | Not applicable | Correctly clean | Correctly clean | Correctly clean |
-| `services/pricingService.js` | Bug | 34 | Hit (line 36) | Hit (line 36) | Hit (line 34) |
+| `services/pricingService.js` | Bug | 34 | Hit (line 36) | Hit (line 36) | Hit (line 36) |
 | `services/inventoryService.js` | Bug | 28 | Hit (line 28) | Hit (line 28) | Hit (line 28) |
-| `workers/reconciliationWorker.js` | Bug | 28 | Hit (line 28) | Hit (line 28) | Hit (line 40) |
+| `workers/reconciliationWorker.js` | Bug | 28 | Hit (line 40) | Hit (line 40) | Hit (line 40) |
 | `services/auditService.js` | Clean | Not applicable | Correctly clean | Correctly clean | Correctly clean |
 | `lib/paging.js` | Clean | Not applicable | Correctly clean | Correctly clean | Correctly clean |
 | `models/payment.js` | Clean | Not applicable | Correctly clean | Correctly clean | Correctly clean |
@@ -308,7 +305,7 @@ This section used to carry the precision result. Clean files drew true but gener
 | 0.6 | 18 of 18 | 0 of 18 |
 | 0.65 | 18 of 18 | 0 of 18 |
 | 0.7 | 18 of 18 | 0 of 18 |
-| 0.8 | 12 of 18 | 0 of 18 |
+| 0.8 | 14 of 18 | 0 of 18 |
 
 Every column is the same, because there is nothing to trade. Every clean trial scored 0, and every finding on a buggy file scored at least 0.72. The gap runs from 0 to 0.72, with no run of either kind inside it. Any gate in that range gives identical results, which means the threshold is currently free and currently useless.
 
@@ -324,7 +321,7 @@ happened to stop that run, which is not a property of the tool.
 > What changed the result was the prompt, not the number. That is still measured on one
 > corpus the policy was written against.
 
-### 4. TypeScript: 18 of 18 planted lines, 1 of 18 false alarms
+### 4. TypeScript: 18 of 18 planted lines, 0 of 18 false alarms
 
 Every other number in this file is JavaScript. This one is not, and it exists because
 "TypeScript is supported" was an assertion for as long as the corpus had no TypeScript in
@@ -342,7 +339,7 @@ happened once across the 40 files of the JavaScript corpus.
 | File | Expected | Trial 1 | Trial 2 | Trial 3 |
 |---|---|---|---|---|
 | `models/invoice.entity.ts` | Defect, line 28 | Hit (line 28) | Hit (line 28) | Hit (line 28) |
-| `services/cache.service.ts` | Defect, line 20 | Hit (line 23) | Hit (line 20) | Hit (line 20) |
+| `services/cache.service.ts` | Defect, line 20 | Hit (line 23) | Hit (line 23) | Hit (line 23) |
 | `services/supplier.service.ts` | Defect, line 15 | Hit (line 15) | Hit (line 15) | Hit (line 15) |
 | `models/cart.model.ts` | Defect, line 28 | Hit (line 28) | Hit (line 28) | Hit (line 28) |
 | `lib/paginate.mts` | Defect, line 23 | Hit (line 23) | Hit (line 23) | Hit (line 23) |
@@ -352,7 +349,7 @@ happened once across the 40 files of the JavaScript corpus.
 | `repositories/customer.repository.ts` | Clean | Correctly clean | Correctly clean | Correctly clean |
 | `models/receipt.entity.ts` | Clean | Correctly clean | Correctly clean | Correctly clean |
 | `lib/money.ts` | Clean | Correctly clean | Correctly clean | Correctly clean |
-| `lib/headers.mts` | Clean | False alarm (line 6) | Correctly clean | Correctly clean |
+| `lib/headers.mts` | Clean | Correctly clean | Correctly clean | Correctly clean |
 
 **A closed list of pattern ids was throwing away correct answers.** Before this run the
 catalogue offered six ids or `none`, and `parsePrediction` forces the score to 0 whenever
@@ -364,8 +361,8 @@ defects planted outside the catalogue: five of fifteen buggy runs, correct and t
 
 Adding an `other` id fixed it. `none` now means no defect; `other` means a defect that is
 not one of the six. The bar is unchanged, and the evidence policy still applies. Across this
-run `other` was used 10 times, never on a clean file, at scores from
-0.75 to 0.95.
+run `other` was used 9 times, never on a clean file, at scores from
+0.75 to 0.97.
 
 > **This corpus was tuned against this tool, in the same week, by the same author.** Two
 > controls were rewritten because the tool flagged them, and the `other` id was added after
@@ -373,13 +370,6 @@ run `other` was used 10 times, never on a clean file, at scores from
 > be read as "no known failure mode is left in a corpus built to expose them", not as a
 > measure of TypeScript quality. The held-out evidence is section 2: JavaScript never
 > motivated the `other` change and can show whether it cost anything there.
-
-**The one false alarm is disputed, and the answer key wins anyway.** On
-`lib/headers.mts` the model wrote: *"Header lookup only tries the lowercased name, so headers stored under a mixed-case or original-case key (not already lowercase) are never found even though hasHeader implies case-insensitive matching."* That is
-arguable rather than wrong. The control was written by hand and the objection is real, so the
-honest options were to rewrite the file or to let the alarm stand. Three controls have already
-been rewritten because the tool flagged them, and rewriting every control it complains about
-guarantees a perfect score by construction. The count stays.
 
 **One defect was not planted.** `invoice.entity.ts` was written as a clean control. A
 nullable TypeORM column arrives as `null` rather than `undefined`, and `isSettled()`
@@ -395,7 +385,7 @@ They do not fail the same way, and picking whichever one looks better would hide
 
 | Provider | Planted lines, raw | Planted lines, gated | False alarms, raw | False alarms, gated | Separation | Latency |
 |---|---|---|---|---|---|---|
-| `claude` | 18 of 18 | 18 of 18 | 0 of 18 | 0 of 18 | 1 | 5.0 s |
+| `claude` | 18 of 18 | 18 of 18 | 0 of 18 | 0 of 18 | 1 | 5.7 s |
 | `codex` | 11 of 18 | 11 of 18 | 0 of 18 | 0 of 18 | 0.861 | 7.0 s |
 
 **Claude wins on both counts** in this run. It finds 18 of 18 planted lines at the gate and 0 of 18 false alarms. One run per provider is not enough to call that a property of the models rather than of this corpus.
@@ -431,7 +421,7 @@ at all, and took the same wall-clock time. The tool's model call costs roughly w
 | `services/orderService.js` | clean | Line 14, wrong location | No finding, correct (score 0) |
 
 The saving here is much smaller: 26% versus
-84% in section 1. The difference is the agent's own
+79% in section 1. The difference is the agent's own
 overhead: its system prompt, reasoning, and response dominate, while file content is
 only part of the bill. **Section 1 measures savings on file content; section 5 measures
 the savings in practice.**
@@ -501,7 +491,7 @@ The planted bugs land at ranks 4, 9, 11, 12, 39, 40 of 40, so 4 of 6 are inside 
 
 - **Tokens do not disappear; they move.** `predict_failures` spawns another model that
   reads the entire file. The saving is in the calling agent's *context window*, not total
-  consumption. The cost is 5.0 s of latency per file.
+  consumption. The cost is 5.7 s of latency per file.
 - **The corpus is generated, and its generator has a defect.** Files with more than eight
   methods receive duplicate method names because the name generator cycles.
   `orderService.js` defines three methods twice. This makes the "clean" controls less
@@ -542,4 +532,4 @@ node bench/measure-file.mjs      # per file (real CLI calls; takes a few minutes
 node bench/markdown.mjs          # this file + charts
 ```
 
-Generated 2026-08-20T15:17:41.772Z.
+Generated 2026-08-30T09:36:32.553Z.

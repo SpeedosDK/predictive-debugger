@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-import { parsePrediction, predictBug } from "../core/prediction/predictBug";
+import { parseAssessment, parsePrediction, predictBug } from "../core/prediction/predictBug";
 
 describe("parsePrediction", () => {
     it("parses a clean JSON verdict", () => {
@@ -91,6 +91,100 @@ describe("parsePrediction", () => {
 
     it("treats an empty pattern as none", () => {
         assert.equal(parsePrediction('{"pattern":"   ","score":0.9}').pattern, "none");
+    });
+});
+
+describe("parseAssessment — the coverage self-report", () => {
+    // Nothing else in the reply separates "checked for this and found nothing"
+    // from "never considered it": pattern "none" with score 0 looks identical
+    // either way. See issue #12.
+    it("keeps the catalogue ids the model says it considered", () => {
+        const result = parseAssessment(
+            '{"pattern":"none","score":0,"reason":"clean","checked":["race_condition","off_by_one"]}'
+        );
+        assert.deepEqual(result.checked, ["race_condition", "off_by_one"]);
+    });
+
+    it("reports them in catalogue order, so two replies compare directly", () => {
+        const result = parseAssessment(
+            '{"pattern":"none","score":0,"checked":["other","off_by_one","race_condition"]}'
+        );
+        assert.deepEqual(result.checked, ["race_condition", "off_by_one", "other"]);
+    });
+
+    it("drops ids that are not in the catalogue", () => {
+        // Which also bounds the field without a length cap: the model cannot
+        // return more entries than the catalogue has.
+        const result = parseAssessment(
+            '{"pattern":"none","score":0,"checked":["race_condition","sql_injection","","none"]}'
+        );
+        assert.deepEqual(result.checked, ["race_condition"]);
+    });
+
+    it("de-duplicates a repeated id", () => {
+        const result = parseAssessment(
+            '{"pattern":"none","score":0,"checked":["null_reference","null_reference"]}'
+        );
+        assert.deepEqual(result.checked, ["null_reference"]);
+    });
+
+    it("leaves it undefined when the model reported nothing", () => {
+        // Distinct from an empty list, which would claim the model said it
+        // checked nothing.
+        assert.equal(parseAssessment('{"pattern":"none","score":0}').checked, undefined);
+        assert.equal(parseAssessment('{"pattern":"none","score":0,"checked":[]}').checked, undefined);
+        assert.equal(
+            parseAssessment('{"pattern":"none","score":0,"checked":"race_condition"}').checked,
+            undefined
+        );
+    });
+
+    it("keeps the reported pattern alongside the rest of the coverage", () => {
+        const result = parseAssessment(
+            '{"pattern":"race_condition","score":0.8,"checked":["race_condition","resource_leak"]}'
+        );
+        assert.equal(result.findings[0].pattern, "race_condition");
+        assert.deepEqual(result.checked, ["race_condition", "resource_leak"]);
+    });
+
+    it("keeps the verdict, and the coverage that did arrive, from a cut-off reply", () => {
+        // `checked` is last in the response schema precisely so truncation
+        // costs the disclosure before it costs the verdict. The repair cuts
+        // back to the last value boundary at any depth, so the ids that made it
+        // through are kept -- the model did report weighing them, and the
+        // partial one it did not finish naming is dropped rather than guessed.
+        const result = parseAssessment(
+            '{"pattern":"off_by_one","score":0.8,"line":4,"reason":"loop runs one too far","checked":["off_by_one","race_cond'
+        );
+        assert.equal(result.findings[0].pattern, "off_by_one");
+        assert.equal(result.findings[0].line, 4);
+        assert.deepEqual(result.checked, ["off_by_one"]);
+    });
+
+    it("does not confuse an absent coverage report with an unavailable verdict", () => {
+        const unavailable = parseAssessment("no idea");
+        assert.equal(unavailable.findings[0].pattern, "unknown");
+        assert.equal(unavailable.checked, undefined);
+    });
+});
+
+describe("buildPrompt — asking for coverage", () => {
+    it("asks which categories were considered, not only which was found", async () => {
+        const fake = fakeProvider('{"pattern":"none","score":0,"reason":"fine"}');
+        await predictBug({
+            provider: fake.provider,
+            location: { file: "fake" },
+            filePath: "a.js",
+            code: "const x = 1;"
+        });
+
+        assert.ok(fake.lastPrompt.includes('"checked" is a coverage record'));
+        assert.ok(fake.lastPrompt.includes('"checked": ["<pattern ids you considered>"]'));
+        // Padding the list would make the field worse than absent, so the
+        // prompt has to say so.
+        assert.ok(fake.lastPrompt.includes("Do not pad the list"));
+        // It must not read as a lever on the verdict.
+        assert.ok(fake.lastPrompt.includes("It does not affect the score"));
     });
 });
 
@@ -231,6 +325,76 @@ describe("buildPrompt truncation reporting", () => {
         assert.ok(fake.lastPrompt.includes("a local variable"));
     });
 
+    it("sends the definitions of imported functions the file calls", async () => {
+        // Single-file scope produced a false positive that was attributable to
+        // it entirely: the disproof was that a callee was idempotent, and that
+        // callee was one import away. See issue #4.
+        const fake = fakeProvider('{"pattern":"none","score":0,"reason":"fine"}');
+        await predictBug({
+            provider: fake.provider,
+            location: { file: "fake" },
+            filePath: "billing.ts",
+            code: 'import { normalizeBillingDate } from "./dates";\nexport const f = (r) => normalizeBillingDate(r.due);',
+            callees: [
+                {
+                    name: "normalizeBillingDate",
+                    from: "./dates.ts",
+                    source: "function normalizeBillingDate(v) { return v instanceof Date ? v : new Date(v); }"
+                }
+            ]
+        });
+
+        assert.ok(fake.lastPrompt.includes("----- BEGIN CALLEE DEFINITIONS -----"));
+        assert.ok(fake.lastPrompt.includes("// normalizeBillingDate — from ./dates.ts"));
+        assert.ok(fake.lastPrompt.includes("v instanceof Date"));
+        assert.ok(fake.lastPrompt.includes("A callee that already"));
+    });
+
+    it("says a callee is context, not the subject of the review", async () => {
+        // Otherwise the verdict on a file drifts onto a defect in a helper it
+        // merely calls, and the reported line number belongs to another file.
+        const fake = fakeProvider('{"pattern":"none","score":0,"reason":"fine"}');
+        await predictBug({
+            provider: fake.provider,
+            location: { file: "fake" },
+            filePath: "a.ts",
+            code: 'import { h } from "./h";\nh();',
+            callees: [{ name: "h", from: "./h.ts", source: "function h() {}" }]
+        });
+
+        assert.ok(fake.lastPrompt.includes("report defects only in the text"));
+        assert.ok(fake.lastPrompt.includes("never a defect in a callee"));
+        // The asymmetry matters as much as the rule: an unresolved import must
+        // not read as evidence against the caller.
+        assert.ok(fake.lastPrompt.includes("is not thereby suspect"));
+    });
+
+    it("marks a callee whose definition was cut", async () => {
+        const fake = fakeProvider('{"pattern":"none","score":0,"reason":"fine"}');
+        await predictBug({
+            provider: fake.provider,
+            location: { file: "fake" },
+            filePath: "a.ts",
+            code: "big();",
+            callees: [{ name: "big", from: "./big.ts", source: "function big() {", excerpted: true }]
+        });
+
+        assert.ok(fake.lastPrompt.includes("(definition truncated)"));
+    });
+
+    it("omits the callee block entirely when nothing resolved", async () => {
+        const fake = fakeProvider('{"pattern":"none","score":0,"reason":"fine"}');
+        await predictBug({
+            provider: fake.provider,
+            location: { file: "fake" },
+            filePath: "a.js",
+            code: "const x = 1;",
+            callees: []
+        });
+
+        assert.ok(!fake.lastPrompt.includes("CALLEE DEFINITIONS"));
+    });
+
     it("reports how much of an oversized file was analysed", async () => {
         const fake = fakeProvider('{"pattern":"none","score":0,"reason":"fine"}');
         // 200k chars of 10-char lines = 20,000 lines, past the 120k cap.
@@ -245,6 +409,241 @@ describe("buildPrompt truncation reporting", () => {
         assert.ok(fake.lastPrompt.includes("file truncated here"));
         // The prompt must stay bounded even for a huge input.
         assert.ok(fake.lastPrompt.length < 130_000, `prompt was ${fake.lastPrompt.length}`);
+    });
+});
+
+describe("parseAssessment — a ranked list of findings", () => {
+    it("parses a bare array of findings", () => {
+        const result = parseAssessment(
+            '[{"pattern":"off_by_one","score":0.8,"line":3,"reason":"a"},' +
+                '{"pattern":"resource_leak","score":0.6,"line":9,"reason":"b"}]'
+        );
+        assert.deepEqual(
+            result.findings.map((f) => f.pattern),
+            ["off_by_one", "resource_leak"]
+        );
+        assert.equal(result.findings[1].line, 9);
+    });
+
+    it("parses the findings envelope, with file-level coverage outside the list", () => {
+        const result = parseAssessment(
+            '{"findings":[{"pattern":"race_condition","score":0.9,"reason":"a"}],' +
+                '"checked":["race_condition","null_reference"]}'
+        );
+        assert.deepEqual(
+            result.findings.map((f) => f.pattern),
+            ["race_condition"]
+        );
+        assert.deepEqual(result.checked, ["race_condition", "null_reference"]);
+    });
+
+    it("still accepts a single object, whichever shape the prompt asked for", () => {
+        // Discarding a correct answer over its container is the one outcome
+        // worth ruling out here: a missed defect is the most expensive way for
+        // this tool to be wrong.
+        const result = parseAssessment('{"pattern":"null_reference","score":0.7,"reason":"a"}');
+        assert.equal(result.findings.length, 1);
+        assert.equal(result.findings[0].pattern, "null_reference");
+    });
+
+    it("ranks by score, highest first", () => {
+        const result = parseAssessment(
+            '[{"pattern":"off_by_one","score":0.3,"reason":"a"},' +
+                '{"pattern":"race_condition","score":0.9,"reason":"b"},' +
+                '{"pattern":"resource_leak","score":0.6,"reason":"c"}]'
+        );
+        assert.deepEqual(
+            result.findings.map((f) => f.score),
+            [0.9, 0.6, 0.3]
+        );
+    });
+
+    it("keeps the model's own order for findings it scored the same", () => {
+        const result = parseAssessment(
+            '[{"pattern":"off_by_one","score":0.8,"reason":"first"},' +
+                '{"pattern":"resource_leak","score":0.8,"reason":"second"}]'
+        );
+        assert.deepEqual(
+            result.findings.map((f) => f.reason),
+            ["first", "second"]
+        );
+    });
+
+    it("collapses an empty list to the one none verdict", () => {
+        // An empty list is how the multi-finding prompt says "clean", and the
+        // rest of the product asks `findings[0]` what the verdict was.
+        const result = parseAssessment('{"findings":[],"checked":["race_condition"]}');
+        assert.equal(result.findings.length, 1);
+        assert.equal(result.findings[0].pattern, "none");
+        assert.equal(result.findings[0].score, 0);
+        assert.deepEqual(result.checked, ["race_condition"]);
+    });
+
+    it("drops a none that arrives alongside a real finding", () => {
+        // A reply reporting both is contradicting itself, and the finding is
+        // the half that carries information.
+        const result = parseAssessment(
+            '[{"pattern":"none","score":0,"reason":"clean"},' +
+                '{"pattern":"off_by_one","score":0.8,"reason":"a"}]'
+        );
+        assert.deepEqual(
+            result.findings.map((f) => f.pattern),
+            ["off_by_one"]
+        );
+    });
+
+    it("caps the list, because the reply is untrusted output", () => {
+        const many = Array.from(
+            { length: 30 },
+            (_, i) => `{"pattern":"off_by_one","score":0.5,"reason":"r${i}"}`
+        ).join(",");
+        const result = parseAssessment(`[${many}]`);
+        assert.equal(result.findings.length, 10);
+    });
+
+    it("ignores non-objects in the list rather than failing the whole reply", () => {
+        const result = parseAssessment(
+            '[null,"nonsense",{"pattern":"off_by_one","score":0.8,"reason":"a"}]'
+        );
+        assert.deepEqual(
+            result.findings.map((f) => f.pattern),
+            ["off_by_one"]
+        );
+    });
+
+    it("reads a bare empty list as a clean file, the same as an empty envelope", () => {
+        const result = parseAssessment("[]");
+        assert.equal(result.findings[0].pattern, "none");
+        assert.equal(result.findings[0].score, 0);
+    });
+
+    it("degrades to unknown when entries arrived but none could be read", () => {
+        // The opposite of an empty list: something was said and we could not
+        // make it out. Collapsing the two would report a reply we failed to
+        // parse as a clean bill of health.
+        const result = parseAssessment('[null,"nonsense"]');
+        assert.equal(result.findings[0].pattern, "unknown");
+        assert.match(result.findings[0].reason, /Could not parse/);
+    });
+
+    it("keeps the complete findings from a list cut off inside a later one", () => {
+        // The old repair cut at the last top-level comma, so a truncation two
+        // levels down discarded findings that had arrived whole.
+        const result = parseAssessment(
+            '[{"pattern":"off_by_one","score":0.8,"line":3,"reason":"a"},' +
+                '{"pattern":"resource_leak","score":0.6,"line":9,"reason":"b"},' +
+                '{"pattern":"race_cond'
+        );
+        assert.deepEqual(
+            result.findings.map((f) => f.pattern),
+            ["off_by_one", "resource_leak"]
+        );
+    });
+
+    it("recovers the complete pairs of a finding cut off mid-key", () => {
+        const result = parseAssessment(
+            '[{"pattern":"off_by_one","score":0.8,"reason":"a"},' +
+                '{"pattern":"resource_leak","score":0.6,"line_ch'
+        );
+        assert.deepEqual(
+            result.findings.map((f) => f.pattern),
+            ["off_by_one", "resource_leak"]
+        );
+        assert.equal(result.findings[1].line, undefined);
+    });
+
+    it("does not invent a finding from a fragment that completed no pair", () => {
+        const result = parseAssessment('[{"pattern":"off_by_one","score":0.8,"reason":"a"},{"pat');
+        assert.deepEqual(
+            result.findings.map((f) => f.pattern),
+            ["off_by_one"]
+        );
+    });
+
+    it("forces the score of a none inside a list to zero", () => {
+        const result = parseAssessment('[{"pattern":"none","score":0.9,"reason":"clean"}]');
+        assert.equal(result.findings[0].pattern, "none");
+        assert.equal(result.findings[0].score, 0);
+    });
+});
+
+describe("buildPrompt — asking for a list", () => {
+    it("asks for one verdict by default", async () => {
+        const fake = fakeProvider('{"pattern":"none","score":0,"reason":"fine"}');
+        await predictBug({
+            provider: fake.provider,
+            location: { file: "fake" },
+            filePath: "a.js",
+            code: "const x = 1;"
+        });
+
+        assert.ok(fake.lastPrompt.includes("Identify the single most likely runtime failure"));
+        assert.ok(!fake.lastPrompt.includes('"findings"'));
+    });
+
+    it("asks for every demonstrable finding under multi", async () => {
+        const fake = fakeProvider('{"findings":[],"checked":[]}');
+        await predictBug({
+            provider: fake.provider,
+            location: { file: "fake" },
+            filePath: "a.js",
+            code: "const x = 1;",
+            multi: true
+        });
+
+        assert.ok(fake.lastPrompt.includes("Identify every runtime failure in that source"));
+        assert.ok(fake.lastPrompt.includes('"findings": [{"pattern"'));
+        assert.ok(fake.lastPrompt.includes('Order "findings" by score, highest first'));
+    });
+
+    it("states that a list is not a lower bar", async () => {
+        // The risk of asking for more than one finding is that the list reads
+        // as a quota, and the second-best candidate in a clean file is exactly
+        // what a false positive is made of.
+        const fake = fakeProvider('{"findings":[]}');
+        await predictBug({
+            provider: fake.provider,
+            location: { file: "fake" },
+            filePath: "a.js",
+            code: "const x = 1;",
+            multi: true
+        });
+
+        assert.ok(fake.lastPrompt.includes("A list is not a lower bar"));
+        assert.ok(fake.lastPrompt.includes("Do not pad the"));
+        assert.ok(fake.lastPrompt.includes("do not report the same defect twice"));
+        // The evidence policy still governs every finding.
+        assert.ok(fake.lastPrompt.includes(">= 0.70"));
+    });
+
+    it("keeps coverage outside the list, where it describes the file", async () => {
+        const fake = fakeProvider('{"findings":[]}');
+        await predictBug({
+            provider: fake.provider,
+            location: { file: "fake" },
+            filePath: "a.js",
+            code: "const x = 1;",
+            multi: true
+        });
+
+        assert.ok(fake.lastPrompt.includes("belongs outside the list, once"));
+    });
+
+    it("reports truncation once for the whole assessment, not per finding", async () => {
+        const fake = fakeProvider(
+            '{"findings":[{"pattern":"off_by_one","score":0.8,"reason":"a"},' +
+                '{"pattern":"resource_leak","score":0.6,"reason":"b"}]}'
+        );
+        const result = await predictBug({
+            provider: fake.provider,
+            location: { file: "fake" },
+            filePath: "big.js",
+            code: "let a = 1;\n".repeat(20_000),
+            multi: true
+        });
+
+        assert.equal(result.findings.length, 2);
+        assert.match(result.truncated ?? "", /covers the first \d+ of 20001 lines/);
     });
 });
 

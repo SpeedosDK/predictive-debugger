@@ -32,6 +32,7 @@ export interface StaticAnalysis {
     parseError?: string;
 }
 
+/** One defect the model reports. */
 export interface BugPrediction {
     /** Identifier from the bug pattern catalogue, or "none". */
     pattern: string;
@@ -41,9 +42,41 @@ export interface BugPrediction {
     reason: string;
     /** 1-based line the model points at, when it identifies one. */
     line?: number;
+}
+
+/**
+ * Everything one model call establishes about one file.
+ *
+ * `checked` and `truncated` live here rather than on a finding because both
+ * describe the examination, not any defect it turned up: a truncated file is
+ * truncated for every finding, and coverage is a property of the pass.
+ */
+export interface BugAssessment {
     /**
-     * Set when the file was too large to send in full. The verdict is then based
-     * on a prefix of the file, which the caller should make visible.
+     * Findings, most likely first.
+     *
+     * Never empty. A clean file yields a single `none` finding and an
+     * unparseable reply a single `unknown` one, so `findings[0]` is always the
+     * verdict — which is what lets the single-finding surfaces keep working
+     * unchanged while a caller that wants the whole list reads the array.
+     */
+    findings: BugPrediction[];
+    /**
+     * Which catalogue patterns the model reports having considered for this
+     * file, in catalogue order.
+     *
+     * A disclosure, not a guarantee: it is the model's own account of its
+     * coverage, and it could name a category it did not really weigh. It exists
+     * because nothing else in the reply separates "checked for this and found
+     * nothing" from "never considered it" — `pattern: "none"` with `score: 0`
+     * looks identical either way. Undefined means the model reported nothing,
+     * which is distinct from `status: "unavailable"`, where no verdict could be
+     * parsed at all.
+     */
+    checked?: string[];
+    /**
+     * Set when the file was too large to send in full. The findings are then
+     * based on a prefix of the file, which the caller should make visible.
      */
     truncated?: string;
 }
@@ -69,7 +102,7 @@ export interface FilePrediction {
     file: string;
     metrics: FileMetrics;
     riskScore: number;
-    aiPrediction: BugPrediction;
+    ai: BugAssessment;
     logs: LogSignal;
     combinedScore: number;
 }

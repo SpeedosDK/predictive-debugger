@@ -18,7 +18,8 @@ auth.
 ```
 src/
   core/            analysis engine — no VS Code, no MCP, no I/O beyond files
-    analysis/      AST metrics (ast.ts) and the heuristic risk score (risk.ts)
+    analysis/      AST metrics (ast.ts), heuristic risk (risk.ts), one-hop
+                   import resolution for prompt context (callees.ts)
     logs/          wrapper around tools/log-analyzer
     prediction/    model-backed prediction: one file, or a whole project
     sourceFiles.ts shared source-tree walker
@@ -48,10 +49,14 @@ Read this before relying on it.
   exercised against a real install. The macOS branch of the Claude credential
   check assumes Keychain storage and reports "signed in" without verifying it —
   the connect flow's live check is what actually confirms the sign-in.
-- **`predict_failures` sends file contents to a model provider.** The
-  deterministic tools (`analyze_file`, `scan_project`, `analyze_logs`) run
-  entirely locally and send nothing anywhere. If you point the MCP server at a
-  private codebase, know which tools your agent is calling.
+- **`predict_failures` sends file contents to a model provider.** It also sends
+  the definitions of imported functions the file calls, resolved one level deep
+  within the project, so the model can see whether a callee already handles the
+  case it is about to flag; pass `calleeContext: false` to send only the file.
+  Third-party packages are never read. The deterministic tools (`analyze_file`,
+  `scan_project`, `analyze_logs`) run entirely locally and send nothing
+  anywhere. If you point the MCP server at a private codebase, know which tools
+  your agent is calling.
 - **Very large files are analysed only in part.** Up to 120,000 characters
   (roughly 3,500 lines) are sent to the model; beyond that the verdict covers a
   prefix and says so. Files over 4 MB (~120,000 lines) skip static analysis
@@ -177,7 +182,7 @@ already a model, so it needs facts, not a second opinion.
 | `analyze_file` | Complexity metrics + risk score and risk density for one file, with the signals that drove it |
 | `scan_project` | Rank every source file in a directory by risk density — risk per line, not per file |
 | `analyze_logs` | Score log lines by severity and unusual wording, return the anomalies |
-| `predict_failures` | Full pipeline including a second-opinion model verdict and an `actionable` precision gate — spawns a CLI, 5–15s per file |
+| `predict_failures` | Full pipeline including a second-opinion model verdict, an `actionable` precision gate, a `checked` list of the categories the model says it weighed, and an optional ranked `findings` list (`multi: true`) — spawns a CLI, 5–15s per file |
 | `list_providers` | Which CLIs are installed and signed in (for diagnosing failures) |
 
 `predict_failures` is deliberately the odd one out. When an agent calls it, one
@@ -197,6 +202,7 @@ look worst.
 | `predictiveDebugger.codexModel` | *(CLI default)* | Model for the Codex CLI |
 | `predictiveDebugger.logFile` | *(none)* | Workspace-relative log file to fold into the score |
 | `predictiveDebugger.pythonPath` | auto | Interpreter for the log analyzer |
+| `predictiveDebugger.multipleFindings` | `false` | Ask for every demonstrable failure in a file, ranked, rather than the single most likely one — experimental |
 | `predictiveDebugger.maxFiles` | `25` | Cap on files per project run — each costs one CLI call |
 
 ## How the score works

@@ -224,6 +224,13 @@ async function main() {
                 staticRisk: parsed.staticRisk ?? parsed.riskScore ?? null,
                 reason: prediction.reason ?? null,
                 truncated: prediction.truncated ?? null,
+                // Recorded so the open questions about the two newest fields
+                // can be answered from these runs rather than by hand: does a
+                // category missing from `checked` predict lower recall on
+                // planted defects of that category, and does asking for a list
+                // cost precision. Null on a build that reports neither.
+                checked: parsed.checked ?? null,
+                findingCount: Array.isArray(parsed.findings) ? parsed.findings.length : null,
                 outcome,
                 actionableOutcome
             });
