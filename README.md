@@ -18,7 +18,8 @@ auth.
 ```
 src/
   core/            analysis engine — no VS Code, no MCP, no I/O beyond files
-    analysis/      AST metrics (ast.ts) and the heuristic risk score (risk.ts)
+    analysis/      AST metrics (ast.ts), heuristic risk (risk.ts), one-hop
+                   import resolution for prompt context (callees.ts)
     logs/          wrapper around tools/log-analyzer
     prediction/    model-backed prediction: one file, or a whole project
     sourceFiles.ts shared source-tree walker
@@ -48,10 +49,14 @@ Read this before relying on it.
   exercised against a real install. The macOS branch of the Claude credential
   check assumes Keychain storage and reports "signed in" without verifying it —
   the connect flow's live check is what actually confirms the sign-in.
-- **`predict_failures` sends file contents to a model provider.** The
-  deterministic tools (`analyze_file`, `scan_project`, `analyze_logs`) run
-  entirely locally and send nothing anywhere. If you point the MCP server at a
-  private codebase, know which tools your agent is calling.
+- **`predict_failures` sends file contents to a model provider.** It also sends
+  the definitions of imported functions the file calls, resolved one level deep
+  within the project, so the model can see whether a callee already handles the
+  case it is about to flag; pass `calleeContext: false` to send only the file.
+  Third-party packages are never read. The deterministic tools (`analyze_file`,
+  `scan_project`, `analyze_logs`) run entirely locally and send nothing
+  anywhere. If you point the MCP server at a private codebase, know which tools
+  your agent is calling.
 - **Very large files are analysed only in part.** Up to 120,000 characters
   (roughly 3,500 lines) are sent to the model; beyond that the verdict covers a
   prefix and says so. Files over 4 MB (~120,000 lines) skip static analysis

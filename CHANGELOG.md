@@ -6,6 +6,20 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- **The classifier prompt carries the definitions of functions the file calls**,
+  resolved one level deep through relative imports. The motivating false
+  positive was attributable to single-file scope entirely: the disproof of the
+  reported claim was that a callee was idempotent, and that callee was one
+  import away, so the model had no way to see it. The evidence policy already
+  asks the model to disprove a candidate before reporting it; this gives it the
+  material to do so instead of assuming the worst about code it cannot see. One
+  hop only, relative specifiers only — `node_modules` is never read — and both
+  the per-callee and the total size are capped, so the added cost is bounded at
+  roughly an eighth of what a large file already costs. Off via
+  `calleeContext: false` on `predict_failures`. Resolves #4.
+
 ## [0.2.0] — 2026-08-29
 
 Changes driven by the benchmark in `bench/`, each with the measurement that

@@ -231,6 +231,76 @@ describe("buildPrompt truncation reporting", () => {
         assert.ok(fake.lastPrompt.includes("a local variable"));
     });
 
+    it("sends the definitions of imported functions the file calls", async () => {
+        // Single-file scope produced a false positive that was attributable to
+        // it entirely: the disproof was that a callee was idempotent, and that
+        // callee was one import away. See issue #4.
+        const fake = fakeProvider('{"pattern":"none","score":0,"reason":"fine"}');
+        await predictBug({
+            provider: fake.provider,
+            location: { file: "fake" },
+            filePath: "billing.ts",
+            code: 'import { normalizeBillingDate } from "./dates";\nexport const f = (r) => normalizeBillingDate(r.due);',
+            callees: [
+                {
+                    name: "normalizeBillingDate",
+                    from: "./dates.ts",
+                    source: "function normalizeBillingDate(v) { return v instanceof Date ? v : new Date(v); }"
+                }
+            ]
+        });
+
+        assert.ok(fake.lastPrompt.includes("----- BEGIN CALLEE DEFINITIONS -----"));
+        assert.ok(fake.lastPrompt.includes("// normalizeBillingDate — from ./dates.ts"));
+        assert.ok(fake.lastPrompt.includes("v instanceof Date"));
+        assert.ok(fake.lastPrompt.includes("A callee that already"));
+    });
+
+    it("says a callee is context, not the subject of the review", async () => {
+        // Otherwise the verdict on a file drifts onto a defect in a helper it
+        // merely calls, and the reported line number belongs to another file.
+        const fake = fakeProvider('{"pattern":"none","score":0,"reason":"fine"}');
+        await predictBug({
+            provider: fake.provider,
+            location: { file: "fake" },
+            filePath: "a.ts",
+            code: 'import { h } from "./h";\nh();',
+            callees: [{ name: "h", from: "./h.ts", source: "function h() {}" }]
+        });
+
+        assert.ok(fake.lastPrompt.includes("report defects only in the text"));
+        assert.ok(fake.lastPrompt.includes("never a defect in a callee"));
+        // The asymmetry matters as much as the rule: an unresolved import must
+        // not read as evidence against the caller.
+        assert.ok(fake.lastPrompt.includes("is not thereby suspect"));
+    });
+
+    it("marks a callee whose definition was cut", async () => {
+        const fake = fakeProvider('{"pattern":"none","score":0,"reason":"fine"}');
+        await predictBug({
+            provider: fake.provider,
+            location: { file: "fake" },
+            filePath: "a.ts",
+            code: "big();",
+            callees: [{ name: "big", from: "./big.ts", source: "function big() {", excerpted: true }]
+        });
+
+        assert.ok(fake.lastPrompt.includes("(definition truncated)"));
+    });
+
+    it("omits the callee block entirely when nothing resolved", async () => {
+        const fake = fakeProvider('{"pattern":"none","score":0,"reason":"fine"}');
+        await predictBug({
+            provider: fake.provider,
+            location: { file: "fake" },
+            filePath: "a.js",
+            code: "const x = 1;",
+            callees: []
+        });
+
+        assert.ok(!fake.lastPrompt.includes("CALLEE DEFINITIONS"));
+    });
+
     it("reports how much of an oversized file was analysed", async () => {
         const fake = fakeProvider('{"pattern":"none","score":0,"reason":"fine"}');
         // 200k chars of 10-char lines = 20,000 lines, past the 120k cap.

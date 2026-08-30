@@ -196,6 +196,15 @@ server.registerTool(
                 .optional()
                 .describe("Which CLI to ask (default: whichever is installed)"),
             model: z.string().optional().describe("Model override passed to the CLI"),
+            calleeContext: z
+                .boolean()
+                .optional()
+                .describe(
+                    "Also send the definitions of imported functions the file calls, one " +
+                        "level deep, so the model can see whether a callee already handles " +
+                        "the case it is about to flag (default true). Turning this off is " +
+                        "cheaper per call and measurably less accurate."
+                ),
             logFile: z
                 .string()
                 .optional()
@@ -208,13 +217,14 @@ server.registerTool(
                 )
         }
     },
-    async ({ file, provider, model, logFile, verbose }) => {
+    async ({ file, provider, model, logFile, verbose, calleeContext }) => {
         try {
             const active = await registry.resolveActive(provider as ProviderId | undefined);
             const result = await predictFile(path.resolve(file), {
                 provider: active.provider,
                 location: active.location,
                 model,
+                calleeContext,
                 logs: logFile ? { logPath: path.resolve(logFile) } : undefined
             });
 

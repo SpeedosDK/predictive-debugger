@@ -1,5 +1,6 @@
 import fs from "fs/promises";
 import { CliLocation, CliProvider } from "../../providers/types";
+import { collectCalleeContext } from "../analysis/callees";
 import { analyzeSource } from "../analysis/risk";
 import { analyzeLogs, LogAnalysisOptions } from "../logs/analyzeLogs";
 import { FilePrediction } from "../types";
@@ -12,6 +13,12 @@ export interface PredictOptions {
     model?: string;
     logs?: LogAnalysisOptions;
     signal?: AbortSignal;
+    /**
+     * Send the definitions of imported functions the file calls, one hop deep
+     * (default true). Turning it off restores single-file scope, which is
+     * cheaper per call and measurably less accurate — see issue #4.
+     */
+    calleeContext?: boolean;
 }
 
 /**
@@ -28,11 +35,17 @@ export async function predictFile(
     const code = await fs.readFile(filePath, "utf8");
     const staticAnalysis = await analyzeSource(filePath, code);
 
+    // Resolution is here rather than inside predictBug so the prompt builder
+    // stays a pure function of its inputs, testable without a filesystem.
+    const callees =
+        options.calleeContext === false ? [] : await collectCalleeContext(filePath, code);
+
     const aiPrediction = await predictBug({
         provider: options.provider,
         location: options.location,
         filePath,
         code,
+        callees,
         model: options.model,
         signal: options.signal
     });
