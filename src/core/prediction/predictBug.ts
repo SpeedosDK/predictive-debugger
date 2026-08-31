@@ -289,8 +289,9 @@ function buildPrompt(
 
     // The source is untrusted input: it may contain text engineered to look like
     // instructions. Claude runs with every tool disabled, but `codex exec` has no
-    // equivalent switch and can still read files inside its read-only sandbox, so
-    // the boundary is stated explicitly rather than relied upon implicitly.
+    // equivalent switch and can still read files inside its read-only sandbox, and
+    // `copilot` keeps its read tools once shell, write and url are denied, so the
+    // boundary is stated explicitly rather than relied upon implicitly.
     const prompt = [
         "You are a static analysis engine.",
         "",

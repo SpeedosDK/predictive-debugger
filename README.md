@@ -9,7 +9,8 @@ Finds where code is likely to fail before it does. It ships in two shapes:
 - an **MCP server** so coding agents can use it as a tool while they review code
 
 There is no API key and no OAuth flow. Model access is borrowed from whichever
-CLI you are already signed in to — Claude Code or Codex. The extension never
+CLI you are already signed in to — Claude Code, Codex, or GitHub Copilot. The
+extension never
 sees, stores, or transmits a token; it shells out to the CLI and the CLI handles
 auth.
 
@@ -24,7 +25,7 @@ src/
     prediction/    model-backed prediction: one file, or a whole project
     sourceFiles.ts shared source-tree walker
     types.ts       shared result types
-  providers/       Claude Code / Codex CLI adapters + process spawning
+  providers/       Claude Code / Codex / Copilot CLI adapters + process spawning
   extension/       VS Code integration only
   mcp/             MCP stdio server
   test/            unit tests (Node built-in runner)
@@ -47,8 +48,10 @@ Read this before relying on it.
   macOS and Windows, but the CLI-discovery paths for macOS and Linux
   (`/usr/local/bin`, `/opt/homebrew/bin`, `~/.local/bin`) have not been
   exercised against a real install. The macOS branch of the Claude credential
-  check assumes Keychain storage and reports "signed in" without verifying it —
-  the connect flow's live check is what actually confirms the sign-in.
+  check assumes Keychain storage and reports "signed in" without verifying it,
+  and the Copilot check does the same for the system credential store `/login`
+  writes to — the connect flow's live check is what actually confirms the
+  sign-in.
 - **`predict_failures` sends file contents to a model provider.** It also sends
   the definitions of imported functions the file calls, resolved one level deep
   within the project, so the model can see whether a callee already handles the
@@ -83,7 +86,8 @@ Read this before relying on it.
 - **No credentials are handled.** The extension stores only the chosen provider
   id. Tokens stay with the CLI, which does its own auth. Nothing is read from
   `~/.claude/.credentials.json` or `~/.codex/auth.json` beyond checking that the
-  file exists and is non-empty.
+  file exists and is non-empty. The Copilot CLI keeps its token in the system
+  credential store, which is not read at all.
 - **No shell is invoked.** Every child process is `spawn`ed directly with an
   argument array. Prompts and file contents travel over **stdin**, never argv.
   On Windows, npm's `.cmd` shims are routed through `cmd.exe` with quoting this
@@ -94,9 +98,11 @@ Read this before relying on it.
 - **Analysed source is treated as untrusted data.** A file could contain text
   engineered to read as instructions. Claude runs with `--tools ""`, so it has
   no tools to misuse; `codex exec` has no equivalent switch and can still read
-  files within its read-only sandbox, so the prompt marks the source explicitly
-  as data and the parsed `reason`/`pattern` fields are length-capped. Prefer the
-  Claude provider when analysing code you do not trust.
+  files within its read-only sandbox; `copilot` is run with `shell`, `write` and
+  `url` tools denied and its built-in MCP servers off, which leaves it the same
+  read access as Codex. So the prompt marks the source explicitly as data and
+  the parsed `reason`/`pattern` fields are length-capped. Prefer the Claude
+  provider when analysing code you do not trust.
 - **The MCP tools accept absolute paths from the calling agent** and will read
   any file the process can read — by design, since the point is to analyse a
   codebase. Files above 4 MB are skipped rather than loaded.
@@ -126,6 +132,7 @@ You also need at least one CLI installed and signed in:
 ```bash
 npm i -g @anthropic-ai/claude-code   # then: claude
 npm i -g @openai/codex               # then: codex login
+npm i -g @github/copilot             # then: copilot, and /login
 ```
 
 ## Using it in VS Code
@@ -171,6 +178,12 @@ command = "node"
 args = ["/absolute/path/to/dist/mcp-server.js"]
 ```
 
+### GitHub Copilot
+
+```bash
+copilot mcp add predictive-debugger -- node /absolute/path/to/dist/mcp-server.js
+```
+
 ### Tools
 
 The first three are **deterministic**: no model call, no credentials, results in
@@ -200,6 +213,7 @@ look worst.
 | --- | --- | --- |
 | `predictiveDebugger.claudeModel` | *(CLI default)* | Model alias for the Claude CLI |
 | `predictiveDebugger.codexModel` | *(CLI default)* | Model for the Codex CLI |
+| `predictiveDebugger.copilotModel` | *(CLI default)* | Model for the GitHub Copilot CLI (`auto` lets Copilot pick) |
 | `predictiveDebugger.logFile` | *(none)* | Workspace-relative log file to fold into the score |
 | `predictiveDebugger.pythonPath` | auto | Interpreter for the log analyzer |
 | `predictiveDebugger.multipleFindings` | `false` | Ask for every demonstrable failure in a file, ranked, rather than the single most likely one — experimental |
@@ -283,8 +297,8 @@ node bench/markdown.mjs          # rebuild RESULTS.md and its SVG charts
 ```
 
 `measure-file.mjs` uses real model CLI calls. It honours `BENCH_PROVIDER`
-(`claude` or `codex`) and `BENCH_TRIALS` (default: 3), so a full run takes a few
-minutes and consumes model usage.
+(`claude`, `codex`, or `copilot`) and `BENCH_TRIALS` (default: 3), so a full run
+takes a few minutes and consumes model usage.
 
 Headline, over 12 files with 3 trials each against the Claude CLI:
 

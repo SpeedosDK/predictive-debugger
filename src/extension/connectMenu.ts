@@ -6,12 +6,17 @@ interface ProviderQuickPickItem extends vscode.QuickPickItem {
     detected: DetectedProvider;
 }
 
+const MODEL_SETTINGS: Record<ProviderId, string> = {
+    claude: "claudeModel",
+    codex: "codexModel",
+    copilot: "copilotModel"
+};
+
 /** Model override for a provider, if the user configured one. */
 export function getConfiguredModel(id: ProviderId): string | undefined {
-    const key = id === "claude" ? "claudeModel" : "codexModel";
     const value = vscode.workspace
         .getConfiguration("predictiveDebugger")
-        .get<string>(key);
+        .get<string>(MODEL_SETTINGS[id]);
     return value?.trim() || undefined;
 }
 
