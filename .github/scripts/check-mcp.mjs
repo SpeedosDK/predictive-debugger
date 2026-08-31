@@ -36,6 +36,17 @@ for (const tool of tools) {
     assert.ok(tool.description?.length > 40, `${tool.name} needs a real description`);
 }
 
+// The fix-verification rule ships with the server rather than living in each
+// user's project instructions, so a client that never sees it is a regression
+// in the product, not a cosmetic one.
+const instructions = client.getInstructions();
+assert.ok(instructions, "server should advertise instructions");
+assert.match(
+    instructions,
+    /reviewed from outside the context that produced it/,
+    "instructions should carry the fix-verification rule"
+);
+
 const analyze = await client.callTool({
     name: "analyze_file",
     arguments: {
