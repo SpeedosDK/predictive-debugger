@@ -6,6 +6,29 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.4.0] — 2026-08-31
+
+### Added
+
+- **GitHub Copilot CLI as a third provider** (#14). `copilot` now sits behind
+  the same `CliProvider` interface as Claude Code and Codex: pick it in
+  *Predictive Debugger: Connect*, or pass `provider: "copilot"` to
+  `predict_failures`. Auth is borrowed the same way — from `/login`, from the
+  gh CLI's token, or from `COPILOT_GITHUB_TOKEN`/`GH_TOKEN`/`GITHUB_TOKEN` —
+  and no token is ever read by this extension.
+
+  The prompt is piped in on stdin rather than passed as `copilot -p <text>`,
+  because a prompt carrying up to 120,000 characters of source does not fit on
+  a command line on any platform; piped input is a full non-interactive turn as
+  long as `-p` is absent. The turn runs with `shell`, `write` and `url` denied,
+  built-in MCP servers disabled, and `ask_user` off, which leaves Copilot the
+  same read-only footing as `codex exec`.
+
+  Sign-in state is a hint, not proof: `/login` stores its token in the system
+  credential store, which this extension does not read, so the connect flow's
+  live prompt remains what actually confirms it. Model override:
+  `predictiveDebugger.copilotModel`.
+
 ## [0.3.1] — 2026-08-30
 
 ### Fixed

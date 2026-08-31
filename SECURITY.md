@@ -51,5 +51,5 @@ The threat model is spelled out under **Security model** in the
 - **A wrong or missed prediction.** The static score is a heuristic and the
   model verdict is a model's opinion. Both are wrong sometimes; see
   [bench/RESULTS.md](bench/RESULTS.md) for how often. File those as bugs.
-- **Vulnerabilities in the Claude Code or Codex CLI itself.** Report those to
+- **Vulnerabilities in the Claude Code, Codex, or GitHub Copilot CLI itself.** Report those to
   their own maintainers.
