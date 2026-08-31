@@ -5,6 +5,7 @@ import { z } from "zod";
 import { analyzeFile } from "../core/analysis/risk";
 import { analyzeLogs } from "../core/logs/analyzeLogs";
 import {
+    actionableFindings,
     assessmentStatus,
     isActionablePrediction,
     MIN_ACTIONABLE_SCORE,
@@ -24,10 +25,43 @@ declare const __PACKAGE_VERSION__: string | undefined;
 
 const registry = new ProviderRegistry();
 
-const server = new McpServer({
-    name: "predictive-debugger",
-    version: typeof __PACKAGE_VERSION__ === "string" ? __PACKAGE_VERSION__ : "0.0.0-dev"
-});
+/**
+ * Advertised once at initialize, so a session pays for this prose one time
+ * rather than per call, and a client that ignores the field pays nothing.
+ *
+ * The verification rule ships here rather than being left to the calling
+ * agent's judgement because that judgement is the thing it corrects. An agent
+ * that has just written a fix is the worst-placed reader of it: the reasoning
+ * that made the fix look right is still in its context, so a second look from
+ * the same seat re-derives the first one instead of testing it. Leaving the
+ * rule to each user's own project instructions means only the users who
+ * already knew about the failure mode get the benefit.
+ *
+ * It is a floor, not a ceiling. "At minimum" leaves the agent free to verify
+ * more often than the rule requires, and the mechanical-fix exemption is what
+ * stops it from doubling the cost of correcting a typo.
+ */
+const INSTRUCTIONS = [
+    "Deterministic tools first: scan_project and analyze_file cost nothing and answer most " +
+        "questions about where the risk sits. predict_failures spawns a second model, so call " +
+        "it when you want a verdict independent of your own.",
+    "When you fix something these tools flagged, and the fix involved choosing between " +
+        "approaches rather than being mechanical, have the change reviewed from outside the " +
+        "context that produced it: a sub-agent where the host has them, otherwise a fresh " +
+        "predict_failures on the edited file. Re-reading your own fix in the context that " +
+        "wrote it is the weakest check available, because the reasoning that made it look " +
+        "right is still in scope and tends to confirm itself. Do this at minimum for " +
+        "actionable findings, and use your judgement above that. A mechanical fix -- a typo, " +
+        "a missing await, an off-by-one with one correct value -- does not need it."
+].join("\n\n");
+
+const server = new McpServer(
+    {
+        name: "predictive-debugger",
+        version: typeof __PACKAGE_VERSION__ === "string" ? __PACKAGE_VERSION__ : "0.0.0-dev"
+    },
+    { instructions: INSTRUCTIONS }
+);
 
 /**
  * Serialise a reply, compactly.
@@ -299,6 +333,17 @@ server.registerTool(
                               actionable: isActionablePrediction(finding)
                           }))
                       }
+                    : {}),
+                // The verification rule restated on the wire, in four words.
+                // `instructions` is advertised once at initialize and not every
+                // client forwards it to the model, whereas a tool result always
+                // reaches it -- and this is the turn where the rule applies,
+                // since the agent is about to act on a finding. Gated on the
+                // precision gate rather than emitted always: a clean file is
+                // the common reply and should not pay for advice about a fix
+                // nobody is making.
+                ...(actionableFindings(result.ai).length > 0
+                    ? { onFix: "verify independently unless mechanical" }
                     : {}),
                 // Always present, and empty when the model named nothing:
                 // being able to see that coverage was not reported is the

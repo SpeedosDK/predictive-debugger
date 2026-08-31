@@ -207,6 +207,25 @@ A typical agent review looks like: `scan_project` to find the risky files →
 read those files directly → optionally `predict_failures` on the one or two that
 look worst.
 
+### Verifying a fix
+
+The server advertises MCP `instructions` asking the calling agent to have a fix
+reviewed from outside the context that produced it — a sub-agent where the host
+supports them, otherwise a fresh `predict_failures` on the edited file — whenever
+the fix involved choosing between approaches rather than being mechanical. A
+`predict_failures` reply that clears the precision gate repeats it in four words
+as `onFix`, because not every client forwards `instructions` to the model and a
+tool result always reaches it.
+
+This is here because an agent reviewing its own fix is the weakest check
+available: the reasoning that made the fix look right is still in its context,
+so the second look tends to confirm the first rather than test it. Left to the
+agent's own judgement, the review happens on some runs and not others; left to
+each user's project instructions, only the users who already knew about the
+failure mode get it. It is a floor rather than a rule — an agent is free to
+verify more often, and a mechanical fix is explicitly exempt so correcting a
+typo does not cost two model passes.
+
 ## Settings
 
 | Setting | Default | Purpose |

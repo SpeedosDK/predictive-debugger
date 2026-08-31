@@ -6,6 +6,28 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- **The server now ships the fix-verification rule itself**, as MCP
+  `instructions` plus an `onFix` hint on `predict_failures` replies that clear
+  the precision gate. It asks the calling agent to have a non-mechanical fix
+  reviewed from outside the context that produced it — a sub-agent where the
+  host has them, otherwise a fresh `predict_failures` on the edited file.
+
+  An agent that has just written a fix is the worst-placed reader of it: the
+  reasoning that made the fix look right is still in its context, so reviewing
+  it from the same seat re-derives the first conclusion instead of testing it.
+  An independent pass catches defects the author's pass structurally cannot.
+  Left to the agent's judgement this happened on some runs and not others;
+  left to each user's project instructions it reached only the users who
+  already knew about the failure mode.
+
+  It is a floor, not a ceiling — the agent may verify more often, and a
+  mechanical fix is exempt so a typo does not cost two model passes. The hint
+  is duplicated on the wire because `instructions` is sent once at initialize
+  and not every client forwards it to the model, while a tool result always
+  reaches it; gating it on `actionable` keeps a clean file's reply free of it.
+
 ## [0.4.0] — 2026-08-31
 
 ### Added
