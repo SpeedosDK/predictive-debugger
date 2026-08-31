@@ -53,7 +53,7 @@ back both surfaces.
 
 Two seams carry the design, and both have two real implementations:
 
-- `CliProvider` (`src/providers/types.ts`) — Claude and Codex sit behind it.
+- `CliProvider` (`src/providers/types.ts`) — Claude, Codex and Copilot sit behind it.
   Adding a third CLI should mean adding one adapter and touching nothing else.
 - `StateStore` (`src/providers/registry.ts`) — `vscode.Memento` satisfies it
   structurally, and the MCP server uses an in-memory store.

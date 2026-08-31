@@ -1,5 +1,6 @@
 import { ClaudeCliProvider } from "./claudeCli";
 import { CodexCliProvider } from "./codexCli";
+import { CopilotCliProvider } from "./copilotCli";
 import { CliAuthState, CliLocation, CliProvider, ProviderId } from "./types";
 
 const SELECTED_PROVIDER_KEY = "predictiveDebugger.provider";
@@ -51,7 +52,8 @@ export class NoProviderError extends Error {
 export class ProviderRegistry {
     private readonly providers: CliProvider[] = [
         new ClaudeCliProvider(),
-        new CodexCliProvider()
+        new CodexCliProvider(),
+        new CopilotCliProvider()
     ];
 
     constructor(private readonly state: StateStore = new MemoryStateStore()) {}
@@ -106,8 +108,8 @@ export class ProviderRegistry {
         }
 
         throw new NoProviderError(
-            "No supported CLI found. Install the Claude Code CLI or the Codex CLI, " +
-                "sign in there, then run “Predictive Debugger: Connect”."
+            "No supported CLI found. Install the Claude Code CLI, the Codex CLI, or the " +
+                "GitHub Copilot CLI, sign in there, then run “Predictive Debugger: Connect”."
         );
     }
 }

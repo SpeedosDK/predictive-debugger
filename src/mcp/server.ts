@@ -187,7 +187,7 @@ server.registerTool(
 );
 
 /* ------------------------------------------------------------------ *
- * Model-backed tool. Spawns the Claude/Codex CLI, so it is slow and
+ * Model-backed tool. Spawns the Claude/Codex/Copilot CLI, so it is slow and
  * billed. An agent calling this is asking a second model to do work it
  * could do itself — hence the explicit "only if" in the description.
  * ------------------------------------------------------------------ */
@@ -198,12 +198,13 @@ server.registerTool(
         title: "Predict the most likely runtime failure in a file",
         description:
             "Combine static analysis with a second-opinion verdict from the signed-in " +
-            "Claude Code or Codex CLI, returning the most likely runtime failure with a " +
-            "line number and reason. `status` distinguishes actionable, uncertain, no-finding, " +
-            "and unavailable results. `checked` lists the bug categories the model reports " +
-            "having considered, so a clean file weighed against the whole catalogue is " +
-            "distinguishable from one where it stopped early; it is a self-report, and an " +
-            "empty list means no coverage was reported. Pass `multi: true` to get every " +
+            "Claude Code, Codex, or GitHub Copilot CLI, returning the most likely runtime " +
+            "failure with a line number and reason. `status` distinguishes actionable, " +
+            "uncertain, no-finding, and unavailable results. `checked` lists the bug " +
+            "categories the model reports having considered, so a clean file weighed " +
+            "against the whole catalogue is distinguishable from one where it stopped " +
+            "early; it is a self-report, and an empty list means no coverage was " +
+            "reported. Pass `multi: true` to get every " +
             "finding the model can demonstrate, ranked, in a `findings` array instead of " +
             "one verdict — experimental, and more findings per call is also more surface " +
             "for false positives per call. Treat it as a defect only when " +
@@ -215,7 +216,7 @@ server.registerTool(
         inputSchema: {
             file: z.string().describe("Absolute path to a .js/.jsx/.ts/.tsx file"),
             provider: z
-                .enum(["claude", "codex"])
+                .enum(["claude", "codex", "copilot"])
                 .optional()
                 .describe("Which CLI to ask (default: whichever is installed)"),
             model: z.string().optional().describe("Model override passed to the CLI"),
@@ -322,7 +323,8 @@ server.registerTool(
     {
         title: "Show available CLI providers",
         description:
-            "Report which supported CLIs (Claude Code, Codex) are installed and signed in. " +
+            "Report which supported CLIs (Claude Code, Codex, GitHub Copilot) are installed " +
+            "and signed in. " +
             "Call this to diagnose why predict_failures is failing.",
         inputSchema: {}
     },

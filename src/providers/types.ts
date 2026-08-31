@@ -1,4 +1,4 @@
-export type ProviderId = "claude" | "codex";
+export type ProviderId = "claude" | "codex" | "copilot";
 
 export interface CliLocation {
     /** Absolute path to the executable / shim we resolved. */
