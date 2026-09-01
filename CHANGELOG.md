@@ -6,6 +6,36 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.5.2] — 2026-09-01
+
+### Fixed
+
+- **A model verdict was thrown away when the reply had prose after it**
+  containing a `}` or `]`. `extractJson` found the end of the JSON with
+  `lastIndexOf`, so commentary like "the guard at `if (a) { return; }` already
+  covers it" moved the cut past the reply, `JSON.parse` failed, and the repair
+  path declined to help because the brackets were already balanced. A correct,
+  confident finding was reported as `unknown`. The end of the value is now
+  found by scanning forward with depth tracking, string- and escape-aware, the
+  way `repairTruncatedJson` already did it. The wider `lastIndexOf` read stays
+  as a fallback, and can no longer be reached by a reply with a complete value
+  at the front.
+
+- **`export default foo;` sent the model `const foo = foo` instead of the
+  function.** The default-export branch resolved a declaration it could see
+  inline, but an identifier naming a declaration made earlier in the file fell
+  through to the range covering the identifier itself. That excerpt was worse
+  than sending nothing: it spent tokens to say a function is itself. It now
+  resolves through the same alias path a named export uses, and a default
+  export naming something not declared in that file sends nothing rather than
+  something misleading.
+
+  Both were found by running this project's own `predict_failures` over
+  `src/core/`, and both had escaped the test suite. A third report from the
+  same sweep — that `predictFile` would throw on an empty `findings` array —
+  was a false positive: `rank()` guarantees the list is never empty, on a path
+  the model could not see. Verifying before acting is the point.
+
 ## [0.5.1] — 2026-09-01
 
 ### Project

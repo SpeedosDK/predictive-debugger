@@ -52,13 +52,6 @@ smoke test that the bundled MCP server starts and lists its tools.
 
 Work targets `develop` unless it fixes something already released.
 
-Going public has one prerequisite that is easy to miss: GitHub's [private
-vulnerability reporting](https://github.com/SpeedosDK/predictive-debugger/security/advisories/new)
-is only available on public repositories, and SECURITY.md sends people there.
-Turn it on (Settings → Security → Private vulnerability reporting) in the same
-sitting the repository becomes public, or the only private channel the project
-advertises is a 404.
-
 Cutting a release means: move the `[Unreleased]` entries in
 [CHANGELOG.md](CHANGELOG.md) under a dated version heading, set the version in
 `package.json` to match (the MCP server reports it and `prepack` rebuilds from

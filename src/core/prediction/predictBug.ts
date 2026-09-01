@@ -528,6 +528,54 @@ function jsonStart(text: string): number {
     return Math.min(brace, bracket);
 }
 
+/**
+ * Index of the character that closes the value starting at `body[0]`, or -1.
+ *
+ * Scanning forward with depth tracking rather than reading back from the last
+ * closer, because the trailing prose this parser exists to tolerate can
+ * contain one. A reply that ended `...} Note: the guard at if (a) { return; }
+ * already covers it` put the cut after the prose, so a perfectly good verdict
+ * failed to parse and was reported as `unknown` -- the model's answer thrown
+ * away for talking after it. String and escape handling mirrors
+ * `repairTruncatedJson`, for the same reason it needs it there: a brace inside
+ * a `reason` string is text, not structure.
+ */
+function jsonEnd(body: string): number {
+    let depth = 0;
+    let inString = false;
+    let escaped = false;
+
+    for (let i = 0; i < body.length; i++) {
+        const ch = body[i];
+
+        if (escaped) {
+            escaped = false;
+            continue;
+        }
+        if (inString) {
+            if (ch === "\\") {
+                escaped = true;
+            } else if (ch === '"') {
+                inString = false;
+            }
+            continue;
+        }
+
+        if (ch === '"') {
+            inString = true;
+        } else if (ch === "{" || ch === "[") {
+            depth++;
+        } else if (ch === "}" || ch === "]") {
+            depth--;
+            if (depth === 0) {
+                return i;
+            }
+        }
+    }
+
+    return -1;
+}
+
 function extractJson(raw: string): { value: unknown; repaired: boolean } | undefined {
     const withoutFences = raw.replace(/```(?:json)?/gi, "");
     const start = jsonStart(withoutFences);
@@ -537,6 +585,17 @@ function extractJson(raw: string): { value: unknown; repaired: boolean } | undef
     }
 
     const body = withoutFences.slice(start);
+
+    const balanced = jsonEnd(body);
+    const value = balanced > 0 ? tryParse(body.slice(0, balanced + 1)) : undefined;
+    if (value !== undefined) {
+        return { value, repaired: false };
+    }
+
+    // Kept as a fallback rather than removed: it is the wider read, and a
+    // reply whose structure defeats the scan above can still parse from it.
+    // It cannot reintroduce the bug, because the balanced read already
+    // returned for every reply that has a complete value at the front.
     const closer = body[0] === "[" ? "]" : "}";
     const end = body.lastIndexOf(closer);
 

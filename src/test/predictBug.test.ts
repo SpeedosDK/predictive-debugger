@@ -212,6 +212,36 @@ describe("parsePrediction — bounding untrusted model output", () => {
         assert.equal(result.reason, "short reason");
         assert.equal(result.pattern, "race_condition");
     });
+
+    it("keeps the verdict when the model adds prose containing a brace", () => {
+        // The end of the JSON was found with lastIndexOf, so a closing brace in
+        // the commentary moved the cut past the reply and the whole verdict was
+        // discarded as unparseable. Models talk after answering, and code
+        // discussion has braces in it.
+        const result = parsePrediction(
+            '{"pattern":"null_reference","score":0.8,"line":12,"reason":"r"}\n\n' +
+                "Note: the guard at if (a) { return; } already covers the other path."
+        );
+        assert.equal(result.pattern, "null_reference");
+        assert.equal(result.score, 0.8);
+    });
+
+    it("keeps the verdict when the trailing prose contains a bracket", () => {
+        const result = parsePrediction(
+            '{"pattern":"off_by_one","score":0.75,"line":4,"reason":"r"}\n' +
+                "The loop reads items[items.length] on the last pass."
+        );
+        assert.equal(result.pattern, "off_by_one");
+        assert.equal(result.score, 0.75);
+    });
+
+    it("does not mistake a brace inside a string for the end of the reply", () => {
+        const result = parsePrediction(
+            '{"pattern":"other","score":0.6,"reason":"the block } is unbalanced","line":9}'
+        );
+        assert.equal(result.pattern, "other");
+        assert.equal(result.reason, "the block } is unbalanced");
+    });
 });
 
 describe("buildPrompt truncation reporting", () => {
