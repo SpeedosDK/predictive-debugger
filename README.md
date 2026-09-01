@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="logo/predictive-debugger-logo.png" alt="Predictive Debugger" width="840">
+</p>
+
 # Predictive Debugger
 
 [![CI](https://github.com/SpeedosDK/predictive-debugger/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/SpeedosDK/predictive-debugger/actions/workflows/ci.yml)
