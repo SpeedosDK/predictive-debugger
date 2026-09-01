@@ -6,6 +6,8 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.5.0] — 2026-09-01
+
 ### Project
 
 - **Code contributions are closed for now; bug reports stay open.** The
