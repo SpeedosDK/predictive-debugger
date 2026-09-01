@@ -6,6 +6,24 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.5.1] — 2026-09-01
+
+### Project
+
+- **README gets a beginner on-ramp; the benchmark report defines its terms up
+  front.** A "New to this?" section now sits right after the opening pitch,
+  ahead of the existing developer-facing content: what the tool does in one
+  sentence, what MCP means, which of the two shapes (VS Code extension or MCP
+  server) a reader wants, and the three prerequisites — Node.js, an
+  already-signed-in AI coding CLI, and a built checkout.
+
+  `bench/RESULTS.md` opens with a plain-language paragraph on what the test
+  actually did before naming it, and its glossary now appears before the
+  Bottom line table uses the terms rather than partway through the report.
+  Edited in `bench/markdown.mjs`, the generator, and regenerated rather than
+  hand-edited, so the wording survives the next `npm run bench`. No measured
+  number changed; the charts came back byte-identical.
+
 ## [0.5.0] — 2026-09-01
 
 ### Project
