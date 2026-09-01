@@ -250,4 +250,66 @@ describe("collectCalleeContext", () => {
         const total = callees.reduce((sum, c) => sum + c.source.length, 0);
         assert.ok(total <= 16_000, `spent ${total} chars`);
     });
+
+    it("resolves `export default foo` back to the declaration of foo", async () => {
+        // This returned `const total = total` -- the identifier sliced as its
+        // own definition, which is worse than sending nothing. Found by running
+        // predict_failures on this project's own source.
+        const callees = await collect({
+            "index.ts": [
+                'import total from "./total";',
+                "export function bill(cart) {",
+                "    return total(cart.items);",
+                "}"
+            ].join("\n"),
+            "total.ts": [
+                "function total(items) {",
+                "    return items.reduce((sum, i) => sum + i.price, 0);",
+                "}",
+                "",
+                "export default total;"
+            ].join("\n")
+        });
+
+        assert.equal(callees.length, 1);
+        assert.match(callees[0].source, /items\.reduce/);
+        assert.doesNotMatch(callees[0].source, /^const total = total$/);
+    });
+
+    it("resolves `export default` of a const the same way", async () => {
+        const callees = await collect({
+            "index.ts": [
+                'import total from "./total";',
+                "export function bill(cart) {",
+                "    return total(cart.items);",
+                "}"
+            ].join("\n"),
+            "total.ts": [
+                "const total = (items) => items.reduce((sum, i) => sum + i.price, 0);",
+                "",
+                "export default total;"
+            ].join("\n")
+        });
+
+        assert.equal(callees.length, 1);
+        assert.match(callees[0].source, /items\.reduce/);
+    });
+
+    it("sends nothing when the default export names something not declared here", async () => {
+        // Better an absent callee than a misleading one: the name resolves to
+        // no definition in this file, so there is nothing honest to show.
+        const callees = await collect({
+            "index.ts": [
+                'import total from "./total";',
+                "export function bill(cart) {",
+                "    return total(cart.items);",
+                "}"
+            ].join("\n"),
+            "total.ts": ['import { total } from "./elsewhere";', "", "export default total;"].join(
+                "\n"
+            )
+        });
+
+        assert.deepEqual(callees, []);
+    });
 });
