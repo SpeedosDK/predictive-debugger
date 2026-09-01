@@ -14,6 +14,42 @@ extension never
 sees, stores, or transmits a token; it shells out to the CLI and the CLI handles
 auth.
 
+## New to this?
+
+Skip this section if you already know what MCP is and which of the two setups
+below you want.
+
+**What this does, in one sentence:** it reads code and points at the line most
+likely to fail before it does — either you click a button in VS Code and read
+the result yourself, or an AI coding assistant calls it as a tool while it
+reviews code for you.
+
+**What "MCP" means:** Model Context Protocol, a small standard that lets an AI
+assistant — Claude Code, Codex, GitHub Copilot, and others — call external
+tools instead of only replying in chat. This project *is* one such tool. There
+is nothing called "MCP" to install by itself; you install this project, then
+point an MCP-capable assistant at it, which the sections below walk through.
+
+**Which setup is for you?**
+
+- Want to click a button in your editor and see results yourself? Use the
+  **VS Code extension** — jump to [Using it in VS Code](#using-it-in-vs-code).
+- Already use an AI coding assistant and want it to reach for this
+  automatically while reviewing code? Use the **MCP server** — jump to
+  [Using it from an agent](#using-it-from-an-agent-mcp).
+
+**Before either one, you need:**
+
+1. [Node.js](https://nodejs.org) 22 or later. This project is a Node program;
+   installing Node is what gives you the `node` and `npm` commands used below.
+2. One AI coding CLI already installed and signed in: Claude Code, Codex, or
+   GitHub Copilot CLI (install commands are under [Setup](#setup)). This
+   project has no AI model of its own — it borrows whichever one of these
+   you're signed into. Install one first if you don't have one; there's
+   nothing for this project to borrow otherwise.
+3. This repository on your machine, and built once: `npm install && npm run
+   build`, covered next.
+
 ## Layout
 
 ```

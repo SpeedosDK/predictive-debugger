@@ -387,9 +387,29 @@ async function main() {
 Does \`predict_failures\` save context for a calling agent, and is its answer
 trustworthy enough to act on without reading the file?
 
+In plain terms: we took ${perFile.length} small JavaScript files — ${perFile.filter((f) => f.kind === "buggy").length} with a bug deliberately
+planted in them, ${perFile.filter((f) => f.kind === "clean").length} written clean on purpose — and asked the tool to find the
+bug in each, ${summary.trials} separate times per file. We never told it which files were
+buggy. The question this answers is whether its guess is worth trusting, and
+whether asking costs less than reading the file yourself would have.
+
 Corpus: ${project.corpus.files} generated files with ${project.corpus.bugs} planted bugs.
-The per-file test covers ${perFile.length} of them: ${perFile.filter((f) => f.kind === "buggy").length} buggy files and
-${perFile.filter((f) => f.kind === "clean").length} clean controls. Each file gets ${summary.trials} trials using the \`${summary.provider}\` CLI.
+The per-file test above covers ${perFile.length} of them: ${perFile.filter((f) => f.kind === "buggy").length} buggy files and
+${perFile.filter((f) => f.kind === "clean").length} clean controls, ${summary.trials} trials each, using the \`${summary.provider}\` CLI. A
+larger, separate result further down covers ranking a whole project instead of
+one file at a time.
+
+## How to read the numbers below
+
+| Term | Meaning |
+|---|---|
+| Trial | One independent model call on one file. Each file gets ${summary.trials} trials. |
+| Hit | The prediction lands inside the function the planted defect is in. |
+| Wrong location | The model names a defect, but outside that function. |
+| False alarm | The model names a defect in a clean control file — the wrong answer that matters most, since it's what would make someone stop trusting the tool. |
+| Raw finding | What the model returned before the product applies its confidence rule. |
+| Actionable | A named finding scored ≥ ${recommendedCut.t} — confident enough that VS Code adds it to Problems. |
+| AUC | How cleanly the score separates buggy files from clean ones, from 0.5 (no better than a coin flip) to 1.0 (perfect separation). |
 
 ## Bottom line
 
@@ -421,18 +441,6 @@ accepted most of the file, so a prediction fell inside it by luck; and on a defe
 defensible sites it called a correct answer a miss. \`lib/retry.js\` is the example of the
 second. The defect swallows an error so the function resolves undefined, the key names the
 \`catch\`, and the model names the fall-through four lines later. Both are the defect.
-
-## How to read the report
-
-| Term | Meaning |
-|---|---|
-| Trial | One independent model call on one file. Each file gets ${summary.trials} trials. |
-| Hit | The prediction lands inside the function the planted defect is in. |
-| Wrong location | The model names a defect, but outside that function. |
-| False alarm | The model names a defect in a clean control file. |
-| Raw finding | What the model returned before the product applies its confidence rule. |
-| Actionable | A named finding with score ≥ ${recommendedCut.t}. VS Code may add it to Problems. |
-| AUC | How well scores separate buggy and clean trials. 1.0 is perfect; 0.5 is chance. |
 
 The five charts below are embedded from \`bench/charts\`. Each caption states what to look
 for, and the link below each chart opens the SVG at full size.
