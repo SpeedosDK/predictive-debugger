@@ -3,9 +3,10 @@
 [![CI](https://github.com/SpeedosDK/predictive-debugger/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/SpeedosDK/predictive-debugger/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-Finds where code is likely to fail before it does. It ships in two shapes:
+Finds where code is likely to fail before it does. It comes in two forms:
 
-- a **VS Code extension** for a human reviewing their own code
+- an unfinished **VS Code extension preview** for a human reviewing their own
+  code
 - an **MCP server** so coding agents can use it as a tool while they review code
 
 There is no API key and no OAuth flow. Model access is borrowed from whichever
@@ -33,7 +34,8 @@ point an MCP-capable assistant at it, which the sections below walk through.
 **Which setup is for you?**
 
 - Want to click a button in your editor and see results yourself? Use the
-  **VS Code extension** — jump to [Using it in VS Code](#using-it-in-vs-code).
+  unfinished **VS Code extension preview** — jump to
+  [Using it in VS Code](#using-it-in-vs-code).
 - Already use an AI coding assistant and want it to reach for this
   automatically while reviewing code? Use the **MCP server** — jump to
   [Using it from an agent](#using-it-from-an-agent-mcp).
@@ -43,12 +45,49 @@ point an MCP-capable assistant at it, which the sections below walk through.
 1. [Node.js](https://nodejs.org) 22 or later. This project is a Node program;
    installing Node is what gives you the `node` and `npm` commands used below.
 2. One AI coding CLI already installed and signed in: Claude Code, Codex, or
-   GitHub Copilot CLI (install commands are under [Setup](#setup)). This
-   project has no AI model of its own — it borrows whichever one of these
-   you're signed into. Install one first if you don't have one; there's
-   nothing for this project to borrow otherwise.
-3. This repository on your machine, and built once: `npm install && npm run
-   build`, covered next.
+   GitHub Copilot CLI. This project has no AI model of its own — it borrows
+   whichever one of these you're signed into. Install one first if you don't
+   have one; there's nothing for this project to borrow otherwise.
+3. Predictive Debugger downloaded and built using the instructions below.
+
+## Download and install
+
+Predictive Debugger is not published to npm or the VS Code Marketplace. Download
+the project from GitHub and build it locally:
+
+1. Open the [v0.5.2 release](https://github.com/SpeedosDK/predictive-debugger/releases/tag/v0.5.2).
+2. Under **Assets**, select **Source code (zip)**.
+3. Extract the ZIP to a permanent location. Your MCP configuration will point
+   to a file inside this folder, so moving it later will break that path.
+4. Open a terminal in the extracted folder.
+5. Install the dependencies and build the project:
+
+   ```bash
+   npm install
+   npm run build
+   ```
+
+The build creates both entry points:
+
+| Output | Purpose |
+| --- | --- |
+| `dist/mcp-server.js` | MCP server to add to Claude Code, Codex, or GitHub Copilot |
+| `dist/extension.js` | Unfinished VS Code extension preview |
+
+You do not need to run `npm test` to use the tool. That command is for checking
+the project during development.
+
+You also need at least one supported CLI installed and signed in:
+
+```bash
+npm i -g @anthropic-ai/claude-code   # then: claude
+npm i -g @openai/codex               # then: codex login
+npm i -g @github/copilot             # then: copilot, and /login
+```
+
+For the MCP server, continue to [Using it from an agent](#using-it-from-an-agent-mcp).
+To try the unfinished editor extension, see
+[Using it in VS Code](#using-it-in-vs-code).
 
 ## Layout
 
@@ -88,6 +127,10 @@ Read this before relying on it.
   and the Copilot check does the same for the system credential store `/login`
   writes to — the connect flow's live check is what actually confirms the
   sign-in.
+- **The VS Code extension is unfinished.** It is not published to the VS Code
+  Marketplace or distributed as an installable VSIX. You can try it from the
+  source folder using the development workflow below. The MCP server is built
+  and configured directly from the downloaded source.
 - **`predict_failures` sends file contents to a model provider.** It also sends
   the definitions of imported functions the file calls, resolved one level deep
   within the project, so the model can see whether a callee already handles the
@@ -145,35 +188,15 @@ Read this before relying on it.
 - `npm audit` reported 0 vulnerabilities across 111 production dependencies at
   the 0.2.0 release. Re-run it rather than trusting this line.
 
-## Setup
-
-```bash
-npm install
-npm run build     # type-check, then bundle to dist/
-npm test
-```
-
-Both entry points ship as single bundled files, produced by esbuild:
-
-| Output | Purpose |
-| --- | --- |
-| `dist/extension.js` | VS Code extension (`vscode` stays external) |
-| `dist/mcp-server.js` | MCP stdio server, also exposed as the `predictive-debugger-mcp` bin |
-
-`tools/` is not bundled — the log analyzer is a Python script spawned as a
-separate process.
-
-You also need at least one CLI installed and signed in:
-
-```bash
-npm i -g @anthropic-ai/claude-code   # then: claude
-npm i -g @openai/codex               # then: codex login
-npm i -g @github/copilot             # then: copilot, and /login
-```
-
 ## Using it in VS Code
 
-Press <kbd>F5</kbd> to launch an Extension Development Host, then:
+The VS Code extension is still an unfinished preview. It is not available from
+the Marketplace and there is no prebuilt VSIX to install. To try it:
+
+1. Complete [Download and install](#download-and-install).
+2. Open the extracted `predictive-debugger-0.5.2` folder in VS Code.
+3. Press <kbd>F5</kbd> to launch an Extension Development Host.
+4. Run one of these commands in the new VS Code window:
 
 | Command | What it does |
 | --- | --- |
@@ -190,23 +213,60 @@ open in another window, so the dev host needs a different folder.
 
 ## Using it from an agent (MCP)
 
+### Ask your agent to add it
+
+Your coding agent can usually configure the MCP server for you. After running
+`npm run build`, copy the full path to `dist/mcp-server.js`. Open the project
+where you want to use Predictive Debugger and give the agent one of these
+instructions:
+
+> Add Predictive Debugger as a project-scoped MCP server for this project. The
+> server command is `node` and its entry point is
+> `/absolute/path/to/predictive-debugger-0.5.2/dist/mcp-server.js`. Verify that
+> the server starts and lists its tools.
+
+Or, to make it available in every project:
+
+> Add Predictive Debugger as a user-level MCP server so it is available in all
+> my projects. The server command is `node` and its entry point is
+> `/absolute/path/to/predictive-debugger-0.5.2/dist/mcp-server.js`. Verify that
+> the server starts and lists its tools.
+
+Replace the example with the real path on your machine. Project scope makes the
+server available only when you work in that project. User or global scope makes
+it available across projects. This setting controls where the MCP registration
+is loaded; it does not restrict which paths the server process can read.
+
+If your agent cannot change its own MCP configuration, use the matching manual
+instructions below.
+
 ### Claude Code
 
-A project-scoped `.mcp.json` is already committed (it points at `dist/mcp-server.js`, so run `npm run build` first), so from this directory:
+A project-scoped `.mcp.json` is included in the download. It points at
+`dist/mcp-server.js`, so after building you can start Claude Code from the
+downloaded folder:
 
 ```bash
 claude
 ```
 
-Claude Code picks up the server automatically. To register it globally instead:
+To add it to another project, run this from that project's folder:
 
 ```bash
-claude mcp add predictive-debugger -- node /absolute/path/to/dist/mcp-server.js
+claude mcp add --scope project predictive-debugger -- node /absolute/path/to/dist/mcp-server.js
+```
+
+To make it available in every project, use user scope:
+
+```bash
+claude mcp add --scope user predictive-debugger -- node /absolute/path/to/dist/mcp-server.js
 ```
 
 ### Codex
 
-Add to `~/.codex/config.toml`:
+Add the following block to `.codex/config.toml` inside a trusted project for a
+project-only setup. Add it to `~/.codex/config.toml` instead to make the server
+available in every project:
 
 ```toml
 [mcp_servers.predictive-debugger]
@@ -215,6 +275,23 @@ args = ["/absolute/path/to/dist/mcp-server.js"]
 ```
 
 ### GitHub Copilot
+
+For a project-only setup, add this to `.mcp.json` in the project where you want
+to use the server:
+
+```json
+{
+  "mcpServers": {
+    "predictive-debugger": {
+      "command": "node",
+      "args": ["/absolute/path/to/dist/mcp-server.js"]
+    }
+  }
+}
+```
+
+To add it to your Copilot user configuration and make it available across
+projects, run:
 
 ```bash
 copilot mcp add predictive-debugger -- node /absolute/path/to/dist/mcp-server.js
