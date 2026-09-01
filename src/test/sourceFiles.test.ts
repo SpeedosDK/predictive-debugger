@@ -3,7 +3,55 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { after, before, describe, it } from "node:test";
-import { collectSourceFiles, isSourceFile } from "../core/sourceFiles";
+import { collectSourceFiles, isSourceFile, isTestFile } from "../core/sourceFiles";
+
+describe("isTestFile", () => {
+    it("matches the suffix conventions", () => {
+        for (const name of [
+            "auth.spec.ts",
+            "auth.test.js",
+            "Component.Spec.tsx",
+            "src/api/user.test.mts"
+        ]) {
+            assert.ok(isTestFile(name), `${name} should read as a test`);
+        }
+    });
+
+    it("matches files under a test directory, at any depth", () => {
+        for (const name of [
+            "__tests__/auth.ts",
+            "test/helpers/build.js",
+            "src/tests/api/user.ts",
+            "src/__mocks__/fs.ts",
+            "SPEC/thing.ts"
+        ]) {
+            assert.ok(isTestFile(name), `${name} should read as a test`);
+        }
+    });
+
+    it("accepts either separator", () => {
+        assert.ok(isTestFile("src\\__tests__\\auth.ts"));
+    });
+
+    it("leaves ordinary source alone", () => {
+        for (const name of [
+            "src/index.ts",
+            "src/testing.ts",
+            "src/contest/entry.ts",
+            "src/latest/api.js",
+            "protest.js"
+        ]) {
+            assert.ok(!isTestFile(name), `${name} should not read as a test`);
+        }
+    });
+
+    it("only judges the path below the scanned root", () => {
+        // The reason this takes a relative path: someone whose projects live
+        // under a directory called `test` would otherwise have every file they
+        // own excluded by an ancestor they never chose.
+        assert.ok(!isTestFile(path.relative("C:/projects/test/app", "C:/projects/test/app/src/index.ts")));
+    });
+});
 
 describe("isSourceFile", () => {
     it("accepts the JavaScript and TypeScript extensions", () => {
