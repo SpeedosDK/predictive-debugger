@@ -6,6 +6,39 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Project
+
+- **Code contributions are closed for now; bug reports stay open.** The
+  interfaces are still moving between releases, so pull requests against them
+  would be work spent against decisions that have not settled. Documented in
+  CONTRIBUTING.md with the reasoning and the fact that it is temporary. The
+  feature-request issue template is gone; the bug template stays, because a
+  report from a codebase the author cannot see is what the generated-corpus
+  benchmark cannot provide.
+
+### Changed
+
+- **`scan_project` no longer ranks test files** (#10). `*.spec.*`, `*.test.*`
+  and anything under `__tests__`/`__mocks__`/`test`/`tests`/`spec` are left
+  out; `includeTests: true` brings them back, and the reply reports
+  `excludedTests` when any were withheld.
+
+  They were never ranked high for a real reason. `DENSITY_WEIGHTS` scores
+  `asyncCalls`, and a spec file full of mocked awaits reads as async
+  complexity while carrying none of the defect risk that weight stands in
+  for. Four of the top 25 hits on a real backend were `.spec.ts` files; on
+  this project's own `src/`, tests took five of the top six slots. Those are
+  wasted slots in the one tool whose whole job is spending a limited reading
+  budget well.
+
+  The filter is applied at the `scan_project` call site rather than inside
+  `collectSourceFiles`, so the VS Code project-wide run still covers tests —
+  a human who asked for the whole workspace is not paying per file read. The
+  predicate itself lives in `core/sourceFiles.ts` so both surfaces agree on
+  what a test file is, and it takes a path relative to the scanned root:
+  judged on absolute paths, anyone whose projects sit under a directory named
+  `test` would have had their entire codebase excluded.
+
 ### Added
 
 - **The server now ships the fix-verification rule itself**, as MCP

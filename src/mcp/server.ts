@@ -12,7 +12,7 @@ import {
     predictionStatus
 } from "../core/prediction/confidence";
 import { predictFile } from "../core/prediction/predictFile";
-import { collectSourceFiles } from "../core/sourceFiles";
+import { collectSourceFiles, isTestFile } from "../core/sourceFiles";
 import { ProviderRegistry } from "../providers/registry";
 import { ProviderId } from "../providers/types";
 
@@ -127,8 +127,9 @@ server.registerTool(
     {
         title: "Rank a project's files by risk",
         description:
-            "Walk a directory and rank every JavaScript/TypeScript file by risk density — " +
+            "Walk a directory and rank its JavaScript/TypeScript files by risk density — " +
             "how concentrated the failure-prone code is, not how big the file is. " +
+            "Test files are left out by default; pass includeTests to rank them too. " +
             "Deterministic and fast — no model call. " +
             "Call this at the start of a code review to decide which files are worth your " +
             "attention, instead of reading the tree in arbitrary order.",
@@ -144,13 +145,32 @@ server.registerTool(
             verbose: z
                 .boolean()
                 .optional()
-                .describe("Include the raw metric counts for every file (default false)")
+                .describe("Include the raw metric counts for every file (default false)"),
+            includeTests: z
+                .boolean()
+                .optional()
+                .describe(
+                    "Rank test files too — *.spec.*, *.test.*, and anything under " +
+                        "__tests__/test/tests/spec/__mocks__ (default false). They rank high " +
+                        "for a structural reason rather than a real one: mocked awaits read " +
+                        "as async complexity. Turn this on to audit a suite's own complexity."
+                )
         }
     },
-    async ({ directory, limit, verbose }) => {
+    async ({ directory, limit, verbose, includeTests }) => {
         try {
             const root = path.resolve(directory);
-            const files = await collectSourceFiles(root);
+            const walked = await collectSourceFiles(root);
+            // Filtered here rather than inside the walker so that the walker
+            // keeps one behaviour for both surfaces: the VS Code project run
+            // still covers tests, where a human asked for the whole workspace
+            // and is not paying per file read. Only this ranking, which exists
+            // to spend an agent's reading budget, opts out. One walk either
+            // way, so the count below is exact rather than a second pass.
+            const files = includeTests
+                ? walked
+                : walked.filter((file) => !isTestFile(path.relative(root, file)));
+            const excludedTests = walked.length - files.length;
             const analyses = await Promise.all(
                 files.map((file) =>
                     analyzeFile(file).catch((err) => ({
@@ -172,6 +192,10 @@ server.registerTool(
                 scanned: files.length,
                 returned: ranked.length,
                 orderedBy: "riskDensity",
+                // Only when something was actually withheld: silence would
+                // leave a caller wondering why the spec file it expected to
+                // see is missing, and a zero would cost every other reply.
+                ...(excludedTests > 0 ? { excludedTests } : {}),
                 // Paths are echoed relative to the scanned root and the metric
                 // counts are dropped by default: this output lands whole in the
                 // caller's context, and the same numbers are already spelled out
