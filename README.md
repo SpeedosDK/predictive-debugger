@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="logo/predictive-debugger-logo.png" alt="Predictive Debugger" width="840">
+  <img src="logo/predictive-debugger-logo-readable.png" alt="Predictive Debugger" width="840">
 </p>
 
 # Predictive Debugger
