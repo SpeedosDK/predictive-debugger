@@ -393,6 +393,14 @@ async function findExportedDefinition(
             if (declaration?.id?.name) {
                 aliases.set("default", declaration.id.name);
                 collect(declaration, exported);
+            } else if (declaration?.type === "Identifier") {
+                // `export default foo;` names a declaration made elsewhere in
+                // the file, exactly like a named alias does. Without this the
+                // range below covered the bare identifier, so the excerpt sent
+                // to the model was `const foo = foo` -- worse than sending
+                // nothing, since it burns tokens to say that a function is
+                // itself. Found by running this tool on its own source.
+                aliases.set("default", declaration.name);
             } else if (typeof declaration?.start === "number") {
                 defaultRange = {
                     start: declaration.start,
