@@ -5,13 +5,14 @@ import { z } from "zod";
 import { analyzeFile } from "../core/analysis/risk";
 import { analyzeLogs } from "../core/logs/analyzeLogs";
 import {
+    actionableFindings,
     assessmentStatus,
     isActionablePrediction,
     MIN_ACTIONABLE_SCORE,
     predictionStatus
 } from "../core/prediction/confidence";
 import { predictFile } from "../core/prediction/predictFile";
-import { collectSourceFiles } from "../core/sourceFiles";
+import { collectSourceFiles, isTestFile } from "../core/sourceFiles";
 import { ProviderRegistry } from "../providers/registry";
 import { ProviderId } from "../providers/types";
 
@@ -24,10 +25,43 @@ declare const __PACKAGE_VERSION__: string | undefined;
 
 const registry = new ProviderRegistry();
 
-const server = new McpServer({
-    name: "predictive-debugger",
-    version: typeof __PACKAGE_VERSION__ === "string" ? __PACKAGE_VERSION__ : "0.0.0-dev"
-});
+/**
+ * Advertised once at initialize, so a session pays for this prose one time
+ * rather than per call, and a client that ignores the field pays nothing.
+ *
+ * The verification rule ships here rather than being left to the calling
+ * agent's judgement because that judgement is the thing it corrects. An agent
+ * that has just written a fix is the worst-placed reader of it: the reasoning
+ * that made the fix look right is still in its context, so a second look from
+ * the same seat re-derives the first one instead of testing it. Leaving the
+ * rule to each user's own project instructions means only the users who
+ * already knew about the failure mode get the benefit.
+ *
+ * It is a floor, not a ceiling. "At minimum" leaves the agent free to verify
+ * more often than the rule requires, and the mechanical-fix exemption is what
+ * stops it from doubling the cost of correcting a typo.
+ */
+const INSTRUCTIONS = [
+    "Deterministic tools first: scan_project and analyze_file cost nothing and answer most " +
+        "questions about where the risk sits. predict_failures spawns a second model, so call " +
+        "it when you want a verdict independent of your own.",
+    "When you fix something these tools flagged, and the fix involved choosing between " +
+        "approaches rather than being mechanical, have the change reviewed from outside the " +
+        "context that produced it: a sub-agent where the host has them, otherwise a fresh " +
+        "predict_failures on the edited file. Re-reading your own fix in the context that " +
+        "wrote it is the weakest check available, because the reasoning that made it look " +
+        "right is still in scope and tends to confirm itself. Do this at minimum for " +
+        "actionable findings, and use your judgement above that. A mechanical fix -- a typo, " +
+        "a missing await, an off-by-one with one correct value -- does not need it."
+].join("\n\n");
+
+const server = new McpServer(
+    {
+        name: "predictive-debugger",
+        version: typeof __PACKAGE_VERSION__ === "string" ? __PACKAGE_VERSION__ : "0.0.0-dev"
+    },
+    { instructions: INSTRUCTIONS }
+);
 
 /**
  * Serialise a reply, compactly.
@@ -93,8 +127,9 @@ server.registerTool(
     {
         title: "Rank a project's files by risk",
         description:
-            "Walk a directory and rank every JavaScript/TypeScript file by risk density — " +
+            "Walk a directory and rank its JavaScript/TypeScript files by risk density — " +
             "how concentrated the failure-prone code is, not how big the file is. " +
+            "Test files are left out by default; pass includeTests to rank them too. " +
             "Deterministic and fast — no model call. " +
             "Call this at the start of a code review to decide which files are worth your " +
             "attention, instead of reading the tree in arbitrary order.",
@@ -110,13 +145,32 @@ server.registerTool(
             verbose: z
                 .boolean()
                 .optional()
-                .describe("Include the raw metric counts for every file (default false)")
+                .describe("Include the raw metric counts for every file (default false)"),
+            includeTests: z
+                .boolean()
+                .optional()
+                .describe(
+                    "Rank test files too — *.spec.*, *.test.*, and anything under " +
+                        "__tests__/test/tests/spec/__mocks__ (default false). They rank high " +
+                        "for a structural reason rather than a real one: mocked awaits read " +
+                        "as async complexity. Turn this on to audit a suite's own complexity."
+                )
         }
     },
-    async ({ directory, limit, verbose }) => {
+    async ({ directory, limit, verbose, includeTests }) => {
         try {
             const root = path.resolve(directory);
-            const files = await collectSourceFiles(root);
+            const walked = await collectSourceFiles(root);
+            // Filtered here rather than inside the walker so that the walker
+            // keeps one behaviour for both surfaces: the VS Code project run
+            // still covers tests, where a human asked for the whole workspace
+            // and is not paying per file read. Only this ranking, which exists
+            // to spend an agent's reading budget, opts out. One walk either
+            // way, so the count below is exact rather than a second pass.
+            const files = includeTests
+                ? walked
+                : walked.filter((file) => !isTestFile(path.relative(root, file)));
+            const excludedTests = walked.length - files.length;
             const analyses = await Promise.all(
                 files.map((file) =>
                     analyzeFile(file).catch((err) => ({
@@ -138,6 +192,10 @@ server.registerTool(
                 scanned: files.length,
                 returned: ranked.length,
                 orderedBy: "riskDensity",
+                // Only when something was actually withheld: silence would
+                // leave a caller wondering why the spec file it expected to
+                // see is missing, and a zero would cost every other reply.
+                ...(excludedTests > 0 ? { excludedTests } : {}),
                 // Paths are echoed relative to the scanned root and the metric
                 // counts are dropped by default: this output lands whole in the
                 // caller's context, and the same numbers are already spelled out
@@ -299,6 +357,17 @@ server.registerTool(
                               actionable: isActionablePrediction(finding)
                           }))
                       }
+                    : {}),
+                // The verification rule restated on the wire, in four words.
+                // `instructions` is advertised once at initialize and not every
+                // client forwards it to the model, whereas a tool result always
+                // reaches it -- and this is the turn where the rule applies,
+                // since the agent is about to act on a finding. Gated on the
+                // precision gate rather than emitted always: a clean file is
+                // the common reply and should not pay for advice about a fix
+                // nobody is making.
+                ...(actionableFindings(result.ai).length > 0
+                    ? { onFix: "verify independently unless mechanical" }
                     : {}),
                 // Always present, and empty when the model named nothing:
                 // being able to see that coverage was not reported is the

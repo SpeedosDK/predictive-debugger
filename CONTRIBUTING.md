@@ -1,6 +1,21 @@
 # Contributing
 
-Issues and pull requests are welcome.
+**Code contributions are not open yet.** This is a single-maintainer project
+whose interfaces are still moving — the scoring weights, the provider seam and
+the MCP reply shapes have all changed inside the last few releases. Taking pull
+requests against decisions that are still in flux would mean wasting other
+people's work. That will change once the shape settles; it is a timing call,
+not a policy about who is welcome.
+
+**Bug reports are open and wanted.** The prediction quality is measured against
+generated corpora rather than real repositories, and the author knows it — see
+the caveats in [bench/RESULTS.md](bench/RESULTS.md). A report about how this
+behaved on a codebase the author cannot see is the most useful thing anyone
+outside can send. Open an issue, or follow [SECURITY.md](SECURITY.md) for
+anything security-relevant.
+
+The rest of this file is how the project is built and tested. It is here for
+anyone building from source, and it is what the maintainer works from.
 
 ## Getting set up
 
@@ -18,7 +33,7 @@ For the VS Code extension, press <kbd>F5</kbd> for an Extension Development
 Host. For the MCP server, `npm run build` then point your agent at
 `dist/mcp-server.js`; a project-scoped `.mcp.json` is already committed.
 
-## Before opening a pull request
+## Before a change lands
 
 ```bash
 npm run check     # tsc --noEmit; esbuild does no type checking
@@ -35,7 +50,14 @@ smoke test that the bundled MCP server starts and lists its tools.
 - **`develop`** is where a version is assembled and tested. Work lands here
   first, and reaches `master` only when it is ready to be a release.
 
-Pull requests should target `develop` unless they fix something already released.
+Work targets `develop` unless it fixes something already released.
+
+Going public has one prerequisite that is easy to miss: GitHub's [private
+vulnerability reporting](https://github.com/SpeedosDK/predictive-debugger/security/advisories/new)
+is only available on public repositories, and SECURITY.md sends people there.
+Turn it on (Settings → Security → Private vulnerability reporting) in the same
+sitting the repository becomes public, or the only private channel the project
+advertises is a 404.
 
 Cutting a release means: move the `[Unreleased]` entries in
 [CHANGELOG.md](CHANGELOG.md) under a dated version heading, set the version in
@@ -81,8 +103,8 @@ npm run bench      # real CLI calls; takes minutes and consumes model usage
 npm run bench:ts
 ```
 
-If you cannot run the benchmark, say so in the pull request rather than
-adjusting the documented figures by hand. Note that the corpora are generated
+If the benchmark cannot be run for a change, say so in the pull request rather
+than adjusting the documented figures by hand. Note that the corpora are generated
 and the prompt has been revised against them, so these are in-sample numbers —
 a change that only improves them has not necessarily improved anything.
 

@@ -1,7 +1,7 @@
 {
   "name": "predictive-debugger",
   "displayName": "Predictive Debugger",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Predicts where code is likely to fail. Ships as a VS Code extension and as an MCP server that coding agents can call while reviewing code. Auth is borrowed from the Claude Code, Codex, or GitHub Copilot CLI you are already signed in to.",
   "author": "SpeedosDK",
   "license": "MIT",

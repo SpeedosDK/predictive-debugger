@@ -6,6 +6,63 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.5.0] — 2026-09-01
+
+### Project
+
+- **Code contributions are closed for now; bug reports stay open.** The
+  interfaces are still moving between releases, so pull requests against them
+  would be work spent against decisions that have not settled. Documented in
+  CONTRIBUTING.md with the reasoning and the fact that it is temporary. The
+  feature-request issue template is gone; the bug template stays, because a
+  report from a codebase the author cannot see is what the generated-corpus
+  benchmark cannot provide.
+
+### Changed
+
+- **`scan_project` no longer ranks test files** (#10). `*.spec.*`, `*.test.*`
+  and anything under `__tests__`/`__mocks__`/`test`/`tests`/`spec` are left
+  out; `includeTests: true` brings them back, and the reply reports
+  `excludedTests` when any were withheld.
+
+  They were never ranked high for a real reason. `DENSITY_WEIGHTS` scores
+  `asyncCalls`, and a spec file full of mocked awaits reads as async
+  complexity while carrying none of the defect risk that weight stands in
+  for. Four of the top 25 hits on a real backend were `.spec.ts` files; on
+  this project's own `src/`, tests took five of the top six slots. Those are
+  wasted slots in the one tool whose whole job is spending a limited reading
+  budget well.
+
+  The filter is applied at the `scan_project` call site rather than inside
+  `collectSourceFiles`, so the VS Code project-wide run still covers tests —
+  a human who asked for the whole workspace is not paying per file read. The
+  predicate itself lives in `core/sourceFiles.ts` so both surfaces agree on
+  what a test file is, and it takes a path relative to the scanned root:
+  judged on absolute paths, anyone whose projects sit under a directory named
+  `test` would have had their entire codebase excluded.
+
+### Added
+
+- **The server now ships the fix-verification rule itself**, as MCP
+  `instructions` plus an `onFix` hint on `predict_failures` replies that clear
+  the precision gate. It asks the calling agent to have a non-mechanical fix
+  reviewed from outside the context that produced it — a sub-agent where the
+  host has them, otherwise a fresh `predict_failures` on the edited file.
+
+  An agent that has just written a fix is the worst-placed reader of it: the
+  reasoning that made the fix look right is still in its context, so reviewing
+  it from the same seat re-derives the first conclusion instead of testing it.
+  An independent pass catches defects the author's pass structurally cannot.
+  Left to the agent's judgement this happened on some runs and not others;
+  left to each user's project instructions it reached only the users who
+  already knew about the failure mode.
+
+  It is a floor, not a ceiling — the agent may verify more often, and a
+  mechanical fix is exempt so a typo does not cost two model passes. The hint
+  is duplicated on the wire because `instructions` is sent once at initialize
+  and not every client forwards it to the model, while a tool result always
+  reaches it; gating it on `actionable` keeps a clean file's reply free of it.
+
 ## [0.4.0] — 2026-08-31
 
 ### Added

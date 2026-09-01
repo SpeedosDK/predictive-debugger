@@ -193,7 +193,7 @@ already a model, so it needs facts, not a second opinion.
 | Tool | Purpose |
 | --- | --- |
 | `analyze_file` | Complexity metrics + risk score and risk density for one file, with the signals that drove it |
-| `scan_project` | Rank every source file in a directory by risk density — risk per line, not per file |
+| `scan_project` | Rank a directory's source files by risk density — risk per line, not per file. Test files are excluded by default (`includeTests` to rank them) |
 | `analyze_logs` | Score log lines by severity and unusual wording, return the anomalies |
 | `predict_failures` | Full pipeline including a second-opinion model verdict, an `actionable` precision gate, a `checked` list of the categories the model says it weighed, and an optional ranked `findings` list (`multi: true`) — spawns a CLI, 5–15s per file |
 | `list_providers` | Which CLIs are installed and signed in (for diagnosing failures) |
@@ -206,6 +206,34 @@ exactly that, so it reaches for `analyze_file` first.
 A typical agent review looks like: `scan_project` to find the risky files →
 read those files directly → optionally `predict_failures` on the one or two that
 look worst.
+
+Test files are left out of that ranking. They rank high for a structural reason
+rather than a real one — `riskDensity` weights async boundaries, and a spec file
+full of mocked awaits reads as async complexity without carrying the defect risk
+that weight stands in for. Scanning this project's own `src/` puts test files in
+five of the top six slots when they are included, and none when they are not.
+`includeTests: true` brings them back, for auditing a suite's own complexity.
+The VS Code project-wide command still covers tests: a human who asked for the
+whole workspace is not spending a per-file reading budget.
+
+### Verifying a fix
+
+The server advertises MCP `instructions` asking the calling agent to have a fix
+reviewed from outside the context that produced it — a sub-agent where the host
+supports them, otherwise a fresh `predict_failures` on the edited file — whenever
+the fix involved choosing between approaches rather than being mechanical. A
+`predict_failures` reply that clears the precision gate repeats it in four words
+as `onFix`, because not every client forwards `instructions` to the model and a
+tool result always reaches it.
+
+This is here because an agent reviewing its own fix is the weakest check
+available: the reasoning that made the fix look right is still in its context,
+so the second look tends to confirm the first rather than test it. Left to the
+agent's own judgement, the review happens on some runs and not others; left to
+each user's project instructions, only the users who already knew about the
+failure mode get it. It is a floor rather than a rule — an agent is free to
+verify more often, and a mechanical fix is explicitly exempt so correcting a
+typo does not cost two model passes.
 
 ## Settings
 
@@ -390,9 +418,15 @@ credentials.
 
 ## Contributing
 
-Issues and pull requests are welcome — see [CONTRIBUTING.md](CONTRIBUTING.md)
-for the setup, what CI checks, and how to change a number that the benchmark
-backs.
+**Bug reports are welcome; code contributions are not open yet.** The
+interfaces are still moving, and taking pull requests against them now would
+waste the work. See [CONTRIBUTING.md](CONTRIBUTING.md) for the reasoning, the
+setup, and what CI checks.
+
+A report about how this behaved on a real codebase is worth more here than
+usual: the accuracy figures come from generated corpora, so anything measured
+on code the author cannot see is filling a gap the benchmark structurally
+cannot.
 
 For anything security-relevant, follow [SECURITY.md](SECURITY.md) and report it
 privately rather than opening an issue.
