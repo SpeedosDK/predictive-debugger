@@ -12,7 +12,9 @@ import {
     predictionStatus
 } from "../core/prediction/confidence";
 import { predictFile } from "../core/prediction/predictFile";
+import { DEFAULT_CONCURRENCY, predictFiles } from "../core/prediction/predictFiles";
 import { collectSourceFiles, isTestFile } from "../core/sourceFiles";
+import { FilePrediction } from "../core/types";
 import { ProviderRegistry } from "../providers/registry";
 import { ProviderId } from "../providers/types";
 
@@ -27,32 +29,45 @@ const registry = new ProviderRegistry();
 
 /**
  * Advertised once at initialize, so a session pays for this prose one time
- * rather than per call, and a client that ignores the field pays nothing.
+ * rather than per call.
  *
- * The verification rule ships here rather than being left to the calling
- * agent's judgement because that judgement is the thing it corrects. An agent
- * that has just written a fix is the worst-placed reader of it: the reasoning
- * that made the fix look right is still in its context, so a second look from
- * the same seat re-derives the first one instead of testing it. Leaving the
- * rule to each user's own project instructions means only the users who
- * already knew about the failure mode get the benefit.
- *
- * It is a floor, not a ceiling. "At minimum" leaves the agent free to verify
- * more often than the rule requires, and the mechanical-fix exemption is what
- * stops it from doubling the cost of correcting a typo.
+ * Ships here rather than being left to the calling agent's judgement because
+ * that judgement is the thing it corrects: an agent that just wrote the code
+ * is the worst-placed reader of it, since the reasoning that made it look
+ * right is still in its context. The routing below (file count, not "is this
+ * a fix" or "is this a feature") is deliberately narrower than earlier
+ * drafts -- see CHANGELOG.md 0.6.0 for why, including the honest caveat that
+ * the sub-agent's payoff is still an argument, not a measured result.
  */
 const INSTRUCTIONS = [
     "Deterministic tools first: scan_project and analyze_file cost nothing and answer most " +
         "questions about where the risk sits. predict_failures spawns a second model, so call " +
         "it when you want a verdict independent of your own.",
-    "When you fix something these tools flagged, and the fix involved choosing between " +
-        "approaches rather than being mechanical, have the change reviewed from outside the " +
-        "context that produced it: a sub-agent where the host has them, otherwise a fresh " +
-        "predict_failures on the edited file. Re-reading your own fix in the context that " +
-        "wrote it is the weakest check available, because the reasoning that made it look " +
-        "right is still in scope and tends to confirm itself. Do this at minimum for " +
-        "actionable findings, and use your judgement above that. A mechanical fix -- a typo, " +
-        "a missing await, an off-by-one with one correct value -- does not need it."
+    "When you point these tools at code you wrote in this session -- a fix for something they " +
+        "flagged, or a feature you just finished -- have it checked from outside the context " +
+        "that wrote it. Re-reading your own work in the context that produced it is the " +
+        "weakest check available, because the reasoning that made it look right is still in " +
+        "scope and tends to confirm itself.",
+    "Which outside seat depends on how far the change reaches. A change confined to one file, " +
+        "including a whole feature in one file: a fresh predict_failures on it, a second model " +
+        "for one call. A change spanning several files: a sub-agent where the host has them, " +
+        "because predict_failures reads each file on its own and never sees how they have to " +
+        "agree. File count is the test -- not how large the change felt, and not whether it " +
+        "was a fix or a feature. A clean predict_failures on new code is not a clearance -- it " +
+        "means the file is locally sound, not that the feature is right.",
+    "Reviewing more than one file: pass them all as `files` in a single predict_failures call. " +
+        "The verdicts are independent and run concurrently, so a batch bills the same as the " +
+        "same files one at a time and returns in roughly the time of the slowest one. Calling " +
+        "once per file pays that wait again for every file and is the main reason this tool " +
+        "feels slow.",
+    "Scope the sub-agent: give it the changed files and what you were trying to do, and ask " +
+        "it to review only that. An unscoped agent rebuilds the project from cold and reports " +
+        "on code nobody touched, which is what makes this expensive. Where the host can run it " +
+        "in the background, do not block on it: this is a second opinion on work already " +
+        "done, not a gate the next step waits behind. Do this at minimum for actionable " +
+        "findings and for changes that span files, and use your judgement above that. A " +
+        "mechanical fix -- a typo, a missing await, an off-by-one with one correct value -- " +
+        "needs neither seat."
 ].join("\n\n");
 
 const server = new McpServer(
@@ -64,19 +79,9 @@ const server = new McpServer(
 );
 
 /**
- * Serialise a reply, compactly.
- *
- * The reader is a model, and every space and newline in the indentation is
- * billed to it. Two-space indent cost 46 of the 161 tokens in a typical
- * `predict_failures` reply -- 29% of the response, spent entirely on making the
- * raw transcript pleasant for a human who is not the audience. Pretty-printing
- * an array is the worst of it: `checked` puts each pattern id on its own
- * indented line, which is most of what the coverage field appeared to cost when
- * it was added.
- *
- * This is the whole point of the tool. It is worth calling instead of reading
- * the file only while the answer is much smaller than the file, so the
- * response budget is the product, not a detail of it.
+ * Serialise a reply, compactly -- not pretty-printed. The reader is a model,
+ * and a two-space indent cost 46 of the 161 tokens in a typical
+ * `predict_failures` reply, 29% spent on formatting nobody reads.
  */
 function json(value: unknown) {
     return { content: [{ type: "text" as const, text: JSON.stringify(value) }] };
@@ -94,10 +99,7 @@ function failure(message: string) {
     };
 }
 
-/* ------------------------------------------------------------------ *
- * Deterministic tools: no model call, no credentials, milliseconds.
- * These are the ones a reviewing agent should reach for.
- * ------------------------------------------------------------------ */
+/* ---- Deterministic tools: no model call, no credentials, milliseconds. ---- */
 
 server.registerTool(
     "analyze_file",
@@ -161,12 +163,8 @@ server.registerTool(
         try {
             const root = path.resolve(directory);
             const walked = await collectSourceFiles(root);
-            // Filtered here rather than inside the walker so that the walker
-            // keeps one behaviour for both surfaces: the VS Code project run
-            // still covers tests, where a human asked for the whole workspace
-            // and is not paying per file read. Only this ranking, which exists
-            // to spend an agent's reading budget, opts out. One walk either
-            // way, so the count below is exact rather than a second pass.
+            // Filtered here, not in the walker: the VS Code project-wide
+            // command still covers tests, and only this ranking opts out.
             const files = includeTests
                 ? walked
                 : walked.filter((file) => !isTestFile(path.relative(root, file)));
@@ -244,11 +242,66 @@ server.registerTool(
     }
 );
 
-/* ------------------------------------------------------------------ *
- * Model-backed tool. Spawns the Claude/Codex/Copilot CLI, so it is slow and
- * billed. An agent calling this is asking a second model to do work it
- * could do itself — hence the explicit "only if" in the description.
- * ------------------------------------------------------------------ */
+/* ---- Model-backed tool: spawns a CLI, slow and billed. ---- */
+
+/**
+ * The per-file body of a `predict_failures` reply, shared by the single-file
+ * and batch shapes so the two cannot drift.
+ */
+function predictionBody(
+    file: string,
+    result: FilePrediction,
+    options: { verbose?: boolean; logFile?: string }
+) {
+    // Verbose fields are opt-in: the verdict alone is ~70 tokens, a fifth of
+    // the old always-on reply. See bench/RESULTS.md section 1.
+    const { findings, truncated, checked } = result.ai;
+    const [top, ...rest] = findings;
+
+    return {
+        file, // echoed as given, not resolved -- the caller already knows the path
+        pattern: top.pattern,
+        score: top.score,
+        line: top.line ?? null,
+        reason: top.reason,
+        status: assessmentStatus(result.ai),
+        actionable: isActionablePrediction(top),
+        // A second demonstrable finding is dropped only if this is omitted.
+        ...(rest.length > 0
+            ? {
+                  findings: findings.map((finding) => ({
+                      pattern: finding.pattern,
+                      score: finding.score,
+                      line: finding.line ?? null,
+                      reason: finding.reason,
+                      status: predictionStatus(finding),
+                      actionable: isActionablePrediction(finding)
+                  }))
+              }
+            : {}),
+        // Always present, even empty: an empty list is itself the signal that
+        // no coverage was reported, and `verbose` would hide that.
+        checked: checked ?? [],
+        combinedScore: round(result.combinedScore),
+        staticRisk: round(result.riskScore),
+        ...(truncated ? { truncated } : {}),
+        ...(options.verbose ? { metrics: result.metrics, logs: result.logs } : {}),
+        ...(!options.verbose && options.logFile ? { logAnomalies: result.logs.anomalyCount } : {})
+    };
+}
+
+/**
+ * The verification rule restated on the wire: `instructions` is sent once at
+ * initialize and not every client forwards it to the model, but a tool result
+ * always reaches it. Always present, not gated on the precision gate -- a
+ * clean reply on code the agent just wrote is the turn this matters most and
+ * is least likely to be remembered as needing it.
+ */
+function reviewHint(results: FilePrediction[]): string {
+    return results.some((result) => actionableFindings(result.ai).length > 0)
+        ? "verify the fix outside this context unless mechanical"
+        : "clean file, not a cleared feature -- review new code outside this context";
+}
 
 server.registerTool(
     "predict_failures",
@@ -268,11 +321,37 @@ server.registerTool(
             "for false positives per call. Treat it as a defect only when " +
             "`actionable` is true; " +
             `that applies the measured score >= ${MIN_ACTIONABLE_SCORE} precision gate. ` +
-            "This spawns another model and takes 5-15 seconds per file, so only call it " +
+            "This spawns another model and takes 5-15 seconds, so only call it " +
             "when you specifically want an independent second opinion. If you are yourself " +
-            "reviewing the code, use analyze_file and read the source instead.",
+            "reviewing the code, use analyze_file and read the source instead. " +
+            "Reviewing several files? Pass them all as `files` in one call rather than " +
+            "calling once per file: the verdicts run concurrently, so the batch costs the " +
+            "same and takes about as long as a single file.",
         inputSchema: {
-            file: z.string().describe("Absolute path to a .js/.jsx/.ts/.tsx file"),
+            file: z
+                .string()
+                .optional()
+                .describe("Absolute path to a .js/.jsx/.ts/.tsx file"),
+            files: z
+                .array(z.string())
+                .optional()
+                .describe(
+                    "Absolute paths to review in one call, run concurrently. Prefer this " +
+                        "over one call per file when checking a change set: the verdicts are " +
+                        "independent, so a batch bills the same as the same files one at a " +
+                        "time but finishes in roughly the time of the slowest one. Replies " +
+                        "carry a `results` array in the order given. Supersedes `file`."
+                ),
+            concurrency: z
+                .number()
+                .int()
+                .min(1)
+                .max(8)
+                .optional()
+                .describe(
+                    `Verdicts in flight at once for a batch (default ${DEFAULT_CONCURRENCY}). ` +
+                        "Lower it if the provider starts rate-limiting."
+                ),
             provider: z
                 .enum(["claude", "codex", "copilot"])
                 .optional()
@@ -308,81 +387,75 @@ server.registerTool(
                 )
         }
     },
-    async ({ file, provider, model, logFile, verbose, calleeContext, multi }) => {
+    async ({ file, files, concurrency, provider, model, logFile, verbose, calleeContext, multi }) => {
+        const batched = Boolean(files && files.length > 0);
+        const requested = batched ? files! : file ? [file] : [];
+        if (requested.length === 0) {
+            return failure("predict_failures needs either `file` or a non-empty `files` array.");
+        }
+
+        // Deduplicated on the resolved path, keyed back to what the caller
+        // wrote, so "./a.js" and its absolute form don't get billed twice but
+        // the reply still echoes the path as given.
+        const givenFor = new Map<string, string>();
+        for (const entry of requested) {
+            const resolved = path.resolve(entry);
+            if (!givenFor.has(resolved)) {
+                givenFor.set(resolved, entry);
+            }
+        }
+        const targets = [...givenFor.keys()];
+
         try {
             const active = await registry.resolveActive(provider as ProviderId | undefined);
-            const result = await predictFile(path.resolve(file), {
+            const options = {
                 provider: active.provider,
                 location: active.location,
                 model,
                 calleeContext,
                 multi,
                 logs: logFile ? { logPath: path.resolve(logFile) } : undefined
-            });
+            };
 
-            // The point of this tool is to cost the caller less context than
-            // reading the file would. Measured on bench/corpus, the verdict is
-            // about a fifth of the response: the rest was the metric block, a
-            // log stanza saying log analysis was not requested, and the absolute
-            // path the caller had just supplied. All three are now opt-in, which
-            // moves the break-even point down to files of roughly 70 tokens.
-            const { findings, truncated, checked } = result.ai;
-            const [top, ...rest] = findings;
+            // Forks on which parameter was used, not on how many targets
+            // survived deduplication -- a caller shouldn't have to guess
+            // whether its paths collapsed to know the reply's shape. `file`
+            // keeps the flat reply it always had.
+            if (!batched) {
+                const result = await predictFile(targets[0], options);
+                return json({
+                    ...predictionBody(givenFor.get(targets[0])!, result, { verbose, logFile }),
+                    review: reviewHint([result]),
+                    viaProvider: active.provider.id
+                });
+            }
+
+            const { results, failures } = await predictFiles(targets, {
+                ...options,
+                concurrency
+            });
 
             return json({
-                // Echoed as given rather than resolved: shorter, and the caller
-                // already knows which file it asked about.
-                file,
-                // The top finding stays at the top level whatever the mode. A
-                // caller that asked one question gets one answer, and the array
-                // is there for the caller that asked for the list.
-                pattern: top.pattern,
-                score: top.score,
-                line: top.line ?? null,
-                reason: top.reason,
-                status: assessmentStatus(result.ai),
-                actionable: isActionablePrediction(top),
-                // Emitted when there is more than one finding even if `multi`
-                // was not set: a model that volunteers a second demonstrable
-                // defect has done work, and dropping it silently would be the
-                // one-per-file behaviour this replaced.
-                ...(rest.length > 0
+                results: results.map((result) =>
+                    predictionBody(givenFor.get(result.file) ?? result.file, result, {
+                        verbose,
+                        logFile
+                    })
+                ),
+                review: reviewHint(results), // hoisted: identical for every entry
+                viaProvider: active.provider.id,
+                ...(failures.length > 0
                     ? {
-                          findings: findings.map((finding) => ({
-                              pattern: finding.pattern,
-                              score: finding.score,
-                              line: finding.line ?? null,
-                              reason: finding.reason,
-                              status: predictionStatus(finding),
-                              actionable: isActionablePrediction(finding)
+                          failures: failures.map((entry) => ({
+                              file: givenFor.get(entry.file) ?? entry.file,
+                              reason: entry.reason
                           }))
                       }
-                    : {}),
-                // The verification rule restated on the wire, in four words.
-                // `instructions` is advertised once at initialize and not every
-                // client forwards it to the model, whereas a tool result always
-                // reaches it -- and this is the turn where the rule applies,
-                // since the agent is about to act on a finding. Gated on the
-                // precision gate rather than emitted always: a clean file is
-                // the common reply and should not pay for advice about a fix
-                // nobody is making.
-                ...(actionableFindings(result.ai).length > 0
-                    ? { onFix: "verify independently unless mechanical" }
-                    : {}),
-                // Always present, and empty when the model named nothing:
-                // being able to see that coverage was not reported is the
-                // point of the field, so hiding it behind `verbose` would
-                // defeat it.
-                checked: checked ?? [],
-                combinedScore: round(result.combinedScore),
-                staticRisk: round(result.riskScore),
-                viaProvider: active.provider.id,
-                ...(truncated ? { truncated } : {}),
-                ...(verbose ? { metrics: result.metrics, logs: result.logs } : {}),
-                ...(!verbose && logFile ? { logAnomalies: result.logs.anomalyCount } : {})
+                    : {})
             });
         } catch (err) {
-            return failure(`Prediction failed for ${file}: ${message(err)}`);
+            const subject = targets.length === 1 ? givenFor.get(targets[0])! : `${targets.length} files`;
+            return failure(`Prediction failed for ${subject}: ${message(err)}`);
         }
     }
 );

@@ -399,7 +399,7 @@ async function findExportedDefinition(
                 // range below covered the bare identifier, so the excerpt sent
                 // to the model was `const foo = foo` -- worse than sending
                 // nothing, since it burns tokens to say that a function is
-                // itself. Found by running this tool on its own source.
+                // itself.
                 aliases.set("default", declaration.name);
             } else if (typeof declaration?.start === "number") {
                 defaultRange = {

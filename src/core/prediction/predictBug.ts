@@ -5,18 +5,12 @@ import { BugAssessment, BugPrediction } from "../types";
 /**
  * Mirrors the example files in `examples/bug-patterns/`, plus `other`.
  *
- * `other` exists because the catalogue was a closed list, and a closed list
- * silently threw away correct answers. Asked about a method that filters on
- * `createdAt` where its own documentation promises `updatedAt`, the model named
- * the line, explained the contradiction exactly, and then had to answer `none`
- * because no id fitted. `parsePrediction` forces the score to 0 for `none`, so
- * the finding was discarded. That happened on every trial of both defects in the
- * TypeScript corpus that were deliberately planted outside the six categories:
- * five of fifteen buggy runs, correct and thrown away.
- *
- * `none` now means "no defect". `other` means "a defect that is not one of
- * these". The bar for reporting is unchanged: the evidence policy below still
- * applies, and `other` is not a licence to report style or taste.
+ * `other` exists because a closed list silently threw away correct answers: a
+ * model that named a real defect outside the six categories had to answer
+ * `none`, which `parsePrediction` scores as 0. Five of fifteen buggy runs in the
+ * TypeScript corpus were lost that way. `none` still means "no defect"; `other`
+ * is not a licence to report style or taste -- the evidence policy below still
+ * applies to it.
  */
 const BUG_PATTERNS = [
     { id: "race_condition", summary: "shared state mutated across an await or callback boundary" },
@@ -166,13 +160,6 @@ function countLines(text: string): number {
 }
 
 /**
- * Render the resolved callee definitions as a second, clearly subordinate block.
- *
- * Marked untrusted for the same reason the source is — these bodies come out of
- * the same tree — and marked as context rather than subject, so a defect in a
- * helper does not become the verdict on the file that called it.
- */
-/**
  * What the model is being asked for, which is the whole of the `multi` flag.
  *
  * The single-finding wording is unchanged. The list wording repeats the
@@ -252,6 +239,13 @@ function calleePolicy(hasCallees: boolean): string[] {
     ];
 }
 
+/**
+ * Render the resolved callee definitions as a second, clearly subordinate block.
+ *
+ * Marked untrusted for the same reason the source is — these bodies come out of
+ * the same tree — and marked as context rather than subject, so a defect in a
+ * helper does not become the verdict on the file that called it.
+ */
 function renderCallees(callees: CalleeContext[]): string[] {
     return [
         "",

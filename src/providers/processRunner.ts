@@ -74,9 +74,10 @@ export function runProcess(options: RunOptions): Promise<RunResult> {
         };
 
         const kill = () => {
-            // On Windows the shim spawns a child of its own; SIGTERM to the
-            // group is the best we can do without a process-tree killer.
-            child.kill(isWindows ? "SIGTERM" : "SIGTERM");
+            // Reaches only `child` itself, which on Windows is cmd.exe, not
+            // the CLI it launched underneath -- the CLI can outlive this
+            // without a process-tree killer, which this is not.
+            child.kill("SIGTERM");
         };
 
         const timer = setTimeout(() => {

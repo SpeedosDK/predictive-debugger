@@ -15,6 +15,24 @@ The per-file test above covers 12 of them: 6 buggy files and
 larger, separate result further down covers ranking a whole project instead of
 one file at a time.
 
+## Bottom line
+
+| Question | Measured answer |
+|---|---|
+| Does the tool reduce context? | Yes. 1,554 tokens instead of 10,344, 85% less file content. |
+| Does it point to the planted line? | 18 of 18 bug trials land inside the defect's own function, 15 of 18 on the exact line. 0 pointed elsewhere. |
+| Does it accuse clean files? | 0 of 18 raw trials, 0 after the 0.7 gate. |
+| Does it help a real agent? | 26% fewer tokens in the A/B. Both arms found 2 of 3 bugs. |
+| Does project ranking help? | At 15 files, risk order contains 4 of 6 bugs. Directory order contains 2. |
+| What does one prediction cost in time? | 5.6 s mean, 19.2 s worst. |
+| Does reviewing several files together help? | Yes. An agent given 4 files finished in 40.6 s asking for them together against 56.2 s asking one at a time — 28% faster, same cost. |
+
+This run has a clean precision result. No clean control received a defect.
+Every prediction landed inside the function containing the defect. The tool saves context, but the extra model call means it did not make the A/B faster.
+
+<details>
+<summary><strong>Full methodology, charts, and detailed results</strong> — how each number above was measured, per-file breakdowns, provider comparison, and the caveats</summary>
+
 ## How to read the numbers below
 
 | Term | Meaning |
@@ -26,20 +44,6 @@ one file at a time.
 | Raw finding | What the model returned before the product applies its confidence rule. |
 | Actionable | A named finding scored ≥ 0.7 — confident enough that VS Code adds it to Problems. |
 | AUC | How cleanly the score separates buggy files from clean ones, from 0.5 (no better than a coin flip) to 1.0 (perfect separation). |
-
-## Bottom line
-
-| Question | Measured answer |
-|---|---|
-| Does the tool reduce context? | Yes. 1,554 tokens instead of 10,344, 85% less file content. |
-| Does it point to the planted line? | 18 of 18 bug trials land inside the defect's own function, 15 of 18 on the exact line. 0 pointed elsewhere. |
-| Does it accuse clean files? | 0 of 18 raw trials, 0 after the 0.7 gate. |
-| Does it help a real agent? | 26% fewer tokens in the A/B. Both arms found 2 of 3 bugs. |
-| Does project ranking help? | At 15 files, risk order contains 4 of 6 bugs. Directory order contains 2. |
-| What does one prediction cost in time? | 5.6 s mean, 19.2 s worst. |
-
-This run has a clean precision result. No clean control received a defect.
-Every prediction landed inside the function containing the defect. The tool saves context, but the extra model call means it did not make the A/B faster.
 
 Two numbers are given for localisation because they answer different questions, and an
 agent and a Problems panel need different ones. **18 of
@@ -61,12 +65,9 @@ for, and the link below each chart opens the SVG at full size.
 
 ### Context used per file
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="charts/context.dark.svg">
-  <img alt="Tokens used per file: reading the file versus asking predict_failures" src="charts/context.light.svg">
-</picture>
+<img alt="Tokens used per file: reading the file versus asking predict_failures" src="charts/context.dark.svg">
 
-[Open this chart at full size](charts/context.light.svg)
+[Open this chart at full size](charts/context.dark.svg) — the light version is at `charts/context.light.svg`
 
 Each pair of bars compares reading the whole file with calling `predict_failures`.
 The tool uses less context on 9 of 12 files. It costs more on
@@ -74,12 +75,9 @@ the smallest files because the answer itself is longer than the source.
 
 ### Result of every trial
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="charts/outcomes.dark.svg">
-  <img alt="Outcome by file and trial: whether the tool named the planted line" src="charts/outcomes.light.svg">
-</picture>
+<img alt="Outcome by file and trial: whether the tool named the planted line" src="charts/outcomes.dark.svg">
 
-[Open this chart at full size](charts/outcomes.light.svg)
+[Open this chart at full size](charts/outcomes.dark.svg) — the light version is at `charts/outcomes.light.svg`
 
 Rows are files and columns are trials. The chart shows 18 correct-line
 hits, 0 wrong locations, and 18 correctly
@@ -87,12 +85,9 @@ clean control trials.
 
 ### Score separation
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="charts/scores.dark.svg">
-  <img alt="Score distribution for buggy and clean files, with the actionable gate" src="charts/scores.light.svg">
-</picture>
+<img alt="Score distribution for buggy and clean files, with the actionable gate" src="charts/scores.dark.svg">
 
-[Open this chart at full size](charts/scores.light.svg)
+[Open this chart at full size](charts/scores.dark.svg) — the light version is at `charts/scores.light.svg`
 
 The horizontal position is the model score from 0 to 1. Clean trials sit at 0 in this
 run. Findings on buggy files start at 0.72. The vertical marker is the
@@ -100,12 +95,9 @@ run. Findings on buggy files start at 0.72. The vertical marker is the
 
 ### Claude and Codex
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="charts/providers.dark.svg">
-  <img alt="Planted lines found and false alarms raised, per provider, raw and after the gate" src="charts/providers.light.svg">
-</picture>
+<img alt="Planted lines found and false alarms raised, per provider, raw and after the gate" src="charts/providers.dark.svg">
 
-[Open this chart at full size](charts/providers.light.svg)
+[Open this chart at full size](charts/providers.dark.svg) — the light version is at `charts/providers.light.svg`
 
 This chart compares raw and gated results under the same prompt. Claude hit 18
 of 18 planted lines. Codex hit
@@ -114,12 +106,9 @@ Neither provider raised a gated false alarm in these runs.
 
 ### Bugs found within a file budget
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="charts/budget.dark.svg">
-  <img alt="Bugs found at the same file budget using three orderings" src="charts/budget.light.svg">
-</picture>
+<img alt="Bugs found at the same file budget using three orderings" src="charts/budget.dark.svg">
 
-[Open this chart at full size](charts/budget.light.svg)
+[Open this chart at full size](charts/budget.dark.svg) — the light version is at `charts/budget.light.svg`
 
 The x-axis is the number of files an agent reads. The y-axis is planted bugs included.
 At 15 files, risk-density order reaches 4 bugs.
@@ -182,9 +171,6 @@ Section 4 puts the two providers side by side on the same policy.
 
 ## Historical comparison
 
-<details>
-<summary>Open the full before/after history</summary>
-
 This section tracks the route from the first benchmark to the current build. Skip it if
 you only need the current result. `scan_project` ranks by
 risk density rather than total risk, `combinedScore` weights the model verdict at 0.9
@@ -243,8 +229,6 @@ The comparison also exposes three limits:
 - **The smallest files still cost more to ask about than to read**, and always will: an
   81-token file cannot be described in
   fewer tokens than it contains.
-
-</details>
 
 ## Detailed results
 
@@ -525,6 +509,14 @@ The planted bugs land at ranks 2, 8, 11, 12, 39, 40 of 40, so 4 of 6 are inside 
 - **Tokens are counted with cl100k BPE** (gpt-tokenizer), not Claude's tokenizer, except
   in section 5 where the figures come from the harness's own accounting. The ratios hold;
   the absolute figures in sections 1–3 are approximate.
+- **The batching number is 5 serial and 3 batched
+  runs**, wall-clock only. It is not evidence about bug-finding or cost: both were measured
+  equal in section 6 and are expected to stay equal, since batching changes when the model
+  calls happen, not what they are asked. It says only that four sequential provider round
+  trips are slower than one, which is a property of network calls rather than of this
+  corpus, and is why it is reported with a small sample rather than not at all.
+
+</details>
 
 ## Run it yourself
 
@@ -538,6 +530,15 @@ node bench/generate-corpus.mjs   # corpus + answer key
 node bench/measure.mjs           # project level
 node bench/measure-file.mjs      # per file (real CLI calls; takes a few minutes)
 node bench/markdown.mjs          # this file + charts
+
+node bench/measure-agents.mjs --arms=tool --trials=5 --out=results-agents-batched.json
 ```
+
+`results-agents.json` is a frozen pre-batching snapshot, the same role
+`baseline.json` plays above -- the `tool` arm's prompt now always asks for one
+batched call, so there is no flag left that reproduces the four-separate-calls
+number it holds. `--out` writes elsewhere rather than resuming into it, because
+its `tool` cells already show as done under the old meaning of that arm and
+would otherwise be skipped rather than replaced.
 
 Generated 2026-08-30T14:28:29.625Z.
