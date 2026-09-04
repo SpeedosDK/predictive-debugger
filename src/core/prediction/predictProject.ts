@@ -1,10 +1,13 @@
 import { collectSourceFiles } from "../sourceFiles";
-import { FilePrediction, ProjectPrediction } from "../types";
-import { predictFile, PredictOptions } from "./predictFile";
+import { ProjectPrediction } from "../types";
+import { PredictOptions } from "./predictFile";
+import { DEFAULT_CONCURRENCY, predictFiles } from "./predictFiles";
 
 export interface PredictProjectOptions extends PredictOptions {
     /** Stop after this many files. Each file costs one model call. */
     maxFiles?: number;
+    /** Provider calls in flight at once (default {@link DEFAULT_CONCURRENCY}). */
+    concurrency?: number;
     onProgress?: (file: string, index: number, total: number) => void;
 }
 
@@ -13,26 +16,11 @@ export async function predictProject(
     options: PredictProjectOptions
 ): Promise<ProjectPrediction> {
     const files = (await collectSourceFiles(root)).slice(0, options.maxFiles ?? 25);
-    const results: FilePrediction[] = [];
-    const failures: Array<{ file: string; reason: string }> = [];
 
-    for (const [index, file] of files.entries()) {
-        if (options.signal?.aborted) {
-            break;
-        }
-        options.onProgress?.(file, index, files.length);
-
-        try {
-            results.push(await predictFile(file, options));
-        } catch (err) {
-            // One unreadable file or CLI hiccup must not discard the work
-            // already done on the other files.
-            failures.push({
-                file,
-                reason: err instanceof Error ? err.message : String(err)
-            });
-        }
-    }
+    // Files are independent, so this is a pool rather than a loop. Note that
+    // `onProgress` now reports starts, which no longer arrive in index order:
+    // a progress UI should count them, not treat the index as a position.
+    const { results, failures } = await predictFiles(files, options);
 
     return {
         projectRisk: average(results.map((r) => r.combinedScore)),

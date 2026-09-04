@@ -6,6 +6,77 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- **`predict_failures` takes a `files` array and runs the verdicts
+  concurrently.** The tool reviewed one file per call, so an agent checking a
+  four-file change set paid the provider's latency four times in series. The
+  benchmark had read that as the tool being intrinsically slow; it was not. A
+  verdict is 5–15 seconds of a subprocess waiting on a model, and those waits
+  are independent — one file's verdict never informs another's — so the
+  serialisation bought nothing. A batch now bills the same as the same files one
+  at a time and returns in roughly the time of the slowest one.
+
+  `file` still works and still returns the flat reply it always has; wrapping a
+  single verdict in a one-element array to make the shapes uniform would have
+  cost every existing caller a rewrite to buy nothing. A batch returns a
+  `results` array in the order the paths were given — a pool finishes out of
+  order, and a caller should not have to re-match replies to requests — with
+  `review` and `viaProvider` hoisted out of it, since repeating advice that is
+  identical for every entry makes it a per-file cost that scales with the batch.
+  Duplicate paths collapse, because each entry is a billed model call. Files
+  that fail are reported in a separate `failures` array rather than folded in as
+  results with an error field, so one unreadable file does not discard the work
+  already done on the others. `concurrency` (default 4) is there for providers
+  that rate-limit.
+
+  `predictProject`, behind the VS Code project-wide command, was serial for the
+  same reason and now shares the same pool.
+
+### Changed
+
+- **The verification rule now covers new code, not just fixes, and the seat is
+  chosen by file count alone.** The rule advertised in MCP `instructions` fired
+  only when the agent fixed something these tools flagged, but the argument
+  behind it — that the context which wrote the code confirms it rather than
+  tests it — never depended on the change being a fix. Scoping it to fixes left
+  out the case that needs it most: on new feature code a clean `predict_failures`
+  reply reads as a clearance, when all it means is that the file is locally
+  sound. The trigger is now these tools pointed at code the agent wrote in the
+  session, which still keeps it from firing on work the tools were never shown.
+
+  The seat is chosen by how far the change reaches, because the two seats do not
+  cost the same. A change confined to one file — including a whole feature in
+  one file — gets a fresh `predict_failures`, already a second model for one
+  call. A change spanning several files gets a sub-agent, because
+  `predict_failures` reads each file on its own and never sees how they have to
+  agree. File count is the whole test: not how large the change felt, not
+  whether it was a fix or a feature, and not whether "correctness depends on
+  what was asked for" — a condition that sounds narrow and is not, since every
+  feature exists to satisfy an ask and the clause was true of essentially all
+  non-trivial work. Whether a change crosses a file boundary is a fact about the
+  diff an agent cannot argue itself past, and it tracks the one thing a per-file
+  tool structurally cannot check: whether two files still agree.
+
+  The mechanical exemption is unchanged. Sub-agents are to be scoped to the
+  changed files and the goal, and backgrounded where the host allows it: an
+  unscoped one rebuilds the project from cold and reports on code nobody
+  touched, and a blocking one doubles the wait on the turn a user is watching.
+
+  That the sub-agent earns its cost is still an argument, not a result: the
+  benchmark measures review of code the reviewer did not write, which is the one
+  setting where the contamination the rule exists to correct cannot occur, so it
+  can price the sub-agent but not value it. The trigger is held to the narrowest
+  case the argument supports until that changes.
+
+- **`onFix` on `predict_failures` replies is now `review`, and is always
+  present.** It was gated on the precision gate, on the reasoning that a clean
+  file should not pay for advice about a fix nobody is making. That gate was the
+  wrong shape once the rule covered new code: a clean reply on code the agent
+  just wrote is the turn where the rule matters most and is least likely to be
+  remembered. The wording forks on the gate instead of the field appearing and
+  disappearing, so neither case pays for the other's advice.
+
 ## [0.5.2] — 2026-09-01
 
 ### Fixed

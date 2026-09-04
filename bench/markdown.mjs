@@ -28,7 +28,24 @@ const fmt = (n) => n.toLocaleString("en-US");
 const dec = (n, digits = 1) => n.toFixed(digits);
 const pct = (n, digits = 0) => `${dec(n * 100, digits)}%`;
 
-/** One chart, two themes, plus the <picture> block that selects between them. */
+/**
+ * One chart, rendered in both themes so either is available to link to
+ * directly, embedded as a single plain `<img>`.
+ *
+ * This used to be a `<picture>` with a `<source media="prefers-color-scheme">`,
+ * which GitHub follows but a plain markdown renderer -- an IDE preview, a
+ * viewer with no notion of a page theme -- has no reason to support, and some
+ * drop the whole element rather than fall back to the `<img>` inside it. A
+ * chart that only renders on one specific host is worse than one that always
+ * renders in one fixed theme, and the "open full size" link matching what is
+ * actually on screen is worth more than the doc silently following the
+ * reader's OS setting.
+ *
+ * Both SVGs are still written and both stay linkable: each carries its own
+ * background rect, so either displays correctly on its own regardless of the
+ * surrounding page, and swapping which one this function embeds is a one-word
+ * change if the dark choice below ever needs to flip.
+ */
 async function emit(name, buildSpec, altText) {
     for (const [mode, c] of Object.entries(THEMES)) {
         await fs.writeFile(
@@ -38,12 +55,10 @@ async function emit(name, buildSpec, altText) {
         );
     }
 
-    return `<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="charts/${name}.dark.svg">
-  <img alt="${altText}" src="charts/${name}.light.svg">
-</picture>
+    const embedded = `${name}.dark.svg`;
+    return `<img alt="${altText}" src="charts/${embedded}">
 
-[Open this chart at full size](charts/${name}.light.svg)`;
+[Open this chart at full size](charts/${embedded}) — the light version is at \`charts/${name}.light.svg\``;
 }
 
 function table(headers, rows) {
@@ -86,6 +101,21 @@ async function main() {
     // help one language without quietly hurting the other.
     const ts = await read("results-file-ts.json");
     const tsManifest = await read("manifest-ts.json");
+    // Wall-clock only, and only the "tool" arm: whether calling predict_failures
+    // once per file or once for all of them finds the same bugs is a separate
+    // question the agent grid already answers (they tie); this is only about
+    // how long the calls themselves take. Filtered to compliant runs -- a run
+    // that skipped the batched call would understate its own cost, not confirm
+    // the improvement.
+    const agentsSerial = await read("results-agents.json");
+    const agentsBatched = await read("results-agents-batched.json");
+    const toolRuns = (j) => j.results.filter((r) => r.arm === "tool" && r.ok && r.compliant);
+    const meanOf = (records, key) => records.reduce((a, r) => a + r[key], 0) / records.length;
+    const serialTool = toolRuns(agentsSerial);
+    const batchedTool = toolRuns(agentsBatched);
+    const serialWallS = meanOf(serialTool, "wallMs") / 1000;
+    const batchedWallS = meanOf(batchedTool, "wallMs") / 1000;
+    const batchingSpeedup = 1 - batchedWallS / serialWallS;
     const { summary, runs } = file;
 
     const ok = runs.filter((r) => !r.error);
@@ -399,6 +429,28 @@ ${perFile.filter((f) => f.kind === "clean").length} clean controls, ${summary.tr
 larger, separate result further down covers ranking a whole project instead of
 one file at a time.
 
+## Bottom line
+
+| Question | Measured answer |
+|---|---|
+| Does the tool reduce context? | Yes. ${fmt(toolTotal)} tokens instead of ${fmt(baselineTotal)}, ${pct(1 - toolTotal / baselineTotal)} less file content. |
+| Does it point to the planted line? | ${summary.buggy.hit} of ${buggyRuns.length} bug trials land inside the defect's own function, ${exactLine} of ${buggyRuns.length} on the exact line. ${summary.buggy.wrongLocation} pointed elsewhere. |
+| Does it accuse clean files? | ${cleanNamed} of ${cleanRuns.length} raw trials${gateClearsNoise ? `, ${recommendedCut.falseAlarms} after the ${recommendedCut.t} gate` : ", and no tested gate removes them"}. |
+| Does it help a real agent? | ${pct(1 - abNow.tool / abNow.read)} fewer tokens in the A/B. Both arms found ${abNow.bugsFound} of ${abNow.bugsTotal} bugs. |
+| Does project ranking help? | At 15 files, risk order contains ${project.budgets.find((b) => b.k === 15).riskOrder.found} of ${project.corpus.bugs} bugs. Directory order contains ${project.budgets.find((b) => b.k === 15).directoryOrder.found}. |
+| What does one prediction cost in time? | ${dec(summary.latency.meanMsPerFile / 1000)} s mean, ${dec(summary.latency.maxMs / 1000)} s worst. |
+| Does reviewing several files together help? | Yes. An agent given 4 files finished in ${dec(batchedWallS)} s asking for them together against ${dec(serialWallS)} s asking one at a time — ${pct(batchingSpeedup)} faster, same cost. |
+
+${cleanNamed === 0 ? "This run has a clean precision result. No clean control received a defect." : `${cleanNamed} of ${cleanRuns.length} clean trials named a defect, ${recommendedCut.falseAlarms} of them above the gate.`}
+${
+    summary.buggy.wrongLocation === 0
+        ? "Every prediction landed inside the function containing the defect."
+        : `Localisation is the weakness: ${summary.buggy.wrongLocation} of ${buggyRuns.length} bug trials found a real-looking issue outside the defect's function.`
+} The tool saves context, but the extra model call means it did not make the A/B faster.
+
+<details>
+<summary><strong>Full methodology, charts, and detailed results</strong> — how each number above was measured, per-file breakdowns, provider comparison, and the caveats</summary>
+
 ## How to read the numbers below
 
 | Term | Meaning |
@@ -410,24 +462,6 @@ one file at a time.
 | Raw finding | What the model returned before the product applies its confidence rule. |
 | Actionable | A named finding scored ≥ ${recommendedCut.t} — confident enough that VS Code adds it to Problems. |
 | AUC | How cleanly the score separates buggy files from clean ones, from 0.5 (no better than a coin flip) to 1.0 (perfect separation). |
-
-## Bottom line
-
-| Question | Measured answer |
-|---|---|
-| Does the tool reduce context? | Yes. ${fmt(toolTotal)} tokens instead of ${fmt(baselineTotal)}, ${pct(1 - toolTotal / baselineTotal)} less file content. |
-| Does it point to the planted line? | ${summary.buggy.hit} of ${buggyRuns.length} bug trials land inside the defect's own function, ${exactLine} of ${buggyRuns.length} on the exact line. ${summary.buggy.wrongLocation} pointed elsewhere. |
-| Does it accuse clean files? | ${cleanNamed} of ${cleanRuns.length} raw trials${gateClearsNoise ? `, ${recommendedCut.falseAlarms} after the ${recommendedCut.t} gate` : ", and no tested gate removes them"}. |
-| Does it help a real agent? | ${pct(1 - abNow.tool / abNow.read)} fewer tokens in the A/B. Both arms found ${abNow.bugsFound} of ${abNow.bugsTotal} bugs. |
-| Does project ranking help? | At 15 files, risk order contains ${project.budgets.find((b) => b.k === 15).riskOrder.found} of ${project.corpus.bugs} bugs. Directory order contains ${project.budgets.find((b) => b.k === 15).directoryOrder.found}. |
-| What does one prediction cost in time? | ${dec(summary.latency.meanMsPerFile / 1000)} s mean, ${dec(summary.latency.maxMs / 1000)} s worst. |
-
-${cleanNamed === 0 ? "This run has a clean precision result. No clean control received a defect." : `${cleanNamed} of ${cleanRuns.length} clean trials named a defect, ${recommendedCut.falseAlarms} of them above the gate.`}
-${
-    summary.buggy.wrongLocation === 0
-        ? "Every prediction landed inside the function containing the defect."
-        : `Localisation is the weakness: ${summary.buggy.wrongLocation} of ${buggyRuns.length} bug trials found a real-looking issue outside the defect's function.`
-} The tool saves context, but the extra model call means it did not make the A/B faster.
 
 Two numbers are given for localisation because they answer different questions, and an
 agent and a Problems panel need different ones. **${summary.buggy.hit} of
@@ -589,9 +623,6 @@ Section 4 puts the two providers side by side on the same policy.
 
 ## Historical comparison
 
-<details>
-<summary>Open the full before/after history</summary>
-
 This section tracks the route from the first benchmark to the current build. Skip it if
 you only need the current result. \`scan_project\` ranks by
 risk density rather than total risk, \`combinedScore\` weights the model verdict at 0.9
@@ -631,8 +662,6 @@ The comparison also exposes three limits:
 - **The smallest files still cost more to ask about than to read**, and always will: an
   ${Math.min(...contextRows.map((r) => r.fileTokens))}-token file cannot be described in
   fewer tokens than it contains.
-
-</details>
 
 ## Detailed results
 
@@ -977,6 +1006,14 @@ ${bugRankSentence}
 - **Tokens are counted with cl100k BPE** (gpt-tokenizer), not Claude's tokenizer, except
   in section 5 where the figures come from the harness's own accounting. The ratios hold;
   the absolute figures in sections 1–3 are approximate.
+- **The batching number is ${serialTool.length} serial and ${batchedTool.length} batched
+  runs**, wall-clock only. It is not evidence about bug-finding or cost: both were measured
+  equal in section 6 and are expected to stay equal, since batching changes when the model
+  calls happen, not what they are asked. It says only that four sequential provider round
+  trips are slower than one, which is a property of network calls rather than of this
+  corpus, and is why it is reported with a small sample rather than not at all.
+
+</details>
 
 ## Run it yourself
 
@@ -990,7 +1027,16 @@ node bench/generate-corpus.mjs   # corpus + answer key
 node bench/measure.mjs           # project level
 node bench/measure-file.mjs      # per file (real CLI calls; takes a few minutes)
 node bench/markdown.mjs          # this file + charts
+
+node bench/measure-agents.mjs --arms=tool --trials=5 --out=results-agents-batched.json
 \`\`\`
+
+\`results-agents.json\` is a frozen pre-batching snapshot, the same role
+\`baseline.json\` plays above -- the \`tool\` arm's prompt now always asks for one
+batched call, so there is no flag left that reproduces the four-separate-calls
+number it holds. \`--out\` writes elsewhere rather than resuming into it, because
+its \`tool\` cells already show as done under the old meaning of that arm and
+would otherwise be skipped rather than replaced.
 
 Generated ${file.generatedAt}.
 `;

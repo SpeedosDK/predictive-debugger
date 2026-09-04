@@ -231,7 +231,7 @@ already a model, so it needs facts, not a second opinion.
 | `analyze_file` | Complexity metrics + risk score and risk density for one file, with the signals that drove it |
 | `scan_project` | Rank a directory's source files by risk density — risk per line, not per file. Test files are excluded by default (`includeTests` to rank them) |
 | `analyze_logs` | Score log lines by severity and unusual wording, return the anomalies |
-| `predict_failures` | Full pipeline including a second-opinion model verdict, an `actionable` precision gate, a `checked` list of the categories the model says it weighed, and an optional ranked `findings` list (`multi: true`) — spawns a CLI, 5–15s per file |
+| `predict_failures` | Full pipeline including a second-opinion model verdict, an `actionable` precision gate, a `checked` list of the categories the model says it weighed, and an optional ranked `findings` list (`multi: true`) — spawns a CLI, 5–15s. Takes `files: [...]` to review a change set in one call, concurrently |
 | `list_providers` | Which CLIs are installed and signed in (for diagnosing failures) |
 
 `predict_failures` is deliberately the odd one out. When an agent calls it, one
@@ -243,6 +243,15 @@ A typical agent review looks like: `scan_project` to find the risky files →
 read those files directly → optionally `predict_failures` on the one or two that
 look worst.
 
+Reviewing several files at once, pass them as `files` rather than calling the
+tool once each. The verdicts are independent, so they run concurrently: a batch
+bills the same as the same files one at a time, and returns in roughly the time
+of the slowest one instead of the sum of all of them. The reply carries a
+`results` array in the order the paths were given, with `failures` listed
+separately so one unreadable file does not discard the rest of the batch.
+Calling once per file pays the provider's latency again for every file, and was
+the single largest contributor to how slow this tool felt.
+
 Test files are left out of that ranking. They rank high for a structural reason
 rather than a real one — `riskDensity` weights async boundaries, and a spec file
 full of mocked awaits reads as async complexity without carrying the defect risk
@@ -252,24 +261,59 @@ five of the top six slots when they are included, and none when they are not.
 The VS Code project-wide command still covers tests: a human who asked for the
 whole workspace is not spending a per-file reading budget.
 
-### Verifying a fix
+### Verifying new code
 
-The server advertises MCP `instructions` asking the calling agent to have a fix
-reviewed from outside the context that produced it — a sub-agent where the host
-supports them, otherwise a fresh `predict_failures` on the edited file — whenever
-the fix involved choosing between approaches rather than being mechanical. A
-`predict_failures` reply that clears the precision gate repeats it in four words
-as `onFix`, because not every client forwards `instructions` to the model and a
-tool result always reaches it.
+The server advertises MCP `instructions` asking the calling agent to have code
+it wrote in the session — a fix for something these tools flagged, or a feature
+it just finished — checked from outside the context that wrote it. Every
+`predict_failures` reply repeats the rule in one line as `review`, because not
+every client forwards `instructions` to the model and a tool result always
+reaches it.
 
-This is here because an agent reviewing its own fix is the weakest check
-available: the reasoning that made the fix look right is still in its context,
+Which outside seat depends on how far the change reaches, and the two do not
+cost the same. **File count is the test** — not how large the change felt, and
+not whether it was a fix or a feature:
+
+| The change | The seat | Why |
+| --- | --- | --- |
+| Confined to one file, including a whole feature in one file | a fresh `predict_failures` on it | already a second model, and one call |
+| Spanning several files | a scoped sub-agent | `predict_failures` reads each file on its own and never sees how they have to agree |
+| Mechanical — a typo, a missing await, an off-by-one with one correct value | neither | the reasoning has one correct outcome to confirm |
+
+An earlier version of this rule also sent "anything whose correctness depends on
+what was asked for" to the sub-agent. That sounds narrow and is not: every
+feature exists to satisfy an ask, so it was true of essentially all non-trivial
+work and quietly made the expensive seat the default. Whether a change crosses a
+file boundary is a fact about the diff that an agent cannot argue itself past.
+
+A clean `predict_failures` on new code is not a clearance. It means the file is
+locally sound, which is not the same as the feature being right: this tool never
+saw what the code was meant to do.
+
+The sub-agent is scoped, and backgrounded where the host allows it. It is given
+the changed files and what was being attempted and asked to review only that,
+and nothing downstream waits on it. An unscoped agent rebuilds the project from
+cold and reports on code nobody touched; a blocking one doubles the wait on the
+turn a user is watching. Those are the two ways a rule like this gets switched
+off.
+
+This is here because an agent reviewing its own work is the weakest check
+available: the reasoning that made the code look right is still in its context,
 so the second look tends to confirm the first rather than test it. Left to the
 agent's own judgement, the review happens on some runs and not others; left to
 each user's project instructions, only the users who already knew about the
 failure mode get it. It is a floor rather than a rule — an agent is free to
-verify more often, and a mechanical fix is explicitly exempt so correcting a
-typo does not cost two model passes.
+verify more often, and the mechanical exemption is what stops correcting a typo
+from costing two model passes.
+
+**The sub-agent half of this rule is not measured, and the trigger is kept
+narrow because of that.** Arms that spawn a sub-agent have been run, but only
+against code the reviewing agent did not write — which is the one setting where
+the self-confirmation this rule exists to correct cannot happen. That can price
+a sub-agent and cannot value it. So the claim here is an argument, not a result,
+and the trigger is held to the narrowest case the argument actually supports:
+changes that cross a file boundary, where a per-file tool structurally cannot
+see whether the files still agree.
 
 ## Settings
 

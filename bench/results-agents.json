@@ -1,0 +1,1134 @@
+{
+ "note": "Section 8. The same corpus, answer key and enclosing-function grading as section 6, with two arms added: a scoped sub-agent, and the tool followed by a scoped sub-agent. Non-compliant runs -- an arm that was told to spawn a sub-agent and did not, or one that used a tool it was told to avoid -- are recorded and excluded from the aggregates.",
+ "ranAt": "2026-09-04",
+ "model": "sonnet",
+ "trials": 5,
+ "files": [
+  "src/services/pricingService.js",
+  "src/workers/reconciliationWorker.js",
+  "src/models/cartTotals.js",
+  "src/services/orderService.js"
+ ],
+ "arms": [
+  "read",
+  "tool",
+  "subagent",
+  "tool+subagent"
+ ],
+ "byArm": {
+  "read": {
+   "runs": 5,
+   "usable": 5,
+   "nonCompliant": 0,
+   "failed": 0,
+   "meanBugsFound": 2,
+   "sdBugsFound": 0,
+   "bugsTotal": 3,
+   "meanExactHits": 2,
+   "meanFalseAlarms": 0,
+   "controlsTotal": 1,
+   "meanBillableTokens": 3800,
+   "meanContextTokens": 57504,
+   "meanCostUsd": 0.09645612,
+   "meanWallMs": 30463.8,
+   "sdWallMs": 8428.94054433889,
+   "meanTurns": 5.2
+  },
+  "tool": {
+   "runs": 5,
+   "usable": 5,
+   "nonCompliant": 0,
+   "failed": 0,
+   "meanBugsFound": 2.8,
+   "sdBugsFound": 0.44721359549995787,
+   "bugsTotal": 3,
+   "meanExactHits": 2.6,
+   "meanFalseAlarms": 0,
+   "controlsTotal": 1,
+   "meanBillableTokens": 2488.8,
+   "meanContextTokens": 44462.6,
+   "meanCostUsd": 0.05388064,
+   "meanWallMs": 56165.2,
+   "sdWallMs": 9462.578702446812,
+   "meanTurns": 5
+  },
+  "subagent": {
+   "runs": 5,
+   "usable": 5,
+   "nonCompliant": 0,
+   "failed": 0,
+   "meanBugsFound": 2,
+   "sdBugsFound": 0,
+   "bugsTotal": 3,
+   "meanExactHits": 2,
+   "meanFalseAlarms": 0.4,
+   "controlsTotal": 1,
+   "meanBillableTokens": 9659.8,
+   "meanContextTokens": 125121.2,
+   "meanCostUsd": 0.191652,
+   "meanWallMs": 118354,
+   "sdWallMs": 62698.217658080204,
+   "meanTurns": 2
+  },
+  "tool+subagent": {
+   "runs": 5,
+   "usable": 5,
+   "nonCompliant": 0,
+   "failed": 0,
+   "meanBugsFound": 2.8,
+   "sdBugsFound": 0.44721359549995787,
+   "bugsTotal": 3,
+   "meanExactHits": 2.8,
+   "meanFalseAlarms": 0.4,
+   "controlsTotal": 1,
+   "meanBillableTokens": 11669.8,
+   "meanContextTokens": 135430.6,
+   "meanCostUsd": 0.2261752,
+   "meanWallMs": 140672.6,
+   "sdWallMs": 28668.847226562844,
+   "meanTurns": 4
+  }
+ },
+ "results": [
+  {
+   "arm": "read",
+   "trial": 1,
+   "ok": true,
+   "parsed": true,
+   "compliant": true,
+   "predictCalls": 0,
+   "subagentsSpawned": 0,
+   "bugsFound": 2,
+   "bugsTotal": 3,
+   "exactHits": 2,
+   "falseAlarms": 0,
+   "controlsTotal": 1,
+   "missingVerdicts": 0,
+   "recall": 0.6666666666666666,
+   "perFile": [
+    {
+     "file": "src/services/pricingService.js",
+     "truth": "bug",
+     "claimed": true,
+     "line": 36,
+     "correct": true
+    },
+    {
+     "file": "src/workers/reconciliationWorker.js",
+     "truth": "bug",
+     "claimed": false,
+     "line": null,
+     "correct": false
+    },
+    {
+     "file": "src/models/cartTotals.js",
+     "truth": "bug",
+     "claimed": true,
+     "line": 6,
+     "correct": true
+    },
+    {
+     "file": "src/services/orderService.js",
+     "truth": "clean",
+     "claimed": false,
+     "line": null,
+     "correct": true
+    }
+   ],
+   "wallMs": 20517,
+   "durationMs": 19455,
+   "costUsd": 0.0862816,
+   "turns": 5,
+   "billableTokens": 3031,
+   "contextTokens": 50791
+  },
+  {
+   "arm": "read",
+   "trial": 2,
+   "ok": true,
+   "parsed": true,
+   "compliant": true,
+   "predictCalls": 0,
+   "subagentsSpawned": 0,
+   "bugsFound": 2,
+   "bugsTotal": 3,
+   "exactHits": 2,
+   "falseAlarms": 0,
+   "controlsTotal": 1,
+   "missingVerdicts": 0,
+   "recall": 0.6666666666666666,
+   "perFile": [
+    {
+     "file": "src/services/pricingService.js",
+     "truth": "bug",
+     "claimed": true,
+     "line": 36,
+     "correct": true
+    },
+    {
+     "file": "src/workers/reconciliationWorker.js",
+     "truth": "bug",
+     "claimed": false,
+     "line": null,
+     "correct": false
+    },
+    {
+     "file": "src/models/cartTotals.js",
+     "truth": "bug",
+     "claimed": true,
+     "line": 6,
+     "correct": true
+    },
+    {
+     "file": "src/services/orderService.js",
+     "truth": "clean",
+     "claimed": false,
+     "line": null,
+     "correct": true
+    }
+   ],
+   "wallMs": 27319,
+   "durationMs": 26248,
+   "costUsd": 0.0891216,
+   "turns": 5,
+   "billableTokens": 3315,
+   "contextTokens": 51075
+  },
+  {
+   "arm": "read",
+   "trial": 3,
+   "ok": true,
+   "parsed": true,
+   "compliant": true,
+   "predictCalls": 0,
+   "subagentsSpawned": 0,
+   "bugsFound": 2,
+   "bugsTotal": 3,
+   "exactHits": 2,
+   "falseAlarms": 0,
+   "controlsTotal": 1,
+   "missingVerdicts": 0,
+   "recall": 0.6666666666666666,
+   "perFile": [
+    {
+     "file": "src/services/pricingService.js",
+     "truth": "bug",
+     "claimed": true,
+     "line": 36,
+     "correct": true
+    },
+    {
+     "file": "src/workers/reconciliationWorker.js",
+     "truth": "bug",
+     "claimed": false,
+     "line": null,
+     "correct": false
+    },
+    {
+     "file": "src/models/cartTotals.js",
+     "truth": "bug",
+     "claimed": true,
+     "line": 6,
+     "correct": true
+    },
+    {
+     "file": "src/services/orderService.js",
+     "truth": "clean",
+     "claimed": false,
+     "line": null,
+     "correct": true
+    }
+   ],
+   "wallMs": 27658,
+   "durationMs": 26501,
+   "costUsd": 0.0915172,
+   "turns": 5,
+   "billableTokens": 3557,
+   "contextTokens": 51309
+  },
+  {
+   "arm": "read",
+   "trial": 4,
+   "ok": true,
+   "parsed": true,
+   "compliant": true,
+   "predictCalls": 0,
+   "subagentsSpawned": 0,
+   "bugsFound": 2,
+   "bugsTotal": 3,
+   "exactHits": 2,
+   "falseAlarms": 0,
+   "controlsTotal": 1,
+   "missingVerdicts": 0,
+   "recall": 0.6666666666666666,
+   "perFile": [
+    {
+     "file": "src/services/pricingService.js",
+     "truth": "bug",
+     "claimed": true,
+     "line": 36,
+     "correct": true
+    },
+    {
+     "file": "src/workers/reconciliationWorker.js",
+     "truth": "bug",
+     "claimed": false,
+     "line": null,
+     "correct": false
+    },
+    {
+     "file": "src/models/cartTotals.js",
+     "truth": "bug",
+     "claimed": true,
+     "line": 6,
+     "correct": true
+    },
+    {
+     "file": "src/services/orderService.js",
+     "truth": "clean",
+     "claimed": false,
+     "line": null,
+     "correct": true
+    }
+   ],
+   "wallMs": 42947,
+   "durationMs": 41866,
+   "costUsd": 0.115937,
+   "turns": 6,
+   "billableTokens": 4746,
+   "contextTokens": 82243
+  },
+  {
+   "arm": "read",
+   "trial": 5,
+   "ok": true,
+   "parsed": true,
+   "compliant": true,
+   "predictCalls": 0,
+   "subagentsSpawned": 0,
+   "bugsFound": 2,
+   "bugsTotal": 3,
+   "exactHits": 2,
+   "falseAlarms": 0,
+   "controlsTotal": 1,
+   "missingVerdicts": 0,
+   "recall": 0.6666666666666666,
+   "perFile": [
+    {
+     "file": "src/services/pricingService.js",
+     "truth": "bug",
+     "claimed": true,
+     "line": 36,
+     "correct": true
+    },
+    {
+     "file": "src/workers/reconciliationWorker.js",
+     "truth": "bug",
+     "claimed": false,
+     "line": null,
+     "correct": false
+    },
+    {
+     "file": "src/models/cartTotals.js",
+     "truth": "bug",
+     "claimed": true,
+     "line": 6,
+     "correct": true
+    },
+    {
+     "file": "src/services/orderService.js",
+     "truth": "clean",
+     "claimed": false,
+     "line": null,
+     "correct": true
+    }
+   ],
+   "wallMs": 33878,
+   "durationMs": 32785,
+   "costUsd": 0.09942319999999999,
+   "turns": 5,
+   "billableTokens": 4351,
+   "contextTokens": 52102
+  },
+  {
+   "arm": "tool",
+   "trial": 1,
+   "ok": true,
+   "parsed": true,
+   "compliant": true,
+   "predictCalls": 4,
+   "subagentsSpawned": 0,
+   "bugsFound": 3,
+   "bugsTotal": 3,
+   "exactHits": 3,
+   "falseAlarms": 0,
+   "controlsTotal": 1,
+   "missingVerdicts": 0,
+   "recall": 1,
+   "perFile": [
+    {
+     "file": "src/services/pricingService.js",
+     "truth": "bug",
+     "claimed": true,
+     "line": 36,
+     "correct": true
+    },
+    {
+     "file": "src/workers/reconciliationWorker.js",
+     "truth": "bug",
+     "claimed": true,
+     "line": 40,
+     "correct": true
+    },
+    {
+     "file": "src/models/cartTotals.js",
+     "truth": "bug",
+     "claimed": true,
+     "line": 6,
+     "correct": true
+    },
+    {
+     "file": "src/services/orderService.js",
+     "truth": "clean",
+     "claimed": false,
+     "line": null,
+     "correct": true
+    }
+   ],
+   "wallMs": 47278,
+   "durationMs": 46206,
+   "costUsd": 0.051757000000000004,
+   "turns": 5,
+   "billableTokens": 2278,
+   "contextTokens": 44232
+  },
+  {
+   "arm": "tool",
+   "trial": 2,
+   "ok": true,
+   "parsed": true,
+   "compliant": true,
+   "predictCalls": 4,
+   "subagentsSpawned": 0,
+   "bugsFound": 2,
+   "bugsTotal": 3,
+   "exactHits": 2,
+   "falseAlarms": 0,
+   "controlsTotal": 1,
+   "missingVerdicts": 0,
+   "recall": 0.6666666666666666,
+   "perFile": [
+    {
+     "file": "src/services/pricingService.js",
+     "truth": "bug",
+     "claimed": true,
+     "line": 34,
+     "correct": true
+    },
+    {
+     "file": "src/workers/reconciliationWorker.js",
+     "truth": "bug",
+     "claimed": true,
+     "line": 66,
+     "correct": false
+    },
+    {
+     "file": "src/models/cartTotals.js",
+     "truth": "bug",
+     "claimed": true,
+     "line": 6,
+     "correct": true
+    },
+    {
+     "file": "src/services/orderService.js",
+     "truth": "clean",
+     "claimed": false,
+     "line": null,
+     "correct": true
+    }
+   ],
+   "wallMs": 52327,
+   "durationMs": 51271,
+   "costUsd": 0.052163,
+   "turns": 5,
+   "billableTokens": 2319,
+   "contextTokens": 44281
+  },
+  {
+   "arm": "tool",
+   "trial": 3,
+   "ok": true,
+   "parsed": true,
+   "compliant": true,
+   "predictCalls": 4,
+   "subagentsSpawned": 0,
+   "bugsFound": 3,
+   "bugsTotal": 3,
+   "exactHits": 3,
+   "falseAlarms": 0,
+   "controlsTotal": 1,
+   "missingVerdicts": 0,
+   "recall": 1,
+   "perFile": [
+    {
+     "file": "src/services/pricingService.js",
+     "truth": "bug",
+     "claimed": true,
+     "line": 36,
+     "correct": true
+    },
+    {
+     "file": "src/workers/reconciliationWorker.js",
+     "truth": "bug",
+     "claimed": true,
+     "line": 40,
+     "correct": true
+    },
+    {
+     "file": "src/models/cartTotals.js",
+     "truth": "bug",
+     "claimed": true,
+     "line": 6,
+     "correct": true
+    },
+    {
+     "file": "src/services/orderService.js",
+     "truth": "clean",
+     "claimed": false,
+     "line": null,
+     "correct": true
+    }
+   ],
+   "wallMs": 50264,
+   "durationMs": 49297,
+   "costUsd": 0.054738,
+   "turns": 5,
+   "billableTokens": 2563,
+   "contextTokens": 44560
+  },
+  {
+   "arm": "tool",
+   "trial": 4,
+   "ok": true,
+   "parsed": true,
+   "compliant": true,
+   "predictCalls": 4,
+   "subagentsSpawned": 0,
+   "bugsFound": 3,
+   "bugsTotal": 3,
+   "exactHits": 2,
+   "falseAlarms": 0,
+   "controlsTotal": 1,
+   "missingVerdicts": 0,
+   "recall": 1,
+   "perFile": [
+    {
+     "file": "src/services/pricingService.js",
+     "truth": "bug",
+     "claimed": true,
+     "line": 36,
+     "correct": true
+    },
+    {
+     "file": "src/workers/reconciliationWorker.js",
+     "truth": "bug",
+     "claimed": true,
+     "line": 41,
+     "correct": true
+    },
+    {
+     "file": "src/models/cartTotals.js",
+     "truth": "bug",
+     "claimed": true,
+     "line": 6,
+     "correct": true
+    },
+    {
+     "file": "src/services/orderService.js",
+     "truth": "clean",
+     "claimed": false,
+     "line": null,
+     "correct": true
+    }
+   ],
+   "wallMs": 70777,
+   "durationMs": 69763,
+   "costUsd": 0.055088,
+   "turns": 5,
+   "billableTokens": 2613,
+   "contextTokens": 44590
+  },
+  {
+   "arm": "tool",
+   "trial": 5,
+   "ok": true,
+   "parsed": true,
+   "compliant": true,
+   "predictCalls": 4,
+   "subagentsSpawned": 0,
+   "bugsFound": 3,
+   "bugsTotal": 3,
+   "exactHits": 3,
+   "falseAlarms": 0,
+   "controlsTotal": 1,
+   "missingVerdicts": 0,
+   "recall": 1,
+   "perFile": [
+    {
+     "file": "src/services/pricingService.js",
+     "truth": "bug",
+     "claimed": true,
+     "line": 34,
+     "correct": true
+    },
+    {
+     "file": "src/workers/reconciliationWorker.js",
+     "truth": "bug",
+     "claimed": true,
+     "line": 40,
+     "correct": true
+    },
+    {
+     "file": "src/models/cartTotals.js",
+     "truth": "bug",
+     "claimed": true,
+     "line": 6,
+     "correct": true
+    },
+    {
+     "file": "src/services/orderService.js",
+     "truth": "clean",
+     "claimed": false,
+     "line": null,
+     "correct": true
+    }
+   ],
+   "wallMs": 60180,
+   "durationMs": 59118,
+   "costUsd": 0.055657200000000004,
+   "turns": 5,
+   "billableTokens": 2671,
+   "contextTokens": 44650
+  },
+  {
+   "arm": "subagent",
+   "trial": 1,
+   "ok": true,
+   "parsed": true,
+   "compliant": true,
+   "predictCalls": 0,
+   "subagentsSpawned": 1,
+   "bugsFound": 2,
+   "bugsTotal": 3,
+   "exactHits": 2,
+   "falseAlarms": 1,
+   "controlsTotal": 1,
+   "missingVerdicts": 0,
+   "recall": 0.6666666666666666,
+   "perFile": [
+    {
+     "file": "src/services/pricingService.js",
+     "truth": "bug",
+     "claimed": true,
+     "line": 36,
+     "correct": true
+    },
+    {
+     "file": "src/workers/reconciliationWorker.js",
+     "truth": "bug",
+     "claimed": false,
+     "line": null,
+     "correct": false
+    },
+    {
+     "file": "src/models/cartTotals.js",
+     "truth": "bug",
+     "claimed": true,
+     "line": 6,
+     "correct": true
+    },
+    {
+     "file": "src/services/orderService.js",
+     "truth": "clean",
+     "claimed": true,
+     "line": 14,
+     "correct": false
+    }
+   ],
+   "wallMs": 98819,
+   "durationMs": 97814,
+   "costUsd": 0.2221025,
+   "turns": 2,
+   "billableTokens": 10463,
+   "contextTokens": 141165
+  },
+  {
+   "arm": "subagent",
+   "trial": 2,
+   "ok": true,
+   "parsed": true,
+   "compliant": true,
+   "predictCalls": 0,
+   "subagentsSpawned": 1,
+   "bugsFound": 2,
+   "bugsTotal": 3,
+   "exactHits": 2,
+   "falseAlarms": 0,
+   "controlsTotal": 1,
+   "missingVerdicts": 0,
+   "recall": 0.6666666666666666,
+   "perFile": [
+    {
+     "file": "src/services/pricingService.js",
+     "truth": "bug",
+     "claimed": true,
+     "line": 36,
+     "correct": true
+    },
+    {
+     "file": "src/workers/reconciliationWorker.js",
+     "truth": "bug",
+     "claimed": false,
+     "line": null,
+     "correct": false
+    },
+    {
+     "file": "src/models/cartTotals.js",
+     "truth": "bug",
+     "claimed": true,
+     "line": 6,
+     "correct": true
+    },
+    {
+     "file": "src/services/orderService.js",
+     "truth": "clean",
+     "claimed": false,
+     "line": null,
+     "correct": true
+    }
+   ],
+   "wallMs": 223858,
+   "durationMs": 222813,
+   "costUsd": 0.2248326,
+   "turns": 2,
+   "billableTokens": 10454,
+   "contextTokens": 177431
+  },
+  {
+   "arm": "subagent",
+   "trial": 3,
+   "ok": true,
+   "parsed": true,
+   "compliant": true,
+   "predictCalls": 0,
+   "subagentsSpawned": 1,
+   "bugsFound": 2,
+   "bugsTotal": 3,
+   "exactHits": 2,
+   "falseAlarms": 1,
+   "controlsTotal": 1,
+   "missingVerdicts": 0,
+   "recall": 0.6666666666666666,
+   "perFile": [
+    {
+     "file": "src/services/pricingService.js",
+     "truth": "bug",
+     "claimed": true,
+     "line": 36,
+     "correct": true
+    },
+    {
+     "file": "src/workers/reconciliationWorker.js",
+     "truth": "bug",
+     "claimed": true,
+     "line": 13,
+     "correct": false
+    },
+    {
+     "file": "src/models/cartTotals.js",
+     "truth": "bug",
+     "claimed": true,
+     "line": 6,
+     "correct": true
+    },
+    {
+     "file": "src/services/orderService.js",
+     "truth": "clean",
+     "claimed": true,
+     "line": 14,
+     "correct": false
+    }
+   ],
+   "wallMs": 55692,
+   "durationMs": 54447,
+   "costUsd": 0.1563263,
+   "turns": 2,
+   "billableTokens": 6330,
+   "contextTokens": 87699
+  },
+  {
+   "arm": "subagent",
+   "trial": 4,
+   "ok": true,
+   "parsed": true,
+   "compliant": true,
+   "predictCalls": 0,
+   "subagentsSpawned": 1,
+   "bugsFound": 2,
+   "bugsTotal": 3,
+   "exactHits": 2,
+   "falseAlarms": 0,
+   "controlsTotal": 1,
+   "missingVerdicts": 0,
+   "recall": 0.6666666666666666,
+   "perFile": [
+    {
+     "file": "src/services/pricingService.js",
+     "truth": "bug",
+     "claimed": true,
+     "line": 36,
+     "correct": true
+    },
+    {
+     "file": "src/workers/reconciliationWorker.js",
+     "truth": "bug",
+     "claimed": true,
+     "line": 80,
+     "correct": false
+    },
+    {
+     "file": "src/models/cartTotals.js",
+     "truth": "bug",
+     "claimed": true,
+     "line": 6,
+     "correct": true
+    },
+    {
+     "file": "src/services/orderService.js",
+     "truth": "clean",
+     "claimed": false,
+     "line": null,
+     "correct": true
+    }
+   ],
+   "wallMs": 104110,
+   "durationMs": 102916,
+   "costUsd": 0.1784381,
+   "turns": 2,
+   "billableTokens": 10670,
+   "contextTokens": 109599
+  },
+  {
+   "arm": "subagent",
+   "trial": 5,
+   "ok": true,
+   "parsed": true,
+   "compliant": true,
+   "predictCalls": 0,
+   "subagentsSpawned": 1,
+   "bugsFound": 2,
+   "bugsTotal": 3,
+   "exactHits": 2,
+   "falseAlarms": 0,
+   "controlsTotal": 1,
+   "missingVerdicts": 0,
+   "recall": 0.6666666666666666,
+   "perFile": [
+    {
+     "file": "src/services/pricingService.js",
+     "truth": "bug",
+     "claimed": true,
+     "line": 36,
+     "correct": true
+    },
+    {
+     "file": "src/workers/reconciliationWorker.js",
+     "truth": "bug",
+     "claimed": false,
+     "line": null,
+     "correct": false
+    },
+    {
+     "file": "src/models/cartTotals.js",
+     "truth": "bug",
+     "claimed": true,
+     "line": 6,
+     "correct": true
+    },
+    {
+     "file": "src/services/orderService.js",
+     "truth": "clean",
+     "claimed": false,
+     "line": null,
+     "correct": true
+    }
+   ],
+   "wallMs": 109291,
+   "durationMs": 108047,
+   "costUsd": 0.1765605,
+   "turns": 2,
+   "billableTokens": 10382,
+   "contextTokens": 109712
+  },
+  {
+   "arm": "tool+subagent",
+   "trial": 1,
+   "ok": true,
+   "parsed": true,
+   "compliant": true,
+   "predictCalls": 4,
+   "subagentsSpawned": 1,
+   "bugsFound": 2,
+   "bugsTotal": 3,
+   "exactHits": 2,
+   "falseAlarms": 0,
+   "controlsTotal": 1,
+   "missingVerdicts": 0,
+   "recall": 0.6666666666666666,
+   "perFile": [
+    {
+     "file": "src/services/pricingService.js",
+     "truth": "bug",
+     "claimed": true,
+     "line": 36,
+     "correct": true
+    },
+    {
+     "file": "src/workers/reconciliationWorker.js",
+     "truth": "bug",
+     "claimed": false,
+     "line": null,
+     "correct": false
+    },
+    {
+     "file": "src/models/cartTotals.js",
+     "truth": "bug",
+     "claimed": true,
+     "line": 6,
+     "correct": true
+    },
+    {
+     "file": "src/services/orderService.js",
+     "truth": "clean",
+     "claimed": false,
+     "line": null,
+     "correct": true
+    }
+   ],
+   "wallMs": 102639,
+   "durationMs": 6321,
+   "costUsd": 0.2033837,
+   "turns": 1,
+   "billableTokens": 9191,
+   "contextTokens": 138414
+  },
+  {
+   "arm": "tool+subagent",
+   "trial": 2,
+   "ok": true,
+   "parsed": true,
+   "compliant": true,
+   "predictCalls": 4,
+   "subagentsSpawned": 1,
+   "bugsFound": 3,
+   "bugsTotal": 3,
+   "exactHits": 3,
+   "falseAlarms": 0,
+   "controlsTotal": 1,
+   "missingVerdicts": 0,
+   "recall": 1,
+   "perFile": [
+    {
+     "file": "src/services/pricingService.js",
+     "truth": "bug",
+     "claimed": true,
+     "line": 36,
+     "correct": true
+    },
+    {
+     "file": "src/workers/reconciliationWorker.js",
+     "truth": "bug",
+     "claimed": true,
+     "line": 40,
+     "correct": true
+    },
+    {
+     "file": "src/models/cartTotals.js",
+     "truth": "bug",
+     "claimed": true,
+     "line": 6,
+     "correct": true
+    },
+    {
+     "file": "src/services/orderService.js",
+     "truth": "clean",
+     "claimed": false,
+     "line": null,
+     "correct": true
+    }
+   ],
+   "wallMs": 148670,
+   "durationMs": 147624,
+   "costUsd": 0.2208505,
+   "turns": 6,
+   "billableTokens": 12144,
+   "contextTokens": 96258
+  },
+  {
+   "arm": "tool+subagent",
+   "trial": 3,
+   "ok": true,
+   "parsed": true,
+   "compliant": true,
+   "predictCalls": 4,
+   "subagentsSpawned": 1,
+   "bugsFound": 3,
+   "bugsTotal": 3,
+   "exactHits": 3,
+   "falseAlarms": 1,
+   "controlsTotal": 1,
+   "missingVerdicts": 0,
+   "recall": 1,
+   "perFile": [
+    {
+     "file": "src/services/pricingService.js",
+     "truth": "bug",
+     "claimed": true,
+     "line": 36,
+     "correct": true
+    },
+    {
+     "file": "src/workers/reconciliationWorker.js",
+     "truth": "bug",
+     "claimed": true,
+     "line": 40,
+     "correct": true
+    },
+    {
+     "file": "src/models/cartTotals.js",
+     "truth": "bug",
+     "claimed": true,
+     "line": 6,
+     "correct": true
+    },
+    {
+     "file": "src/services/orderService.js",
+     "truth": "clean",
+     "claimed": true,
+     "line": 14,
+     "correct": false
+    }
+   ],
+   "wallMs": 181549,
+   "durationMs": 180486,
+   "costUsd": 0.2605483,
+   "turns": 6,
+   "billableTokens": 16178,
+   "contextTokens": 133225
+  },
+  {
+   "arm": "tool+subagent",
+   "trial": 4,
+   "ok": true,
+   "parsed": true,
+   "compliant": true,
+   "predictCalls": 4,
+   "subagentsSpawned": 1,
+   "bugsFound": 3,
+   "bugsTotal": 3,
+   "exactHits": 3,
+   "falseAlarms": 0,
+   "controlsTotal": 1,
+   "missingVerdicts": 0,
+   "recall": 1,
+   "perFile": [
+    {
+     "file": "src/services/pricingService.js",
+     "truth": "bug",
+     "claimed": true,
+     "line": 36,
+     "correct": true
+    },
+    {
+     "file": "src/workers/reconciliationWorker.js",
+     "truth": "bug",
+     "claimed": true,
+     "line": 40,
+     "correct": true
+    },
+    {
+     "file": "src/models/cartTotals.js",
+     "truth": "bug",
+     "claimed": true,
+     "line": 6,
+     "correct": true
+    },
+    {
+     "file": "src/services/orderService.js",
+     "truth": "clean",
+     "claimed": false,
+     "line": null,
+     "correct": true
+    }
+   ],
+   "wallMs": 130381,
+   "durationMs": 13440,
+   "costUsd": 0.24028719999999998,
+   "turns": 1,
+   "billableTokens": 10689,
+   "contextTokens": 192858
+  },
+  {
+   "arm": "tool+subagent",
+   "trial": 5,
+   "ok": true,
+   "parsed": true,
+   "compliant": true,
+   "predictCalls": 4,
+   "subagentsSpawned": 1,
+   "bugsFound": 3,
+   "bugsTotal": 3,
+   "exactHits": 3,
+   "falseAlarms": 1,
+   "controlsTotal": 1,
+   "missingVerdicts": 0,
+   "recall": 1,
+   "perFile": [
+    {
+     "file": "src/services/pricingService.js",
+     "truth": "bug",
+     "claimed": true,
+     "line": 36,
+     "correct": true
+    },
+    {
+     "file": "src/workers/reconciliationWorker.js",
+     "truth": "bug",
+     "claimed": true,
+     "line": 40,
+     "correct": true
+    },
+    {
+     "file": "src/models/cartTotals.js",
+     "truth": "bug",
+     "claimed": true,
+     "line": 6,
+     "correct": true
+    },
+    {
+     "file": "src/services/orderService.js",
+     "truth": "clean",
+     "claimed": true,
+     "line": 21,
+     "correct": false
+    }
+   ],
+   "wallMs": 140124,
+   "durationMs": 139159,
+   "costUsd": 0.20580629999999997,
+   "turns": 6,
+   "billableTokens": 10147,
+   "contextTokens": 116398
+  }
+ ]
+}

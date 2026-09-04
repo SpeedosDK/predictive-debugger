@@ -36,15 +36,47 @@ for (const tool of tools) {
     assert.ok(tool.description?.length > 40, `${tool.name} needs a real description`);
 }
 
-// The fix-verification rule ships with the server rather than living in each
+// Batching is the difference between a review of four files costing four
+// round trips of provider latency and costing one, so a schema that quietly
+// loses `files` is a performance regression no unit test would catch. Asserted
+// on the advertised schema rather than by calling the tool, which would need
+// the credentials CI does not have.
+const predict = tools.find((t) => t.name === "predict_failures");
+assert.ok(
+    predict.inputSchema?.properties?.files,
+    "predict_failures should accept a `files` batch"
+);
+assert.ok(
+    !predict.inputSchema.required?.includes("file"),
+    "`file` must be optional now that `files` can carry the request instead"
+);
+
+// The verification rule ships with the server rather than living in each
 // user's project instructions, so a client that never sees it is a regression
-// in the product, not a cosmetic one.
+// in the product, not a cosmetic one. Both halves are asserted: the rule
+// itself, and the routing that keeps it from sending every change to a
+// sub-agent, which is the half that decides whether the rule is affordable.
 const instructions = client.getInstructions();
 assert.ok(instructions, "server should advertise instructions");
 assert.match(
     instructions,
-    /reviewed from outside the context that produced it/,
-    "instructions should carry the fix-verification rule"
+    /checked from outside the context that wrote it/,
+    "instructions should carry the verification rule"
+);
+assert.match(
+    instructions,
+    /Which outside seat depends on how far the change reaches/,
+    "instructions should route between predict_failures and a sub-agent"
+);
+// The gate is file count and nothing softer. Every previous wording that added
+// a second, judgement-shaped condition ("a feature", "correctness depends on
+// what was asked for") was true of nearly all real work and turned the
+// expensive seat back into the default, so the narrow phrasing is the product
+// decision, not a stylistic one.
+assert.match(
+    instructions,
+    /File count is the test/,
+    "instructions should gate the sub-agent on file count, not on the kind of change"
 );
 
 const analyze = await client.callTool({
