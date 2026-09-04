@@ -29,64 +29,15 @@ const registry = new ProviderRegistry();
 
 /**
  * Advertised once at initialize, so a session pays for this prose one time
- * rather than per call, and a client that ignores the field pays nothing.
+ * rather than per call.
  *
- * The verification rule ships here rather than being left to the calling
- * agent's judgement because that judgement is the thing it corrects. An agent
- * that has just written code is the worst-placed reader of it: the reasoning
- * that made the code look right is still in its context, so a second look from
- * the same seat re-derives the first one instead of testing it. Leaving the
- * rule to each user's own project instructions means only the users who
- * already knew about the failure mode get the benefit.
- *
- * The trigger is "you pointed these tools at your own recent work", not "you
- * fixed a finding". The contamination argument never depended on the change
- * being a fix, and scoping it to fixes left out the case that needs it most:
- * new feature code, where a clean `predict_failures` reply reads as a
- * clearance and is not one. It stays anchored to an invocation of this server
- * so the rule cannot fire on work the tools were never shown.
- *
- * Routing exists because the two outside seats are not interchangeable and do
- * not cost the same. `predict_failures` is already a second model, but it
- * reads each file on its own; a sub-agent can be told what was being attempted
- * and can read across files, and pays to rebuild context. Sending every change
- * to the expensive seat is what gets a rule like this switched off, so the
- * cheap seat is the default and the sub-agent is kept for the checks the cheap
- * seat structurally cannot perform.
- *
- * File count is the gate because it is the only part of this that is checkable.
- * An earlier version also sent "anything whose correctness depends on what was
- * asked for" to the sub-agent, which sounds narrow and is not: every feature
- * exists to satisfy an ask, so the clause was true of essentially all
- * non-trivial work and quietly made the expensive seat the default for it.
- * Whether a change crosses a file boundary is a fact about the diff that an
- * agent cannot argue itself past, and it tracks the one thing the cheap seat
- * genuinely cannot do -- see whether two files still agree.
- *
- * That the sub-agent earns its cost is still an argument rather than a result.
- * The benchmark measures review of code the reviewer did not write, which is
- * the one setting where the contamination this rule exists to correct cannot
- * occur, so it can price the sub-agent but not value it. Until that changes,
- * the trigger is kept as narrow as the argument supports.
- *
- * The batching clause is here because measurement put the wall-clock cost
- * somewhere other than where this comment used to assume. It read the
- * sub-agent as the thing that made a review slow; the benchmark found the
- * opposite. A sub-agent arm ran at about the wall-clock of an agent reading
- * the same files, while the tool arm ran several times longer -- not because
- * a verdict is slow, but because an agent asked for one file at a time and
- * paid the provider's latency once per file, in series. `files` collapses
- * that back to a single wait, which is worth more than any advice about when
- * to spawn.
- *
- * The background clause is about wall-clock, not tokens, and survives that
- * correction: a blocking sub-agent still adds its wait to the turn a user is
- * watching. The review is a second opinion on work already done rather than a
- * gate, so nothing downstream needs to wait.
- *
- * It is a floor, not a ceiling. "At minimum" leaves the agent free to verify
- * more often than the rule requires, and the mechanical-fix exemption is what
- * stops it from doubling the cost of correcting a typo.
+ * Ships here rather than being left to the calling agent's judgement because
+ * that judgement is the thing it corrects: an agent that just wrote the code
+ * is the worst-placed reader of it, since the reasoning that made it look
+ * right is still in its context. The routing below (file count, not "is this
+ * a fix" or "is this a feature") is deliberately narrower than earlier
+ * drafts -- see CHANGELOG.md 0.6.0 for why, including the honest caveat that
+ * the sub-agent's payoff is still an argument, not a measured result.
  */
 const INSTRUCTIONS = [
     "Deterministic tools first: scan_project and analyze_file cost nothing and answer most " +
@@ -128,19 +79,9 @@ const server = new McpServer(
 );
 
 /**
- * Serialise a reply, compactly.
- *
- * The reader is a model, and every space and newline in the indentation is
- * billed to it. Two-space indent cost 46 of the 161 tokens in a typical
- * `predict_failures` reply -- 29% of the response, spent entirely on making the
- * raw transcript pleasant for a human who is not the audience. Pretty-printing
- * an array is the worst of it: `checked` puts each pattern id on its own
- * indented line, which is most of what the coverage field appeared to cost when
- * it was added.
- *
- * This is the whole point of the tool. It is worth calling instead of reading
- * the file only while the answer is much smaller than the file, so the
- * response budget is the product, not a detail of it.
+ * Serialise a reply, compactly -- not pretty-printed. The reader is a model,
+ * and a two-space indent cost 46 of the 161 tokens in a typical
+ * `predict_failures` reply, 29% spent on formatting nobody reads.
  */
 function json(value: unknown) {
     return { content: [{ type: "text" as const, text: JSON.stringify(value) }] };
@@ -158,10 +99,7 @@ function failure(message: string) {
     };
 }
 
-/* ------------------------------------------------------------------ *
- * Deterministic tools: no model call, no credentials, milliseconds.
- * These are the ones a reviewing agent should reach for.
- * ------------------------------------------------------------------ */
+/* ---- Deterministic tools: no model call, no credentials, milliseconds. ---- */
 
 server.registerTool(
     "analyze_file",
@@ -225,12 +163,8 @@ server.registerTool(
         try {
             const root = path.resolve(directory);
             const walked = await collectSourceFiles(root);
-            // Filtered here rather than inside the walker so that the walker
-            // keeps one behaviour for both surfaces: the VS Code project run
-            // still covers tests, where a human asked for the whole workspace
-            // and is not paying per file read. Only this ranking, which exists
-            // to spend an agent's reading budget, opts out. One walk either
-            // way, so the count below is exact rather than a second pass.
+            // Filtered here, not in the walker: the VS Code project-wide
+            // command still covers tests, and only this ranking opts out.
             const files = includeTests
                 ? walked
                 : walked.filter((file) => !isTestFile(path.relative(root, file)));
@@ -308,52 +242,31 @@ server.registerTool(
     }
 );
 
-/* ------------------------------------------------------------------ *
- * Model-backed tool. Spawns the Claude/Codex/Copilot CLI, so it is slow and
- * billed. An agent calling this is asking a second model to do work it
- * could do itself — hence the explicit "only if" in the description.
- * ------------------------------------------------------------------ */
+/* ---- Model-backed tool: spawns a CLI, slow and billed. ---- */
 
 /**
- * The per-file body of a `predict_failures` reply.
- *
- * Shared by the single-file and batch shapes so the two cannot drift. Whatever
- * a caller learns about one file, it learns in the same fields whether it asked
- * about one file or ten — the only difference between the shapes is that a
- * batch nests these under `results` and hoists the advice that is identical for
- * every entry.
+ * The per-file body of a `predict_failures` reply, shared by the single-file
+ * and batch shapes so the two cannot drift.
  */
 function predictionBody(
     file: string,
     result: FilePrediction,
     options: { verbose?: boolean; logFile?: string }
 ) {
-    // The point of this tool is to cost the caller less context than
-    // reading the file would. Measured on bench/corpus, the verdict is
-    // about a fifth of the response: the rest was the metric block, a
-    // log stanza saying log analysis was not requested, and the absolute
-    // path the caller had just supplied. All three are now opt-in, which
-    // moves the break-even point down to files of roughly 70 tokens.
+    // Verbose fields are opt-in: the verdict alone is ~70 tokens, a fifth of
+    // the old always-on reply. See bench/RESULTS.md section 1.
     const { findings, truncated, checked } = result.ai;
     const [top, ...rest] = findings;
 
     return {
-        // Echoed as given rather than resolved: shorter, and the caller
-        // already knows which file it asked about.
-        file,
-        // The top finding stays at the top level whatever the mode. A
-        // caller that asked one question gets one answer, and the array
-        // is there for the caller that asked for the list.
+        file, // echoed as given, not resolved -- the caller already knows the path
         pattern: top.pattern,
         score: top.score,
         line: top.line ?? null,
         reason: top.reason,
         status: assessmentStatus(result.ai),
         actionable: isActionablePrediction(top),
-        // Emitted when there is more than one finding even if `multi`
-        // was not set: a model that volunteers a second demonstrable
-        // defect has done work, and dropping it silently would be the
-        // one-per-file behaviour this replaced.
+        // A second demonstrable finding is dropped only if this is omitted.
         ...(rest.length > 0
             ? {
                   findings: findings.map((finding) => ({
@@ -366,10 +279,8 @@ function predictionBody(
                   }))
               }
             : {}),
-        // Always present, and empty when the model named nothing:
-        // being able to see that coverage was not reported is the
-        // point of the field, so hiding it behind `verbose` would
-        // defeat it.
+        // Always present, even empty: an empty list is itself the signal that
+        // no coverage was reported, and `verbose` would hide that.
         checked: checked ?? [],
         combinedScore: round(result.combinedScore),
         staticRisk: round(result.riskScore),
@@ -380,22 +291,11 @@ function predictionBody(
 }
 
 /**
- * The verification rule restated on the wire, in one line.
- *
- * `instructions` is advertised once at initialize and not every client forwards
- * it to the model, whereas a tool result always reaches it -- and this is the
- * turn where the rule applies.
- *
- * Emitted on every reply rather than gated on the precision gate. That gate was
- * the wrong shape: a clean reply on code the agent just wrote is the turn where
- * the rule matters most and is least likely to be remembered, because "no
- * findings" reads as a clearance. It is a file-local one only -- this tool
- * never saw what the code was meant to do. The wording forks so neither case
- * pays for the other's advice.
- *
- * A batch resolves the fork across the whole set rather than per file, because
- * it is hoisted out of `results`: one actionable finding anywhere in a change
- * set is enough to make the fix wording the right advice for the change set.
+ * The verification rule restated on the wire: `instructions` is sent once at
+ * initialize and not every client forwards it to the model, but a tool result
+ * always reaches it. Always present, not gated on the precision gate -- a
+ * clean reply on code the agent just wrote is the turn this matters most and
+ * is least likely to be remembered as needing it.
  */
 function reviewHint(results: FilePrediction[]): string {
     return results.some((result) => actionableFindings(result.ai).length > 0)
@@ -488,21 +388,15 @@ server.registerTool(
         }
     },
     async ({ file, files, concurrency, provider, model, logFile, verbose, calleeContext, multi }) => {
-        // `files` supersedes `file` so a caller migrating from one to the other
-        // cannot accidentally pay for the same file twice, and duplicates
-        // within a batch collapse for the same reason: each entry is a billed
-        // model call, and asking the same question twice in one call is never
-        // what was meant.
         const batched = Boolean(files && files.length > 0);
         const requested = batched ? files! : file ? [file] : [];
         if (requested.length === 0) {
             return failure("predict_failures needs either `file` or a non-empty `files` array.");
         }
 
-        // Resolved for the provider, echoed as given. Keeping both directions
-        // means the reply names files the way the caller named them even though
-        // deduplication happens on the resolved form, where "./a.js" and the
-        // absolute path to the same file are visibly one file.
+        // Deduplicated on the resolved path, keyed back to what the caller
+        // wrote, so "./a.js" and its absolute form don't get billed twice but
+        // the reply still echoes the path as given.
         const givenFor = new Map<string, string>();
         for (const entry of requested) {
             const resolved = path.resolve(entry);
@@ -523,15 +417,10 @@ server.registerTool(
                 logs: logFile ? { logPath: path.resolve(logFile) } : undefined
             };
 
-            // `file` keeps the flat reply it has always had. Wrapping a single
-            // verdict in a one-element array to make the shapes uniform would
-            // cost every existing caller a rewrite and every future one an
-            // extra indirection, to buy nothing.
-            //
-            // The fork is on which parameter was used, not on how many targets
-            // survived deduplication. A caller knows what it passed; it should
-            // not have to reason about whether its paths collapsed to one to
-            // know whether the reply has a `results` array.
+            // Forks on which parameter was used, not on how many targets
+            // survived deduplication -- a caller shouldn't have to guess
+            // whether its paths collapsed to know the reply's shape. `file`
+            // keeps the flat reply it always had.
             if (!batched) {
                 const result = await predictFile(targets[0], options);
                 return json({
@@ -553,14 +442,8 @@ server.registerTool(
                         logFile
                     })
                 ),
-                // Hoisted: identical for every entry, and repeating it per file
-                // would make the advice a per-file cost that scales with the
-                // batch while saying the same thing each time.
-                review: reviewHint(results),
+                review: reviewHint(results), // hoisted: identical for every entry
                 viaProvider: active.provider.id,
-                // Only present when something went wrong. A batch where every
-                // file succeeded should not spend tokens on an empty array
-                // proving it.
                 ...(failures.length > 0
                     ? {
                           failures: failures.map((entry) => ({

@@ -2,13 +2,10 @@ import { FilePrediction } from "../types";
 import { predictFile, PredictOptions } from "./predictFile";
 
 /**
- * How many provider calls may be in flight at once when no caller says.
- *
- * Each unit of concurrency is a CLI subprocess with a model call behind it, so
- * the ceiling is set by the provider's rate limit rather than by local CPU:
- * four is high enough that a typical review batch finishes in roughly one call's
- * time, and low enough that a batch does not read as a burst. Callers that know
- * their own limits should pass `concurrency` instead of relying on this.
+ * Default provider calls in flight at once. Each unit is a CLI subprocess
+ * hitting a rate limit, not local CPU -- four clears a typical batch in about
+ * one call's time without reading as a burst. Callers who know their own
+ * limits should pass `concurrency` instead.
  */
 export const DEFAULT_CONCURRENCY = 4;
 
@@ -27,23 +24,15 @@ export interface PredictFilesResult {
 
 /**
  * Predict several files at once, with a bounded number of provider calls in
- * flight.
+ * flight. The calls are independent -- one file's verdict never informs
+ * another's -- so the previous one-at-a-time version bought nothing but wall
+ * clock: see bench/RESULTS.md for the measured cost of that.
  *
- * The serial version of this was the tool's wall-clock cost. A verdict is
- * 5-15 seconds of a subprocess waiting on a model, so a four-file review spent
- * a minute doing nothing but waiting, four times in a row; the benchmark
- * measured the tool arm at roughly three times the wall-clock of an agent that
- * simply read the same files, entirely from that. The calls are independent —
- * one file's verdict never informs another's — so the serialisation bought
- * nothing.
- *
- * Ordering is restored before returning. A pool finishes out of order by
- * nature, and a caller that passed `[a, b, c]` should not have to re-match
- * replies to requests, so each slot writes into a fixed index and the array is
- * compacted at the end. `failures` is kept separate rather than being folded in
- * as a result with an error field: one unreadable file or CLI hiccup must not
- * discard the work already done on the others, and a caller iterating results
- * should not have to test each one for whether it is really a result.
+ * Ordering is restored before returning, since a pool finishes out of order
+ * and a caller passing `[a, b, c]` shouldn't have to re-match replies to
+ * requests. `failures` is kept separate from `results` rather than folded in
+ * with an error field, so one bad file doesn't force every caller to check
+ * which kind of thing it got back.
  */
 export async function predictFiles(
     filePaths: string[],

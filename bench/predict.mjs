@@ -25,13 +25,9 @@ if (targets.length === 0) {
 }
 const resolved = targets.map((target) => path.resolve(target));
 
-// Compliance log for bench/measure-agents.mjs. An arm that is supposed to call
-// the tool and quietly does not would otherwise be scored as if it had, and the
-// arm that matters most -- tool plus sub-agent -- is exactly the one with the
-// most instructions to drop. Writing the marker here rather than parsing the
-// transcript makes the check independent of how the agent reports its own work.
-// One line per file even when batched, so a batched call is indistinguishable
-// from N single calls to anything reading the log.
+// Compliance log for bench/measure-agents.mjs: proof the tool was actually
+// called, independent of how the agent reports its own work. One line per
+// file even when batched, so this can't be told apart from N single calls.
 if (process.env.BENCH_PREDICT_LOG) {
     fs.appendFileSync(
         process.env.BENCH_PREDICT_LOG,

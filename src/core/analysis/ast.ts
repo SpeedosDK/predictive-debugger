@@ -1,5 +1,8 @@
 import { FileMetrics } from "../types";
 
+/** The parser's own options type, reached without a static ESM import. */
+type ParseOptions = Parameters<Awaited<ReturnType<typeof loadBabel>>["parse"]>[1];
+
 /**
  * @babel/parser and @babel/traverse are ESM-only from v8, and both the
  * extension host and the MCP server load us as CommonJS — so they have to come
@@ -8,9 +11,6 @@ import { FileMetrics } from "../types";
  * Exported because `callees.ts` needs the same pair, and the import has to be
  * dynamic there for the same reason.
  */
-/** The parser's own options type, reached without a static ESM import. */
-type ParseOptions = Parameters<Awaited<ReturnType<typeof loadBabel>>["parse"]>[1];
-
 export async function loadBabel() {
     const [parser, traverseModule] = await Promise.all([
         import("@babel/parser"),

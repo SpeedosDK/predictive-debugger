@@ -17,9 +17,9 @@ export async function predictProject(
 ): Promise<ProjectPrediction> {
     const files = (await collectSourceFiles(root)).slice(0, options.maxFiles ?? 25);
 
-    // Files are independent, so this is a pool rather than a loop. Note that
-    // `onProgress` now reports starts, which no longer arrive in index order:
-    // a progress UI should count them, not treat the index as a position.
+    // `onProgress` now fires when a file starts, not when it finishes -- with
+    // concurrency > 1, several files are in flight between one report and the
+    // next, so seeing index N does not mean N are done.
     const { results, failures } = await predictFiles(files, options);
 
     return {
