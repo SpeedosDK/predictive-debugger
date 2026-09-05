@@ -2,8 +2,7 @@
  * Builds the TypeScript benchmark corpus.
  *
  * Kept separate from the JavaScript corpus on purpose. Mixing them would move
- * every number in the report at once, and the whole point of `baseline.json` is
- * that a JavaScript figure from last week is comparable to one from today. With
+ * both language measurements at once. With
  * two corpora we can ask whether a prompt change helped TypeScript without
  * hiding what it did to JavaScript.
  *

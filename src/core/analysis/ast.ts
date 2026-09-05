@@ -89,7 +89,7 @@ export async function collectMetrics(code: string): Promise<FileMetrics> {
             metrics.branches++;
             metrics.cyclomatic++;
         },
-        "ForStatement|ForOfStatement|ForInStatement|WhileStatement"(path: any) {
+        "ForStatement|ForOfStatement|ForInStatement|WhileStatement|DoWhileStatement"(path: any) {
             metrics.cyclomatic++;
             if (
                 path.findParent(
@@ -97,7 +97,8 @@ export async function collectMetrics(code: string): Promise<FileMetrics> {
                         parent.isForStatement() ||
                         parent.isForOfStatement() ||
                         parent.isForInStatement() ||
-                        parent.isWhileStatement()
+                        parent.isWhileStatement() ||
+                        parent.isDoWhileStatement()
                 )
             ) {
                 metrics.nestedLoops++;

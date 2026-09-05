@@ -20,7 +20,7 @@ export interface StaticAnalysis {
     /**
      * Heuristic risk per unit of code, in [0, 1]. Independent of file length,
      * so it ranks a dense 20-line file above a long but plain one. This is the
-     * ordering `scan_project` uses; see bench/RESULTS.md section 5.
+     * ordering `scan_project` uses; see CHANGELOG.md for the original ranking measurements.
      */
     riskDensity: number;
     /** Human-readable notes about what drove the score. */

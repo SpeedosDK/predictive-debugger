@@ -45,7 +45,7 @@ jobs:
         run: npm run compile
 
       - name: Test
-        run: node --test "out/test/**/*.test.js"
+        run: node --test "out/test/**/*.test.js" "bench/*.test.mjs"
 
       - name: Bundle
         run: npm run bundle

@@ -18,6 +18,7 @@ esbuild.mjs
 tsconfig.json
 examples/
 bench/
+.tmp/
 .github/
 .vscode/
 .idea/

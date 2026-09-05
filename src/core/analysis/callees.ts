@@ -1,6 +1,7 @@
 import fs from "fs/promises";
 import path from "path";
 import { loadBabel, PARSE_OPTIONS } from "./ast";
+import { loadPathAliases } from "./modulePaths";
 
 /**
  * One imported function the analysed file calls, with the source of its
@@ -60,6 +61,7 @@ interface ImportBinding {
     source: string;
     /** The name exported by that module, or "default", or "*" for a namespace. */
     imported: string;
+    member?: string;
 }
 
 interface CallSite {
@@ -68,15 +70,14 @@ interface CallSite {
     /** For `ns.foo()` on a namespace import, the member being called. */
     member?: string;
     order: number;
+    typeOnly?: boolean;
 }
 
 /**
- * Resolve, one hop, the definitions of imported functions `code` calls.
+ * Resolve imported calls and referenced type contracts within a fixed context budget.
  *
- * Deliberately not transitive: one hop covers "the callee already handles this"
- * dismissals, which is the class of false positive this addresses, and each
- * further hop multiplies both the token cost and the chance of burying the file
- * actually under review.
+ * Follows at most four files through explicit re-exports, without following
+ * calls inside dependencies. Cycles and large dependencies yield less context.
  *
  * Never throws. An unresolvable import, an unreadable file, or a syntax error
  * in a dependency yields fewer callees, not a failed prediction — this is
@@ -101,38 +102,55 @@ export async function collectCalleeContext(
 
     const wanted = rankCallees(imports, calls);
     const dir = path.dirname(path.resolve(filePath));
-    const sourceCache = new Map<string, string | undefined>();
+    const definitionCache = new Map<string, Awaited<ReturnType<typeof readExportedDefinitions>>>();
+    const resolutionCache = new Map<string, string | undefined>();
+    const aliases = await loadPathAliases(dir);
     const collected: CalleeContext[] = [];
+    const resolve = async (fromDir: string, specifier: string) => {
+        const key = `${fromDir}\0${specifier}`;
+        if (!resolutionCache.has(key)) {
+            let resolved: string | undefined;
+            const candidates = specifier.startsWith(".")
+                ? [path.resolve(fromDir, specifier)] : aliases(specifier);
+            for (const candidate of candidates) {
+                if (candidate.split(path.sep).includes("node_modules")) continue;
+                resolved = await resolveModule(path.dirname(candidate), `./${path.basename(candidate)}`);
+                if (resolved) break;
+            }
+            resolutionCache.set(key, resolved);
+        }
+        return resolutionCache.get(key);
+    };
+    const definitionFor = async (
+        fromDir: string, binding: ImportBinding, name: string, seen = new Set<string>()
+    ): Promise<{ source: string; file: string } | undefined> => {
+        const resolved = await resolve(fromDir, binding.source);
+        if (!resolved || resolved === path.resolve(filePath) || seen.has(resolved) || seen.size >= 4) return undefined;
+        seen.add(resolved);
+        if (!definitionCache.has(resolved)) {
+            if (definitionCache.size >= 24) return undefined;
+            const dependency = await fs.stat(resolved).then(stat => stat.size <= 4 * 1024 * 1024
+                ? fs.readFile(resolved, "utf8") : undefined).catch(() => undefined);
+            definitionCache.set(resolved, dependency === undefined ? undefined : await readExportedDefinitions(dependency));
+        }
+        const definition = definitionCache.get(resolved)?.(binding.imported, name, binding.member);
+        if (typeof definition === "string") return { source: definition, file: resolved };
+        if (definition) return definitionFor(path.dirname(resolved), { ...definition, member: binding.member }, name, seen);
+        return undefined;
+    };
+    const totalBudget = Math.min(MAX_TOTAL_CALLEE_CHARS, Math.max(1_000, code.length));
     let spent = 0;
 
     for (const { name, binding } of wanted) {
-        if (collected.length >= MAX_CALLEES || spent >= MAX_TOTAL_CALLEE_CHARS) {
+        if (collected.length >= MAX_CALLEES || spent >= totalBudget) {
             break;
         }
 
-        const resolved = await resolveModule(dir, binding.source);
-        // A bare specifier resolves to nothing on purpose: `node_modules` is
-        // both enormous and, being third-party, the one place where "the
-        // callee already handles this" is a documented contract rather than
-        // something to read off the source.
-        if (!resolved || resolved === path.resolve(filePath)) {
-            continue;
-        }
+        const resolved = await definitionFor(dir, binding, name);
+        if (!resolved) continue;
+        const definition = resolved.source;
 
-        if (!sourceCache.has(resolved)) {
-            sourceCache.set(resolved, await fs.readFile(resolved, "utf8").catch(() => undefined));
-        }
-        const dependency = sourceCache.get(resolved);
-        if (dependency === undefined) {
-            continue;
-        }
-
-        const definition = await findExportedDefinition(dependency, binding.imported, name);
-        if (!definition) {
-            continue;
-        }
-
-        const budget = Math.min(MAX_CALLEE_CHARS, MAX_TOTAL_CALLEE_CHARS - spent);
+        const budget = Math.min(MAX_CALLEE_CHARS, totalBudget - spent);
         // A cut so short it cannot even show the signature is worse than no
         // entry at all: it spends tokens to tell the model nothing.
         if (budget < 120) {
@@ -140,12 +158,12 @@ export async function collectCalleeContext(
         }
 
         const excerpted = definition.length > budget;
-        const source = excerpted ? `${cutAtLineBoundary(definition, budget)}\n  /* … */` : definition;
+        const source = excerpted ? `${cutAtLineBoundary(definition, budget - 12)}\n  /* … */` : definition;
 
         spent += source.length;
         collected.push({
             name,
-            from: relativeSpecifier(dir, resolved),
+            from: relativeSpecifier(dir, resolved.file),
             source,
             ...(excerpted ? { excerpted: true } : {})
         });
@@ -172,12 +190,6 @@ async function readCallGraph(
                 return;
             }
             for (const specifier of path.node.specifiers) {
-                // A type-only import cannot be called at runtime, so resolving
-                // it would spend the budget on something the verdict can never
-                // turn on.
-                if (path.node.importKind === "type" || specifier.importKind === "type") {
-                    continue;
-                }
                 const local = specifier.local.name;
                 if (specifier.type === "ImportDefaultSpecifier") {
                     imports.set(local, { source, imported: "default" });
@@ -192,12 +204,30 @@ async function readCallGraph(
                 }
             }
         },
-        CallExpression(path: any) {
+        TSTypeReference(path: any) {
+            const name = path.node.typeName;
+            if (name.type !== "Identifier") return;
+            if (path.findParent((parent: any) =>
+                parent.node.typeParameters?.params?.some((parameter: any) => (parameter.name?.name ?? parameter.name) === name.name) ||
+                (parent.isBlockStatement() && parent.node.body.some((node: any) =>
+                    (node.type === "TSTypeAliasDeclaration" || node.type === "TSInterfaceDeclaration") && node.id.name === name.name)))) return;
+            const binding = path.scope.getBinding(name.name);
+            if (!binding || !binding.path.parentPath?.isImportDeclaration()) return;
+            calls.push({ local: name.name, order: order++, typeOnly: true });
+        },
+        "CallExpression|OptionalCallExpression"(path: any) {
             const callee = path.node.callee;
+            const local = callee.type === "Identifier" ? callee.name
+                : (callee.type === "MemberExpression" || callee.type === "OptionalMemberExpression") && callee.object.type === "Identifier"
+                    ? callee.object.name : undefined;
+            const binding = local ? path.scope.getBinding(local) : undefined;
+            if (!binding || !binding.path.parentPath?.isImportDeclaration()) {
+                return;
+            }
             if (callee.type === "Identifier") {
                 calls.push({ local: callee.name, order: order++ });
             } else if (
-                callee.type === "MemberExpression" &&
+                (callee.type === "MemberExpression" || callee.type === "OptionalMemberExpression") &&
                 !callee.computed &&
                 callee.object.type === "Identifier" &&
                 callee.property.type === "Identifier"
@@ -244,14 +274,8 @@ function rankCallees(
             continue;
         }
 
-        // `client.get()` where `client` is an imported object is a method on a
-        // value, not the imported function itself — the definition we would
-        // find is the object, which is not what was called.
-        if (call.member) {
-            continue;
-        }
-
-        record(counts, call.local, binding, call.order);
+        record(counts, call.member ? `${call.local}.${call.member}` : call.local,
+            { ...binding, member: call.member }, call.typeOnly ? calls.length + call.order : call.order);
     }
 
     return [...counts.values()]
@@ -313,17 +337,15 @@ async function isFile(candidate: string): Promise<boolean> {
 }
 
 /**
- * Pull the source of one exported binding out of a dependency.
+ * Index a dependency once and return a lookup for its exported source.
  *
  * Follows `export { local as exported }` back to the local declaration, because
  * a barrel-style re-export inside the same file is bookkeeping, not a second
- * hop. It does not follow `export { x } from "./y"`, which is one.
+ * hop. External aliases are returned for bounded resolution by the caller.
  */
-async function findExportedDefinition(
-    code: string,
-    imported: string,
-    callName: string
-): Promise<string | undefined> {
+async function readExportedDefinitions(
+    code: string
+): Promise<((imported: string, callName: string, member?: string) => string | ImportBinding | undefined) | undefined> {
     let ast: any;
     try {
         const { parse } = await loadBabel();
@@ -334,6 +356,8 @@ async function findExportedDefinition(
 
     const declarations = new Map<string, { start: number; end: number; prefix: string }>();
     const aliases = new Map<string, string>();
+    const reexports = new Map<string, ImportBinding>();
+    const nodes = new Map<string, any>();
     let defaultRange: { start: number; end: number; prefix: string } | undefined;
 
     const collect = (node: any, exportedNames: Set<string>): void => {
@@ -343,9 +367,11 @@ async function findExportedDefinition(
         if (
             node.type === "FunctionDeclaration" ||
             node.type === "ClassDeclaration" ||
-            node.type === "TSDeclareFunction"
+            node.type === "TSDeclareFunction" ||
+            node.type === "TSInterfaceDeclaration" || node.type === "TSTypeAliasDeclaration"
         ) {
             if (node.id?.name) {
+                nodes.set(node.id.name, node);
                 declarations.set(node.id.name, { start: node.start, end: node.end, prefix: "" });
                 exportedNames.add(node.id.name);
             }
@@ -354,6 +380,7 @@ async function findExportedDefinition(
         if (node.type === "VariableDeclaration") {
             for (const declarator of node.declarations) {
                 if (declarator.id?.type === "Identifier") {
+                    nodes.set(declarator.id.name, declarator.init);
                     declarations.set(declarator.id.name, {
                         start: declarator.start,
                         end: declarator.end,
@@ -373,9 +400,14 @@ async function findExportedDefinition(
             if (node.declaration) {
                 collect(node.declaration, exported);
             }
-            // `export { a } from "./b"` is a second hop; only the local form
-            // resolves here.
-            if (!node.source) {
+            if (node.source) {
+                for (const specifier of node.specifiers) {
+                    if (specifier.type === "ExportSpecifier") {
+                        reexports.set(specifier.exported.name ?? specifier.exported.value,
+                            { source: node.source.value, imported: specifier.local.name ?? specifier.local.value });
+                    }
+                }
+            } else {
                 for (const specifier of node.specifiers) {
                     if (specifier.type === "ExportSpecifier") {
                         const name =
@@ -405,7 +437,7 @@ async function findExportedDefinition(
                 defaultRange = {
                     start: declaration.start,
                     end: declaration.end,
-                    prefix: `const ${callName} = `
+                    prefix: ""
                 };
             }
             continue;
@@ -413,22 +445,32 @@ async function findExportedDefinition(
         collect(node, new Set());
     }
 
-    if (imported === "default") {
-        // `export default function foo()` is exported by construction, so the
-        // `exported` check below does not apply to this branch.
-        const aliased = aliases.get("default");
-        const range = aliased ? declarations.get(aliased) : defaultRange;
-        return range ? slice(code, range) : undefined;
-    }
-
-    const local = aliases.get(imported) ?? imported;
-    const range = declarations.get(local);
-    // Only report what the module actually exports: a name that matches a
-    // private helper is a coincidence, and showing it would be misleading.
-    if (!range || (!exported.has(local) && !aliases.has(imported))) {
-        return undefined;
-    }
-    return slice(code, range);
+    return (imported, callName, member) => {
+        if (reexports.has(imported)) return reexports.get(imported);
+        if (member) {
+            const local = aliases.get(imported) ?? imported;
+            const node = nodes.get(local);
+            const members = node?.type === "ObjectExpression" ? node.properties :
+                node?.type === "ClassDeclaration" ? node.body.body.filter((entry: any) => entry.static) : [];
+            if (!members.some((entry: any) => !entry.computed &&
+                (entry.key?.name ?? entry.key?.value) === member)) return undefined;
+        }
+        if (imported === "default") {
+            const aliased = aliases.get("default");
+            const range = aliased ? declarations.get(aliased) : defaultRange;
+            if (!range) {
+                return undefined;
+            }
+            const prefix = aliased ? "" : `const ${callName} = `;
+            return `${prefix}${slice(code, range)}`;
+        }
+        const local = aliases.get(imported) ?? imported;
+        const range = declarations.get(local);
+        if (!range || (!exported.has(local) && !aliases.has(imported))) {
+            return undefined;
+        }
+        return slice(code, range);
+    };
 }
 
 function slice(code: string, range: { start: number; end: number; prefix: string }): string {

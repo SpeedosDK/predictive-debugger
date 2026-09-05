@@ -1,5 +1,5 @@
 import { FilePrediction } from "../types";
-import { predictFile, PredictOptions } from "./predictFile";
+import { createFilePredictor, PredictOptions } from "./predictFile";
 
 /**
  * Default provider calls in flight at once. Each unit is a CLI subprocess
@@ -26,7 +26,7 @@ export interface PredictFilesResult {
  * Predict several files at once, with a bounded number of provider calls in
  * flight. The calls are independent -- one file's verdict never informs
  * another's -- so the previous one-at-a-time version bought nothing but wall
- * clock: see bench/RESULTS.md for the measured cost of that.
+ * clock; historical measurements are recorded in CHANGELOG.md.
  *
  * Ordering is restored before returning, since a pool finishes out of order
  * and a caller passing `[a, b, c]` shouldn't have to re-match replies to
@@ -38,6 +38,7 @@ export async function predictFiles(
     filePaths: string[],
     options: PredictFilesOptions
 ): Promise<PredictFilesResult> {
+    const predict = createFilePredictor(options);
     const total = filePaths.length;
     const slots: Array<FilePrediction | { reason: string } | undefined> = new Array(total);
     const limit = Math.max(1, Math.min(options.concurrency ?? DEFAULT_CONCURRENCY, total));
@@ -59,7 +60,7 @@ export async function predictFiles(
             options.onProgress?.(file, index, total);
 
             try {
-                slots[index] = await predictFile(file, options);
+                slots[index] = await predict(file);
             } catch (err) {
                 slots[index] = { reason: err instanceof Error ? err.message : String(err) };
             }
