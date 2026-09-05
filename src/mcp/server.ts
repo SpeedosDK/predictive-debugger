@@ -180,7 +180,7 @@ server.registerTool(
 
             // Ranked by density rather than by the size-driven total: the agent
             // pays per token, so "most risk per line read" is the ordering that
-            // spends its budget best. See bench/RESULTS.md section 5.
+            // spends its budget best. See CHANGELOG.md for the original ranking measurements.
             const ranked = analyses
                 .filter((entry): entry is Awaited<ReturnType<typeof analyzeFile>> => "riskScore" in entry)
                 .sort((a, b) => b.riskDensity - a.riskDensity)
@@ -254,7 +254,7 @@ function predictionBody(
     options: { verbose?: boolean; logFile?: string }
 ) {
     // Verbose fields are opt-in: the verdict alone is ~70 tokens, a fifth of
-    // the old always-on reply. See bench/RESULTS.md section 1.
+    // the old always-on reply. See CHANGELOG.md for the original response-size measurements.
     const { findings, truncated, checked } = result.ai;
     const [top, ...rest] = findings;
 
@@ -361,10 +361,9 @@ server.registerTool(
                 .boolean()
                 .optional()
                 .describe(
-                    "Also send the definitions of imported functions the file calls, one " +
-                        "level deep, so the model can see whether a callee already handles " +
-                        "the case it is about to flag (default true). Turning this off is " +
-                        "cheaper per call and measurably less accurate."
+                    "Also send bounded imported definitions and referenced type contracts " +
+                        "so the model can check dependency behavior (default true). " +
+                        "Turning this off reduces input tokens but removes that evidence."
                 ),
             multi: z
                 .boolean()

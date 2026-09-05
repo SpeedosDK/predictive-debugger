@@ -17,6 +17,7 @@ node_modules/**
 # --- Repo tooling and fixtures ----------------------------------------------
 examples/**
 bench/**
+.tmp/**
 .github/**
 .vscode/**
 .gitignore

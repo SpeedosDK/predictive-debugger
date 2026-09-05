@@ -17,6 +17,27 @@ after(async () => {
 });
 
 describe("predictFiles", () => {
+    it("runs the log analyzer once per batch and refreshes it for the next", async () => {
+        const files = await write(["log-a.js", "log-b.js", "log-c.js"]);
+        const counter = path.join(dir, "analyzer-calls.txt");
+        const script = path.join(dir, "analyzer.cjs");
+        const logPath = path.join(dir, "app.log");
+        await fs.writeFile(logPath, "ERROR example");
+        await fs.writeFile(script, `require('fs').appendFileSync(${JSON.stringify(counter)}, 'x'); console.log(JSON.stringify({anomaly_count: 1, anomalies: [{line: 1, text: 'example', score: 1}]}));`);
+        const options = { ...base(fakeProvider({ delayFor: () => 1 })),
+            logs: { logPath, scriptPath: script, pythonPath: process.execPath } };
+        const first = await predictFiles(files, options);
+        assert.equal(first.failures.length, 0);
+        assert.equal(first.results.length, 3);
+        assert.ok(first.results.every(r => r.logs.anomalyCount === 1));
+        assert.equal(await fs.readFile(counter, "utf8"), "x");
+        await predictFiles(files, options);
+        assert.equal(await fs.readFile(counter, "utf8"), "xx");
+        await predictFiles([], options);
+        await predictFiles(files, { ...options, signal: AbortSignal.abort() });
+        assert.equal(await fs.readFile(counter, "utf8"), "xx");
+    });
+
     it("returns results in the order the paths were given, not completion order", async () => {
         // Reversed delays, so completion order is the exact opposite of input
         // order. If the pool ever returns results as they land, this fails.

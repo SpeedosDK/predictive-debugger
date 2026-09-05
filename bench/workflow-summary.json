@@ -1,0 +1,127 @@
+{
+  "completedAt": "2026-09-05T20:17:00.897Z",
+  "configHash": "fce52c56f0f66897b714aa1cbe74872b00a4f7c7711014be7e252aa0d60c3b61",
+  "baseline": {
+    "revision": "1f77c3260bf2b59d579e75d7cdea0f67aca08503",
+    "version": "0.6.0",
+    "label": "v0.6 baseline (master)"
+  },
+  "candidate": {
+    "label": "v0.7 candidate",
+    "note": "Unreleased working build, identified by bundle hash."
+  },
+  "bundles": {
+    "previous": "7a330fa033aac965d2dfed164d76672bfb34bf0b3a5a72ee924c1c4f1f71e50b",
+    "current": "da8122346940d48bc9a4d6ced87c60c774e847aeed7bda360e0bb16b07ded007"
+  },
+  "reusedBaselines": {
+    "file": "bench/results-v06-v07.json",
+    "sha256": "f6ac731fdd81fb7d769a0a368d92de0c4aeb475155edfa98d46e780ff78b0798",
+    "completedAt": "2026-09-05T20:04:39.141Z",
+    "note": "Direct-reading and master sessions reused; candidate sessions are fresh. Cache state and run timing differ."
+  },
+  "arms": [
+    {
+      "arm": "read",
+      "label": "Agent reads files",
+      "bugs": 39,
+      "detected": 34,
+      "otherVerified": 2,
+      "controls": 45,
+      "falseAlarms": 0,
+      "caller": {
+        "input": 4343,
+        "output": 57522,
+        "cacheWrite": 145307,
+        "cacheRead": 1959187,
+        "total": 2166359,
+        "cost": 1.5525384
+      },
+      "internal": {
+        "input": 0,
+        "output": 0,
+        "cacheWrite": 0,
+        "cacheRead": 0,
+        "total": 0,
+        "cost": 0
+      },
+      "wallMs": 619447,
+      "total": {
+        "input": 4343,
+        "output": 57522,
+        "cacheWrite": 145307,
+        "cacheRead": 1959187,
+        "total": 2166359,
+        "cost": 1.5525384
+      }
+    },
+    {
+      "arm": "previous",
+      "label": "Agent + v0.6 master",
+      "bugs": 39,
+      "detected": 35,
+      "otherVerified": 1,
+      "controls": 45,
+      "falseAlarms": 0,
+      "caller": {
+        "input": 4437,
+        "output": 10969,
+        "cacheWrite": 30013,
+        "cacheRead": 32425,
+        "total": 77844,
+        "cost": 0.240431
+      },
+      "internal": {
+        "input": 242969,
+        "output": 37245,
+        "cacheWrite": 127234,
+        "cacheRead": 650919,
+        "total": 1058367,
+        "cost": 1.2492008000000003
+      },
+      "wallMs": 242341,
+      "total": {
+        "input": 247406,
+        "output": 48214,
+        "cacheWrite": 157247,
+        "cacheRead": 683344,
+        "total": 1136211,
+        "cost": 1.4896318000000004
+      }
+    },
+    {
+      "arm": "current",
+      "label": "Agent + v0.7 candidate",
+      "bugs": 39,
+      "detected": 38,
+      "otherVerified": 1,
+      "controls": 45,
+      "falseAlarms": 0,
+      "caller": {
+        "input": 4437,
+        "output": 11270,
+        "cacheWrite": 21610,
+        "cacheRead": 40770,
+        "total": 78087,
+        "cost": 0.211513
+      },
+      "internal": {
+        "input": 251417,
+        "output": 28291,
+        "cacheWrite": 106376,
+        "cacheRead": 641200,
+        "total": 1027284,
+        "cost": 1.0827720000000007
+      },
+      "wallMs": 219347,
+      "total": {
+        "input": 255854,
+        "output": 39561,
+        "cacheWrite": 127986,
+        "cacheRead": 681970,
+        "total": 1105371,
+        "cost": 1.2942850000000008
+      }
+    }
+  ]
+}

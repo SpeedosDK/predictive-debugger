@@ -3,7 +3,7 @@ import { CliLocation, CliProvider } from "../../providers/types";
 import { collectCalleeContext } from "../analysis/callees";
 import { analyzeSource } from "../analysis/risk";
 import { analyzeLogs, LogAnalysisOptions } from "../logs/analyzeLogs";
-import { FilePrediction } from "../types";
+import { FilePrediction, LogSignal } from "../types";
 import { predictBug } from "./predictBug";
 import { combineScores } from "./score";
 
@@ -14,7 +14,7 @@ export interface PredictOptions {
     logs?: LogAnalysisOptions;
     signal?: AbortSignal;
     /**
-     * Send the definitions of imported functions the file calls, one hop deep
+     * Send bounded imported definitions and referenced type contracts
      * (default true). Turning it off restores single-file scope, which is
      * cheaper per call and measurably less accurate — see issue #4.
      */
@@ -37,6 +37,30 @@ export async function predictFile(
     filePath: string,
     options: PredictOptions
 ): Promise<FilePrediction> {
+    return createFilePredictor(options)(filePath);
+}
+
+/** A batch shares one lazy log analysis, including concurrent requests. */
+export function createFilePredictor(
+    options: PredictOptions
+): (filePath: string) => Promise<FilePrediction> {
+    let logAnalysis: Promise<LogSignal> | undefined;
+    const getLogs = () => {
+        logAnalysis ??= options.logs
+            ? analyzeLogs(options.logs)
+            : Promise.resolve({
+                score: 1, anomalyCount: 0, anomalies: [], skipped: "log analysis not requested"
+            });
+        return logAnalysis;
+    };
+    return (filePath) => predictWithLogs(filePath, options, getLogs);
+}
+
+async function predictWithLogs(
+    filePath: string,
+    options: PredictOptions,
+    getLogs: () => Promise<LogSignal>
+): Promise<FilePrediction> {
     const code = await fs.readFile(filePath, "utf8");
     const staticAnalysis = await analyzeSource(filePath, code);
 
@@ -56,9 +80,7 @@ export async function predictFile(
         signal: options.signal
     });
 
-    const logs = options.logs
-        ? await analyzeLogs(options.logs)
-        : { score: 1, anomalyCount: 0, anomalies: [], skipped: "log analysis not requested" };
+    const logs = await getLogs();
 
     // The headline score follows the top finding. A file's risk is set by its
     // worst demonstrable defect, not by how many the model chose to list.

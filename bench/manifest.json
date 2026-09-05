@@ -2,7 +2,7 @@
   "generatedBy": "bench/generate-corpus.mjs",
   "language": "javascript",
   "corpus": "corpus",
-  "fileCount": 40,
+  "fileCount": 48,
   "controls": [
     "src/services/orderService.js",
     "src/api/adminController.js",
@@ -116,5 +116,31 @@
       ],
       "anchor": "} catch (err) {"
     }
-  ]
+  ],
+  "accuracy": {
+    "note": "Development cases, not a held-out accuracy claim. Both billing variants are clean because normalization is idempotent.",
+    "bugs": [
+      {
+        "file": "src/accuracy/discount.ts",
+        "pattern": "null-reference",
+        "line": 3,
+        "acceptableLines": [
+          3
+        ],
+        "acceptableRanges": [
+          [
+            2,
+            4
+          ]
+        ],
+        "summary": "Row permits an absent discount, which is dereferenced without a guard."
+      }
+    ],
+    "controls": [
+      "src/accuracy/discount.fixed.ts",
+      "src/accuracy/billing.ts",
+      "src/accuracy/billing.fixed.ts"
+    ],
+    "fileCount": 8
+  }
 }
