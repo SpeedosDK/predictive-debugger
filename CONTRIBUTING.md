@@ -93,7 +93,6 @@ both the comment and the report:
 
 ```bash
 npm run bench      # real CLI calls; takes minutes and consumes model usage
-npm run bench:ts
 ```
 
 If the benchmark cannot be run for a change, say so in the pull request rather

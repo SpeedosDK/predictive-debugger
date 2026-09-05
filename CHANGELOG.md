@@ -6,6 +6,29 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Removed
+
+- Superseded benchmark datasets, charts and runners. The working tree now retains the complete agent-workflow comparison and its reproduction tools. Previously committed artifacts remain in Git history.
+
+### Fixed
+
+- Exclude temporary benchmark worktrees from npm and VS Code packages.
+- Malformed model verdicts now report unavailable instead of clean, while valid findings in mixed replies remain usable.
+- Callee context respects import bindings when parameters or local variables shadow imported names.
+- Complexity metrics count `do…while` loops, including mixed nested loops.
+
+### Changed
+
+- Prediction evidence distinguishes unseen application wiring from a demonstrated local defect, reducing speculative route-registration and dependency-injection warnings. Numerical claims are checked against a concrete input. The revised candidate retained a verified defect report on all 39 buggy-file trials, with 38 planted matches and one alternative defect, and produced no false alarms in the development comparison.
+- Prediction evidence explicitly includes imported type contracts and leaked resources without a crash. Shortened coverage instructions offset the added policy text.
+- Replaced the benchmark report with fresh Sonnet agent comparisons for direct reading, pinned v0.6 master and the v0.7 candidate. New graphs include caller and internal-provider usage, cache tokens, CLI-estimated cost and adjudicated defect identity. See `bench/RESULTS.md` and `bench/METHOD.md`.
+
+- Dependency context includes referenced types, imported object methods, explicit barrel re-exports and local TypeScript path mappings, with bounded resolution and source-proportional context limits.
+- Oversized files contribute whole declarations from both ends within the existing one-call source budget. Omitted code is disclosed and findings citing unseen lines report unavailable.
+- Benchmark grading separates unavailable replies and location matches from adjudicated defect identity. Added development cases in the existing corpus, response/source hashes, visible model-input token estimates, and offline adjudication.
+- Batch predictions analyze the configured log once per batch, sharing the result across concurrent files.
+- Callee collection resolves each module specifier and parses each dependency once per collection call, reusing its export definitions.
+
 ## [0.6.0] — 2026-09-04
 
 ### Added

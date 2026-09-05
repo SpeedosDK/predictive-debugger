@@ -42,7 +42,7 @@ const HALF_SATURATION = 2.5;
  *
  * Measured on bench/corpus: this ordering puts the planted bugs at ranks
  * 4, 9, 11, 12 out of 40 versus 11, 14, 17, 38 for the size-driven total.
- * Fitted on six bugs, so treat it as a hypothesis — see bench/RESULTS.md.
+ * Fitted on six bugs, so treat it as a hypothesis; see CHANGELOG.md.
  */
 const DENSITY_WEIGHTS: Weight[] = [
     { key: "longFunctions", weight: 0.15, label: (n) => `${n} function(s) longer than 20 statements` },

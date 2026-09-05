@@ -3,6 +3,7 @@ import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { after, describe, it } from "node:test";
+import * as babel from "../core/analysis/ast";
 import { collectCalleeContext } from "../core/analysis/callees";
 
 const roots: string[] = [];
@@ -66,7 +67,7 @@ describe("collectCalleeContext", () => {
         assert.match(callees[0].source, /^const guard = /);
     });
 
-    it("follows a local export alias but not a re-export from another module", async () => {
+    it("follows local export aliases and explicit re-exports", async () => {
         const callees = await collect({
             "index.ts": 'import { pick, passthrough } from "./barrel";\npick(1);\npassthrough(2);\n',
             "barrel.ts": [
@@ -80,7 +81,7 @@ describe("collectCalleeContext", () => {
         // One more hop is one more hop, and the budget is spent on the first.
         assert.deepEqual(
             callees.map((c) => c.name),
-            ["pick"]
+            ["pick", "passthrough"]
         );
         assert.match(callees[0].source, /function chosen/);
     });
@@ -151,7 +152,7 @@ describe("collectCalleeContext", () => {
         assert.deepEqual(callees, []);
     });
 
-    it("ignores a type-only import, which cannot be called at runtime", async () => {
+    it("includes referenced type contracts alongside runtime calls", async () => {
         const callees = await collect({
             "index.ts": [
                 'import type { Shape } from "./shape";',
@@ -163,11 +164,11 @@ describe("collectCalleeContext", () => {
 
         assert.deepEqual(
             callees.map((c) => c.name),
-            ["area"]
+            ["area", "Shape"]
         );
     });
 
-    it("ignores a method called on an imported value", async () => {
+    it("includes an imported object when its called method is declared", async () => {
         // `client.get()` is a method on an object; the definition we would find
         // is the object, which is not what was called.
         const callees = await collect({
@@ -175,7 +176,8 @@ describe("collectCalleeContext", () => {
             "client.ts": "export const client = { get(u) { return u; } };\n"
         });
 
-        assert.deepEqual(callees, []);
+        assert.equal(callees[0].name, "client.get");
+        assert.match(callees[0].source, /get\(u\)/);
     });
 
     it("returns nothing rather than throwing when a dependency will not parse", async () => {
@@ -311,5 +313,110 @@ describe("collectCalleeContext", () => {
         });
 
         assert.deepEqual(callees, []);
+    });
+});
+
+
+describe("callee bindings and shared dependencies", () => {
+    it("ignores shadowed named and namespace imports", async () => {
+        const callees = await collect({
+            "index.ts": 'import { guard } from "./helpers"; import * as ns from "./helpers"; function f(guard, ns) { guard(); ns.guard(); }',
+            "helpers.ts": 'export function guard() { return 1; }'
+        });
+        assert.deepEqual(callees, []);
+    });
+    it("keeps real import calls outside a shadowing scope", async () => {
+        const callees = await collect({
+            "index.ts": 'import { guard } from "./helpers"; function f(guard) { guard(); } guard();',
+            "helpers.ts": 'export function guard() { return 1; }'
+        });
+        assert.deepEqual(callees.map(c => c.name), ["guard"]);
+    });
+    it("resolves multiple exports and default aliases from one dependency", async () => {
+        const callees = await collect({
+            "index.ts": 'import first, { a, b as renamed } from "./helpers"; import second from "./helpers"; first(); second(); a(); renamed();',
+            "helpers.ts": 'export default () => 3; export function a() { return 1; } const b = () => 2; export { b };'
+        });
+        assert.deepEqual(callees.map(c => c.name), ["first", "second", "a", "renamed"]);
+        assert.match(callees[0].source, /^const first = /);
+        assert.match(callees[1].source, /^const second = /);
+        assert.match(callees[3].source, /const b = /);
+    });
+});
+
+
+describe("dependency parse reuse", () => {
+    it("parses shared dependencies once and refreshes on the next collection", async (t) => {
+        const dependency = "export function a() {} export function b() {}";
+        const code = 'import { a, b } from "./helpers"; a(); b();';
+        const file = await tree({ "index.ts": code, "helpers.ts": dependency });
+        const original = await babel.loadBabel();
+        let parses = 0;
+        t.mock.method(babel, "loadBabel", async () => ({
+            ...original,
+            parse: (source: string, options: Parameters<typeof original.parse>[1]) => {
+                if (source === dependency) parses++;
+                return original.parse(source, options);
+            }
+        }));
+        assert.equal((await collectCalleeContext(file, code)).length, 2);
+        assert.equal(parses, 1);
+        assert.equal((await collectCalleeContext(file, code)).length, 2);
+        assert.equal(parses, 2);
+    });
+});
+
+
+describe("bounded dependency contracts", () => {
+    it("resolves JSONC path mappings inherited from a local config", async () => {
+        const callees = await collect({
+            "tsconfig.json": '{"extends":"./base.json", "compilerOptions": {"strict":true}}',
+            "base.json": '{/* local aliases */ "compilerOptions":{"baseUrl":".","paths":{"@lib/*":["lib/*"],},},}',
+            "index.ts": 'import { guard } from "@lib/guard"; guard();',
+            "lib/guard.ts": 'export function guard() { return 1; }'
+        });
+        assert.equal(callees[0].from, "./lib/guard.ts");
+    });
+    it("stops cyclic barrel resolution", async () => {
+        const callees = await collect({
+            "index.ts": 'import { guard } from "./a"; guard();',
+            "a.ts": 'export { guard } from "./b";',
+            "b.ts": 'export { guard } from "./a";'
+        });
+        assert.deepEqual(callees, []);
+    });
+    it("does not include unused imported types", async () => {
+        const callees = await collect({
+            "index.ts": 'import type { Shape } from "./shape"; export const n = 1;',
+            "shape.ts": 'export interface Shape { optional?: number }'
+        });
+        assert.deepEqual(callees, []);
+    });
+    it("resolves optional calls with their original object state", async () => {
+        const callees = await collect({
+            "index.ts": 'import { client } from "./client"; client?.get?.();',
+            "client.ts": 'export const client = { value: 3, get() { return this.value; } };'
+        });
+        assert.equal(callees[0].name, "client.get");
+        assert.match(callees[0].source, /value: 3/);
+    });
+});
+
+
+describe("type contract scope and cost", () => {
+    it("does not mistake generic or local types for imported contracts", async () => {
+        const callees = await collect({
+            "index.ts": 'import type { Row } from "./rows"; function f<Row>(row: Row) {} function g() { type Row = string; let row: Row; }',
+            "rows.ts": 'export interface Row { discount?: number }'
+        });
+        assert.deepEqual(callees, []);
+    });
+    it("limits supporting context for small files", async () => {
+        const callees = await collect({
+            "index.ts": 'import { f } from "./helpers"; f();',
+            "helpers.ts": `export function f() {\n${"    console.log(1);\n".repeat(300)}}`
+        });
+        assert.ok(callees.length > 0);
+        assert.ok(callees.reduce((sum, c) => sum + c.source.length, 0) <= 1000);
     });
 });

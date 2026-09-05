@@ -43,15 +43,14 @@
     "watch": "node esbuild.mjs --watch",
     "watch:tsc": "tsc -p tsconfig.json --watch",
     "pretest": "npm run compile",
-    "test": "node --test \"out/test/**/*.test.js\"",
+    "test": "node --test \"out/test/**/*.test.js\" \"bench/*.test.mjs\"",
     "mcp": "node ./dist/mcp-server.js",
     "prepack": "npm run build",
     "package": "npm run build && vsce package --allow-missing-repository --skip-license",
     "vscode:prepublish": "npm run build",
     "bundle:dev": "node esbuild.mjs",
-    "bench": "node bench/generate-corpus.mjs && node bench/measure.mjs && node bench/measure-file.mjs && node bench/markdown.mjs",
-    "bench:agents": "node bench/measure-agents.mjs",
-    "bench:ts": "node bench/generate-corpus-ts.mjs && node bench/measure-file.mjs --corpus=corpus-ts --manifest=manifest-ts.json --output=results-file-ts.json"
+    "bench": "npm run compile && npm run build && node .github/scripts/check-mcp.mjs && node bench/prepare-master.mjs && node bench/workflows.mjs --output=results-v07-balanced.json && node bench/markdown.mjs && python bench/plot-workflows.py",
+    "bench:agents": "node bench/workflows.mjs --output=results-v07-balanced.json"
   },
   "engines": {
     "vscode": "^1.85.0",
@@ -129,9 +128,7 @@
     "@types/vscode": "~1.85.0",
     "esbuild": "^0.28.2",
     "gpt-tokenizer": "^3.0.1",
-    "typescript": "^5.9.3",
-    "vega": "^6.4.0",
-    "vega-lite": "^6.4.3"
+    "typescript": "^5.9.3"
   },
   "capabilities": {
     "untrustedWorkspaces": {

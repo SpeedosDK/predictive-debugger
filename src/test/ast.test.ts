@@ -90,3 +90,16 @@ describe("collectMetrics", () => {
         assert.equal(metrics.longFunctions, 1);
     });
 });
+
+
+describe("do-while metrics", () => {
+    it("counts nested and mixed loops consistently", async () => {
+        for (const code of ["do { do {} while(y); } while(x);", "while(x) { do {} while(y); }", "do { while(y) {} } while(x);"]) {
+            const metrics = await collectMetrics(code);
+            assert.equal(metrics.cyclomatic, 3);
+            assert.equal(metrics.nestedLoops, 1);
+        }
+        const siblings = await collectMetrics("do {} while(x); do {} while(y);");
+        assert.equal(siblings.nestedLoops, 0);
+    });
+});

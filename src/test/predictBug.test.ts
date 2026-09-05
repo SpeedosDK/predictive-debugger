@@ -89,8 +89,8 @@ describe("parsePrediction", () => {
         assert.equal(result.pattern, "unknown");
     });
 
-    it("treats an empty pattern as none", () => {
-        assert.equal(parsePrediction('{"pattern":"   ","score":0.9}').pattern, "none");
+    it("treats an empty pattern as unavailable", () => {
+        assert.equal(parsePrediction('{"pattern":"   ","score":0.9}').pattern, "unknown");
     });
 });
 
@@ -435,8 +435,8 @@ describe("buildPrompt truncation reporting", () => {
             filePath: "big.js",
             code
         });
-        assert.match(result.truncated ?? "", /covers the first \d+ of 20001 lines/);
-        assert.ok(fake.lastPrompt.includes("file truncated here"));
+        assert.match(result.truncated ?? "", /covers \d+ of 20001 lines/);
+        assert.ok(fake.lastPrompt.includes("omitted source"));
         // The prompt must stay bounded even for a huge input.
         assert.ok(fake.lastPrompt.length < 130_000, `prompt was ${fake.lastPrompt.length}`);
     });
@@ -673,7 +673,7 @@ describe("buildPrompt — asking for a list", () => {
         });
 
         assert.equal(result.findings.length, 2);
-        assert.match(result.truncated ?? "", /covers the first \d+ of 20001 lines/);
+        assert.match(result.truncated ?? "", /covers \d+ of 20001 lines/);
     });
 });
 
@@ -696,3 +696,41 @@ function fakeProvider(reply: string) {
         }
     };
 }
+
+
+describe("invalid verdict fields", () => {
+    it("reports unavailable rather than clean for malformed findings", () => {
+        for (const raw of ['{}', '{"error":"model unavailable"}', '{"findings":[{}]}',
+            '{"pattern":"other"}', '{"pattern":"none","score":null}',
+            '{"pattern":"other","score":"abc"}', '{"pattern":"other","score":true}']) {
+            assert.equal(parsePrediction(raw).pattern, "unknown", raw);
+        }
+    });
+    it("keeps valid findings alongside malformed entries", () => {
+        const result = parseAssessment('{"findings":[{}, {"pattern":"other","score":0.9}]}');
+        assert.equal(result.findings.length, 1);
+        assert.equal(result.findings[0].pattern, "other");
+    });
+});
+
+
+describe("prediction source coverage", () => {
+    it("does not publish a finding outside the supplied source", async () => {
+        const fake = fakeProvider('{"pattern":"other","score":0.9,"line":100,"reason":"bug"}');
+        const result = await predictBug({ provider: fake.provider, location: { file: "fake" },
+            filePath: "small.ts", code: "const a = 1;" });
+        assert.equal(result.findings[0].pattern, "unknown");
+    });
+    it("uses one call for an oversized file", async () => {
+        let calls = 0;
+        const fake = fakeProvider('{"pattern":"none","score":0}');
+        const original = fake.provider.complete;
+        fake.provider.complete = async (...args) => { calls++; return original(...args); };
+        const result = await predictBug({ provider: fake.provider, location: { file: "fake" },
+            filePath: "large.ts", code: Array.from({length: 5000}, (_, i) =>
+                `function f${i}() { return ${i}; }`).join("\n") });
+        assert.equal(calls, 1);
+        assert.match(fake.lastPrompt, /function f4999/);
+        assert.ok(result.truncated);
+    });
+});
