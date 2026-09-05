@@ -2,6 +2,7 @@
 
 [![CI](https://github.com/SpeedosDK/predictive-debugger/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/SpeedosDK/predictive-debugger/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![GitHub Repo stars](https://img.shields.io/github/stars/SpeedosDK/predictive-debugger)](https://github.com/SpeedosDK/predictive-debugger/stargazers)
 
 Finds where code is likely to fail before it does. It ships in two shapes:
 
@@ -140,8 +141,8 @@ Read this before relying on it.
 - **The MCP tools accept absolute paths from the calling agent** and will read
   any file the process can read — by design, since the point is to analyse a
   codebase. Files above 4 MB are skipped rather than loaded.
-- `npm audit` reported 0 vulnerabilities across 111 production dependencies at
-  the 0.2.0 release. Re-run it rather than trusting this line.
+- `npm audit` reported 0 vulnerabilities across 111 production dependencies as
+  of 2026-09-05. Re-run it rather than trusting this line.
 
 ## Setup
 

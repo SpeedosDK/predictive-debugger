@@ -6,6 +6,10 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Fixed
+
+- Bumped transitive `fast-uri` and `qs` to resolve 2 known vulnerabilities (1 moderate, 1 high) via `npm audit fix`. No direct dependency changes.
+
 ## [0.7.0] — 2026-09-05
 
 ### Removed
