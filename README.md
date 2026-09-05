@@ -60,7 +60,7 @@ point an MCP-capable assistant at it, which the sections below walk through.
 Predictive Debugger is not published to npm or the VS Code Marketplace. Download
 the project from GitHub and build it locally:
 
-1. Open the [v0.5.2 release](https://github.com/SpeedosDK/predictive-debugger/releases/tag/v0.5.2).
+1. Open the [v0.7 release]([https://github.com/SpeedosDK/predictive-debugger/releases/tag/v0.7.0]).
 2. Under **Assets**, select **Source code (zip)**.
 3. Extract the ZIP to a permanent location. Your MCP configuration will point
    to a file inside this folder, so moving it later will break that path.
