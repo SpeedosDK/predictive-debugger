@@ -8,6 +8,14 @@ All notable changes to this project are documented here. The format follows
 
 ### Fixed
 
+- Prediction reads now enforce a 4 MB limit, including when a file grows during
+  reading. Oversized files fail individually without starting a model call.
+- Timeout and cancellation stop the Windows CLI process tree and wait for
+  cleanup. Unix CLI processes run in a separate group that is killed on cancellation.
+  Already-cancelled requests no longer start a process.
+- Reject unsafe Windows CLI shim arguments before spawning. Embedded quotes and
+  environment-variable expansion could turn a model override into a shell command.
+  Added a Windows regression test proving the shim never starts for these inputs.
 - Bumped transitive `fast-uri` and `qs` to resolve 2 known vulnerabilities (1 moderate, 1 high) via `npm audit fix`. No direct dependency changes.
 
 ## [0.7.0] — 2026-09-05

@@ -174,6 +174,11 @@ Read this before relying on it.
   argument array. Prompts and file contents travel over **stdin**, never argv.
   On Windows, npm's `.cmd` shims are routed through `cmd.exe` with quoting this
   project controls rather than `shell: true`.
+- **Windows CLI shim arguments are restricted.** Arguments containing double
+  quotes, `%`, `!`, NUL or line breaks are rejected before the process starts.
+  This also applies to model overrides and CLI installation paths; use a path
+  without those characters. Spaces are supported. Source and prompts travel
+  over stdin and are not subject to this restriction.
 - **The extension requires a trusted workspace** (`untrustedWorkspaces:
   supported: false`), and `predictiveDebugger.pythonPath` is machine-scoped so a
   repository cannot point the interpreter we execute at its own binary.

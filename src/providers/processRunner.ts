@@ -1,4 +1,5 @@
 import { spawn } from "child_process";
+import path from "path";
 
 export interface RunResult {
     code: number | null;
@@ -21,11 +22,16 @@ const isWindows = process.platform === "win32";
 
 /** Quote a single argument for cmd.exe when using windowsVerbatimArguments. */
 export function quoteForCmd(arg: string): string {
+    // cmd.exe does not honour backslash-escaped quotes, and expands percent
+    // variables even inside quotes. Reject these inputs before spawning a shim.
+    if (/["%!\r\n\0]/.test(arg)) {
+        throw new Error("Unsafe argument for Windows CLI shim: quotes, variable expansion and line breaks are not supported.");
+    }
     if (arg.length > 0 && !/[\s"^&|<>()%!]/.test(arg)) {
         return arg;
     }
-    // Escape embedded quotes, then wrap. cmd.exe metacharacters are neutralised
-    // by the surrounding quotes.
+    // Remaining metacharacters stay inside quotes; preserve trailing slashes
+    // for the executable's argument parser.
     return `"${arg.replace(/(\\*)"/g, '$1$1\\"').replace(/(\\*)$/, "$1$1")}"`;
 }
 
@@ -39,6 +45,7 @@ export function quoteForCmd(arg: string): string {
  */
 export function runProcess(options: RunOptions): Promise<RunResult> {
     const { file, args, input, cwd, timeoutMs = 120_000, signal, env } = options;
+    if (signal?.aborted) return Promise.reject(new Error("Cancelled"));
 
     let spawnFile = file;
     let spawnArgs = args;
@@ -58,12 +65,14 @@ export function runProcess(options: RunOptions): Promise<RunResult> {
             env: env ?? process.env,
             windowsHide: true,
             windowsVerbatimArguments: verbatim,
+            detached: !isWindows,
             stdio: ["pipe", "pipe", "pipe"]
         });
 
         let stdout = "";
         let stderr = "";
         let settled = false;
+        let stopping = false;
 
         const finish = (fn: () => void) => {
             if (settled) return;
@@ -73,23 +82,28 @@ export function runProcess(options: RunOptions): Promise<RunResult> {
             fn();
         };
 
-        const kill = () => {
-            // Reaches only `child` itself, which on Windows is cmd.exe, not
-            // the CLI it launched underneath -- the CLI can outlive this
-            // without a process-tree killer, which this is not.
-            child.kill("SIGTERM");
+        const stop = async (reason: string) => {
+            if (settled || stopping) return;
+            stopping = true;
+            clearTimeout(timer);
+            try {
+                if (child.pid !== undefined) await killProcessTree(child.pid);
+            } catch (err) {
+                reason += `; process cleanup failed: ${err instanceof Error ? err.message : String(err)}`;
+            } finally {
+                child.stdin.destroy();
+                child.stdout.destroy();
+                child.stderr.destroy();
+                finish(() => reject(new Error(reason)));
+            }
         };
 
         const timer = setTimeout(() => {
-            kill();
-            finish(() =>
-                reject(new Error(`CLI timed out after ${timeoutMs}ms: ${file}`))
-            );
+            void stop(`CLI timed out after ${timeoutMs}ms: ${file}`);
         }, timeoutMs);
 
         const onAbort = () => {
-            kill();
-            finish(() => reject(new Error("Cancelled")));
+            void stop("Cancelled");
         };
 
         if (signal) {
@@ -110,9 +124,9 @@ export function runProcess(options: RunOptions): Promise<RunResult> {
         });
 
         child.on("error", (err) => finish(() => reject(err)));
-        child.on("close", (code) =>
-            finish(() => resolve({ code, stdout, stderr }))
-        );
+        child.on("close", (code) => {
+            if (!stopping) finish(() => resolve({ code, stdout, stderr }));
+        });
 
         if (child.stdin) {
             child.stdin.on("error", () => {
@@ -123,5 +137,34 @@ export function runProcess(options: RunOptions): Promise<RunResult> {
             }
             child.stdin.end();
         }
+    });
+}
+
+async function killProcessTree(pid: number): Promise<void> {
+    if (!isWindows) {
+        try {
+            process.kill(-pid, "SIGKILL");
+        } catch (err) {
+            if ((err as NodeJS.ErrnoException).code !== "ESRCH") throw err;
+        }
+        return;
+    }
+    // Killing only cmd.exe leaves the CLI running. Use the Windows tree killer
+    // directly, with a numeric PID and no shell or PATH-based executable lookup.
+    const taskkill = path.join(process.env.SystemRoot || "C:\\Windows", "System32", "taskkill.exe");
+    await new Promise<void>((resolve, reject) => {
+        const killer = spawn(taskkill, ["/pid", String(pid), "/t", "/f"], {
+            windowsHide: true, stdio: "ignore"
+        });
+        const timer = setTimeout(() => {
+            killer.kill();
+            reject(new Error("taskkill timed out"));
+        }, 10_000);
+        killer.on("error", err => { clearTimeout(timer); reject(err); });
+        killer.on("close", code => {
+            clearTimeout(timer);
+            if (code === 0 || code === 128) resolve();
+            else reject(new Error(`taskkill exited with code ${code}`));
+        });
     });
 }
