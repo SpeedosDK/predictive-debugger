@@ -1,5 +1,8 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
+import fs from "node:fs/promises";
+import os from "node:os";
+import path from "node:path";
 import { quoteForCmd, runProcess } from "../providers/processRunner";
 
 describe("quoteForCmd", () => {
@@ -21,17 +24,69 @@ describe("quoteForCmd", () => {
     });
 
     it("quotes cmd.exe metacharacters", () => {
-        for (const arg of ["a&b", "a|b", "a>b", "a^b", "a%b%", "a(b)"]) {
+        for (const arg of ["a&b", "a|b", "a>b", "a^b", "a(b)"]) {
             assert.match(quoteForCmd(arg), /^".*"$/, `${arg} was left unquoted`);
         }
     });
 
-    it("escapes embedded double quotes", () => {
-        assert.equal(quoteForCmd('say "hi"'), '"say \\"hi\\""');
+    it("rejects shell escape and expansion inputs", () => {
+        for (const arg of ['say "hi"', '%PAYLOAD%', '!PAYLOAD!', 'a\nb', 'a\rb', 'a\0b']) {
+            assert.throws(() => quoteForCmd(arg), /Unsafe argument/);
+        }
     });
 });
 
 describe("runProcess", () => {
+    for (const mode of ["timeout", "abort"] as const) {
+        it(`stops the Windows shim child on ${mode}`, { skip: process.platform !== "win32" }, async () => {
+            const dir = await fs.mkdtemp(path.join(os.tmpdir(), "pd-tree-test-"));
+            const script = path.join(dir, "child.cjs");
+            const shim = path.join(dir, "start.cmd");
+            const pidFile = path.join(dir, "pid.txt");
+            const controller = new AbortController();
+            let pid: number | undefined;
+            try {
+                await fs.writeFile(script, `require('fs').writeFileSync(${JSON.stringify(pidFile)}, String(process.pid)); setInterval(() => {}, 1000);`);
+                await fs.writeFile(shim, `@echo off\r\n"${process.execPath}" "${script}"\r\n`);
+                const pending = runProcess({ file: shim, args: [], timeoutMs: 2500, signal: controller.signal });
+                const rejected = assert.rejects(pending, mode === "abort" ? /Cancelled/ : /timed out/);
+                for (let i = 0; i < 100; i++) {
+                    const value = await fs.readFile(pidFile, "utf8").catch(() => "");
+                    if (value) { pid = Number(value); break; }
+                    await new Promise(resolve => setTimeout(resolve, 20));
+                }
+                assert.ok(pid, "CLI child started");
+                if (mode === "abort") controller.abort();
+                await rejected;
+                assert.throws(() => process.kill(pid!, 0), { code: "ESRCH" });
+            } finally {
+                controller.abort();
+                if (pid) { try { process.kill(pid); } catch {} }
+                await fs.rm(dir, { recursive: true, force: true });
+            }
+        });
+    }
+    it("blocks injection before a Windows shim starts", { skip: process.platform !== "win32" }, async () => {
+        const dir = await fs.mkdtemp(path.join(os.tmpdir(), "pd-argv-test-"));
+        const shim = path.join(dir, "probe.cmd");
+        const marker = path.join(dir, "started.txt");
+        try {
+            await fs.writeFile(shim, '@echo off\r\necho started>"%~dp0started.txt"\r\n');
+            for (const model of ['model" & echo INJECTED & rem "', '%PD_PAYLOAD%']) {
+                await assert.rejects(async () => runProcess({
+                    file: shim,
+                    args: ["--model", model],
+                    env: { ...process.env, PD_PAYLOAD: 'model" & echo INJECTED & rem "' }
+                }), /Unsafe argument/);
+            }
+            await assert.rejects(fs.stat(marker), { code: "ENOENT" });
+            const result = await runProcess({ file: shim, args: ["--model", "normal-model"] });
+            assert.equal(result.code, 0);
+            assert.equal((await fs.readFile(marker, "utf8")).trim(), "started");
+        } finally {
+            await fs.rm(dir, { recursive: true, force: true });
+        }
+    });
     it("passes stdin through and captures stdout", async () => {
         const result = await runProcess({
             file: process.execPath,

@@ -60,7 +60,7 @@ point an MCP-capable assistant at it, which the sections below walk through.
 Predictive Debugger is not published to npm or the VS Code Marketplace. Download
 the project from GitHub and build it locally:
 
-1. Open the [v0.7.0 release](https://github.com/SpeedosDK/predictive-debugger/releases/tag/v0.7.0).
+1. Open the [v0.7.1 release](https://github.com/SpeedosDK/predictive-debugger/releases/tag/v0.7.1).
 2. Under **Assets**, select **Source code (zip)**.
 3. Extract the ZIP to a permanent location. Your MCP configuration will point
    to a file inside this folder, so moving it later will break that path.
@@ -174,6 +174,11 @@ Read this before relying on it.
   argument array. Prompts and file contents travel over **stdin**, never argv.
   On Windows, npm's `.cmd` shims are routed through `cmd.exe` with quoting this
   project controls rather than `shell: true`.
+- **Windows CLI shim arguments are restricted.** Arguments containing double
+  quotes, `%`, `!`, NUL or line breaks are rejected before the process starts.
+  This also applies to model overrides and CLI installation paths; use a path
+  without those characters. Spaces are supported. Source and prompts travel
+  over stdin and are not subject to this restriction.
 - **The extension requires a trusted workspace** (`untrustedWorkspaces:
   supported: false`), and `predictiveDebugger.pythonPath` is machine-scoped so a
   repository cannot point the interpreter we execute at its own binary.

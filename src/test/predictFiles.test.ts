@@ -17,6 +17,19 @@ after(async () => {
 });
 
 describe("predictFiles", () => {
+    it("rejects oversized sources without calling the provider and preserves other results", async () => {
+        const oversized = path.join(dir, "oversized.js");
+        const handle = await fs.open(oversized, "w");
+        await handle.truncate(4 * 1024 * 1024 + 1);
+        await handle.close();
+        const [normal] = await write(["normal-size.js"]);
+        const provider = fakeProvider({ delayFor: () => 1 });
+        const result = await predictFiles([oversized, normal, dir], base(provider));
+        assert.equal(provider.calls, 1);
+        assert.equal(result.results.length, 1);
+        assert.equal(result.failures.length, 2);
+        assert.match(result.failures[0].reason, /4 MB prediction limit/);
+    });
     it("runs the log analyzer once per batch and refreshes it for the next", async () => {
         const files = await write(["log-a.js", "log-b.js", "log-c.js"]);
         const counter = path.join(dir, "analyzer-calls.txt");

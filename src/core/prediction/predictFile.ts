@@ -61,7 +61,7 @@ async function predictWithLogs(
     options: PredictOptions,
     getLogs: () => Promise<LogSignal>
 ): Promise<FilePrediction> {
-    const code = await fs.readFile(filePath, "utf8");
+    const code = await readPredictionSource(filePath);
     const staticAnalysis = await analyzeSource(filePath, code);
 
     // Resolution is here rather than inside predictBug so the prompt builder
@@ -98,4 +98,27 @@ async function predictWithLogs(
         logs,
         combinedScore
     };
+}
+
+async function readPredictionSource(filePath: string): Promise<string> {
+    const limit = 4 * 1024 * 1024;
+    const handle = await fs.open(filePath, "r");
+    try {
+        const stat = await handle.stat();
+        if (!stat.isFile()) throw new Error(`Not a file: ${filePath}`);
+        const tooLarge = () => new Error(`File exceeds the 4 MB prediction limit: ${filePath}`);
+        if (stat.size > limit) throw tooLarge();
+        // Bound the read as well as the stat: a file can grow while being read.
+        const buffer = Buffer.alloc(limit + 1);
+        let length = 0;
+        while (length < buffer.length) {
+            const { bytesRead } = await handle.read(buffer, length, buffer.length - length, null);
+            if (bytesRead === 0) break;
+            length += bytesRead;
+        }
+        if (length > limit) throw tooLarge();
+        return buffer.toString("utf8", 0, length);
+    } finally {
+        await handle.close();
+    }
 }

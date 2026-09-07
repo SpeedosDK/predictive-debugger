@@ -6,8 +6,18 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.7.1] — 2026-09-07
+
 ### Fixed
 
+- Prediction reads now enforce a 4 MB limit, including when a file grows during
+  reading. Oversized files fail individually without starting a model call.
+- Timeout and cancellation stop the Windows CLI process tree and wait for
+  cleanup. Unix CLI processes run in a separate group that is killed on cancellation.
+  Already-cancelled requests no longer start a process.
+- Reject unsafe Windows CLI shim arguments before spawning. Embedded quotes and
+  environment-variable expansion could turn a model override into a shell command.
+  Added a Windows regression test proving the shim never starts for these inputs.
 - Bumped transitive `fast-uri` and `qs` to resolve 2 known vulnerabilities (1 moderate, 1 high) via `npm audit fix`. No direct dependency changes.
 
 ## [0.7.0] — 2026-09-05
@@ -626,7 +636,8 @@ README.
 - `@types/vscode` was newer than the declared `engines.vscode`, which prevented
   packaging and allowed use of APIs missing from the minimum supported version.
 
-[Unreleased]: https://github.com/SpeedosDK/predictive-debugger/compare/v0.7.0...HEAD
+[Unreleased]: https://github.com/SpeedosDK/predictive-debugger/compare/v0.7.1...HEAD
+[0.7.1]: https://github.com/SpeedosDK/predictive-debugger/compare/v0.7.0...v0.7.1
 [0.7.0]: https://github.com/SpeedosDK/predictive-debugger/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/SpeedosDK/predictive-debugger/compare/v0.5.2...v0.6.0
 [0.5.2]: https://github.com/SpeedosDK/predictive-debugger/compare/v0.5.1...v0.5.2
