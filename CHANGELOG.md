@@ -6,6 +6,8 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.7.1] — 2026-09-07
+
 ### Fixed
 
 - Prediction reads now enforce a 4 MB limit, including when a file grows during
@@ -634,7 +636,8 @@ README.
 - `@types/vscode` was newer than the declared `engines.vscode`, which prevented
   packaging and allowed use of APIs missing from the minimum supported version.
 
-[Unreleased]: https://github.com/SpeedosDK/predictive-debugger/compare/v0.7.0...HEAD
+[Unreleased]: https://github.com/SpeedosDK/predictive-debugger/compare/v0.7.1...HEAD
+[0.7.1]: https://github.com/SpeedosDK/predictive-debugger/compare/v0.7.0...v0.7.1
 [0.7.0]: https://github.com/SpeedosDK/predictive-debugger/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/SpeedosDK/predictive-debugger/compare/v0.5.2...v0.6.0
 [0.5.2]: https://github.com/SpeedosDK/predictive-debugger/compare/v0.5.1...v0.5.2
