@@ -6,6 +6,12 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Changed
+
+- Simplified the README with setup first, expandable client instructions and
+  example prompts. Moved detailed setup, tool behavior and VS Code settings to
+  linked guides, and consolidated the security model in `SECURITY.md`.
+
 ## [0.8.0] - 2026-09-10
 
 ### Added
