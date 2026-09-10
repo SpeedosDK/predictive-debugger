@@ -52,3 +52,6 @@ jobs:
 
       - name: Verify the bundled MCP server starts and lists its tools
         run: node .github/scripts/check-mcp.mjs
+
+      - name: Verify the npm package runs through npx
+        run: npm run test:package

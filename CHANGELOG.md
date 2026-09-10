@@ -8,6 +8,10 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
+- Prepared npm distribution for `npx -y predictive-debugger@latest`, with agent
+  setup and update instructions for Claude Code, Codex and Copilot CLI.
+  Added `--version` and `--help`, and a CI check that installs the tarball through
+  `npx` in an isolated cache and exercises the installed MCP server.
 - Added the deterministic `map_dependencies` MCP tool for bounded imports,
   reverse imports and connected test files, with source-line evidence and explicit
   coverage limits. It shares module-path resolution with prediction context and
@@ -30,6 +34,9 @@ All notable changes to this project are documented here. The format follows
 
 ### Changed
 
+- npm packages include only the MCP bundle, Python helper and package docs.
+  JavaScript dependencies are bundled at build time, so `npx` does not need to
+  install them separately. Publishing runs the tests and packaged-server check.
 - Clarified member-selection rules, export resolution states and map traversal
   without changing the 37 benchmark prediction prompts.
 - Broader dependency evidence enabled more detections in targeted tests and used

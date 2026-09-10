@@ -25,6 +25,7 @@ import { ProviderId } from "../providers/types";
  * in JavaScript, so the fallback applies there instead of throwing.
  */
 declare const __PACKAGE_VERSION__: string | undefined;
+const VERSION = typeof __PACKAGE_VERSION__ === "string" ? __PACKAGE_VERSION__ : "0.0.0-dev";
 
 const registry = new ProviderRegistry();
 
@@ -75,7 +76,7 @@ const INSTRUCTIONS = [
 const server = new McpServer(
     {
         name: "predictive-debugger",
-        version: typeof __PACKAGE_VERSION__ === "string" ? __PACKAGE_VERSION__ : "0.0.0-dev"
+        version: VERSION
     },
     { instructions: INSTRUCTIONS }
 );
@@ -518,6 +519,27 @@ function message(err: unknown): string {
 }
 
 async function main(): Promise<void> {
+    const args = process.argv.slice(2);
+    if (args.length === 1 && ["--version", "-v"].includes(args[0])) {
+        process.stdout.write(`${VERSION}\n`);
+        return;
+    }
+    if (args.length === 1 && ["--help", "-h"].includes(args[0])) {
+        process.stdout.write(
+            "Usage: predictive-debugger-mcp [--version | --help]\n\n" +
+            "Start the Predictive Debugger MCP server over stdio with no arguments.\n" +
+            "Configure your agent to run: npx -y predictive-debugger@latest\n" +
+            "On Windows, use: cmd /d /c npx -y predictive-debugger@latest\n\n" +
+            "--version, -v  Print the installed version and exit.\n" +
+            "--help, -h     Show this help and exit.\n"
+        );
+        return;
+    }
+    if (args.length > 0) {
+        process.stderr.write("Unknown arguments. Run predictive-debugger-mcp --help for usage.\n");
+        process.exitCode = 1;
+        return;
+    }
     // stdout is the JSON-RPC channel; anything we want to say goes to stderr.
     await server.connect(new StdioServerTransport());
     process.stderr.write("predictive-debugger MCP server ready\n");
