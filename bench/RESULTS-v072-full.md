@@ -93,7 +93,7 @@ question for both builds, not a change this branch introduced.
 All nine sessions and every internal model call were recorded in this experiment. Run
 order rotates by trial. The run hit the subscription usage limit twice: after the first
 session, and again before the final v0.7.1 session, which ran about four hours after the
-others. Failed attempts were discarded and rerun; no partial session is included. 
+others. Failed attempts were discarded and rerun; no partial session is included.
 
 There are 17 buggy files and 20 clean controls. Repeated trials are not
 additional bugs. These are development cases that informed the tool's prompt and its

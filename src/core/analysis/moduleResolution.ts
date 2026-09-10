@@ -54,4 +54,3 @@ async function isFile(candidate: string): Promise<boolean> {
         .then((stat) => stat.isFile())
         .catch(() => false);
 }
-
