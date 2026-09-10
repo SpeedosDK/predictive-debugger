@@ -1,261 +1,38 @@
 <p align="center">
-  <img src="logo/predictive-debugger-logo-readable.png" alt="Predictive Debugger" width="840">
+  <img src="https://raw.githubusercontent.com/SpeedosDK/predictive-debugger/master/logo/predictive-debugger-logo-readable.png" alt="Predictive Debugger" width="840">
 </p>
 
 # Predictive Debugger
 
+[![npm version](https://img.shields.io/npm/v/predictive-debugger)](https://www.npmjs.com/package/predictive-debugger)
 [![CI](https://github.com/SpeedosDK/predictive-debugger/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/SpeedosDK/predictive-debugger/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![GitHub Repo stars](https://img.shields.io/github/stars/SpeedosDK/predictive-debugger)](https://github.com/SpeedosDK/predictive-debugger/stargazers)
+[![GitHub stars](https://img.shields.io/github/stars/SpeedosDK/predictive-debugger)](https://github.com/SpeedosDK/predictive-debugger/stargazers)
 
-Finds where code is likely to fail before it does. It comes in two forms:
+MCP server for finding likely runtime failures in JavaScript and TypeScript.
+Six tools help your coding agent rank risky files, trace dependencies, inspect
+logs and get an independent model review with a line number and reason.
 
-- an unfinished **VS Code extension preview** for a human reviewing their own
-  code
-- an **MCP server** so coding agents can use it as a tool while they review code
+Uses the Claude Code, Codex or GitHub Copilot CLI you already have installed.
+Prediction calls use that CLI's model access and usage allowance. No separate
+API key is needed.
 
-There is no API key and no OAuth flow. Model access is borrowed from whichever
-CLI you are already signed in to — Claude Code, Codex, or GitHub Copilot. The
-extension never
-sees, stores, or transmits a token; it shells out to the CLI and the CLI handles
-auth.
+<a id="using-it-from-an-agent-mcp"></a>
+<a id="download-and-install"></a>
 
-## New to this?
+## Setup
 
-Skip this section if you already know what MCP is and which of the two setups
-below you want.
+Requires [Node.js](https://nodejs.org) 22 or later. For model predictions, install
+and sign in to at least one supported CLI. Python 3 is optional for log analysis.
 
-**What this does, in one sentence:** it reads code and points at the line most
-likely to fail before it does — either you click a button in VS Code and read
-the result yourself, or an AI coding assistant calls it as a tool while it
-reviews code for you.
+### 1. Add the MCP server
 
-**What "MCP" means:** Model Context Protocol, a small standard that lets an AI
-assistant — Claude Code, Codex, GitHub Copilot, and others — call external
-tools instead of only replying in chat. This project *is* one such tool. There
-is nothing called "MCP" to install by itself; you install this project, then
-point an MCP-capable assistant at it, which the sections below walk through.
+Choose your agent below. `npx` downloads and runs the package automatically.
 
-**Which setup is for you?**
+<details open>
+<summary><strong>Claude Code</strong></summary>
 
-- Want to click a button in your editor and see results yourself? Use the
-  unfinished **VS Code extension preview** — jump to
-  [Using it in VS Code](#using-it-in-vs-code).
-- Already use an AI coding assistant and want it to reach for this
-  automatically while reviewing code? Use the **MCP server** — jump to
-  [Using it from an agent](#using-it-from-an-agent-mcp).
-
-**Before either one, you need:**
-
-1. [Node.js](https://nodejs.org) 22 or later. This project is a Node program;
-   installing Node is what gives you the `node` and `npm` commands used below.
-2. One AI coding CLI already installed and signed in: Claude Code, Codex, or
-   GitHub Copilot CLI. This project has no AI model of its own — it borrows
-   whichever one of these you're signed into. Install one first if you don't
-   have one; there's nothing for this project to borrow otherwise.
-
-## Download and install
-
-The MCP server supports `npx`, which downloads and runs the package without a
-global install or a source build. The VS Code extension still uses a local build.
-
-Download the current npm release and print its version:
-
-```bash
-npx -y predictive-debugger@latest --version
-```
-
-Then follow [Using it from an agent](#using-it-from-an-agent-mcp). Your agent
-starts the server when it needs it. Running the command without `--version`
-starts a stdio server that waits for MCP messages.
-
-### Build from source
-
-Use this for development or the VS Code preview:
-
-1. Open the [v0.8.0 release](https://github.com/SpeedosDK/predictive-debugger/releases/tag/v0.8.0).
-2. Under **Assets**, select **Source code (zip)**.
-3. Extract the ZIP to a permanent location. Your MCP configuration will point
-   to a file inside this folder, so moving it later will break that path.
-4. Open a terminal in the extracted folder.
-5. Install the dependencies and build the project:
-
-   ```bash
-   npm install
-   npm run build
-   ```
-
-The build creates both entry points:
-
-| Output | Purpose |
-| --- | --- |
-| `dist/mcp-server.js` | MCP server to add to Claude Code, Codex, or GitHub Copilot |
-| `dist/extension.js` | Unfinished VS Code extension preview |
-
-You do not need to run `npm test` to use the tool. That command is for checking
-the project during development.
-
-You also need at least one supported CLI installed and signed in:
-
-```bash
-npm i -g @anthropic-ai/claude-code   # then: claude
-npm i -g @openai/codex               # then: codex login
-npm i -g @github/copilot             # then: copilot, and /login
-```
-
-For the MCP server, continue to [Using it from an agent](#using-it-from-an-agent-mcp).
-To try the unfinished editor extension, see
-[Using it in VS Code](#using-it-in-vs-code).
-
-## Layout
-
-```
-src/
-  core/            analysis engine — no VS Code, no MCP, no I/O beyond files
-    analysis/      AST metrics (ast.ts), heuristic risk (risk.ts), dependency
-                   context (callees.ts), file relationships (dependencies.ts)
-    logs/          wrapper around tools/log-analyzer
-    prediction/    model-backed prediction: one file, or a whole project
-    sourceFiles.ts shared source-tree walker
-    types.ts       shared result types
-  providers/       Claude Code / Codex / Copilot CLI adapters + process spawning
-  extension/       VS Code integration only
-  mcp/             MCP stdio server
-  test/            unit tests (Node built-in runner)
-examples/
-  bug-patterns/    deliberately broken files used for testing
-tools/
-  log-analyzer/    dependency-free Python log anomaly scorer
-dist/              bundled output (esbuild) — the only thing shipped
-```
-
-The dependency direction is one-way: `extension/` and `mcp/` both depend on
-`core/` and `providers/`, and never on each other. `core/` depends on nothing
-editor-specific, which is why the same engine backs both surfaces.
-
-## Status and caveats
-
-Read this before relying on it.
-
-- **Developed and manually verified on Windows.** CI builds and tests on Linux,
-  macOS and Windows, but the CLI-discovery paths for macOS and Linux
-  (`/usr/local/bin`, `/opt/homebrew/bin`, `~/.local/bin`) have not been
-  exercised against a real install. The macOS branch of the Claude credential
-  check assumes Keychain storage and reports "signed in" without verifying it,
-  and the Copilot check does the same for the system credential store `/login`
-  writes to — the connect flow's live check is what actually confirms the
-  sign-in.
-- **The VS Code extension is unfinished.** It is not published to the VS Code
-  Marketplace or distributed as an installable VSIX. You can try it from the
-  source folder using the development workflow below.
-- **`predict_failures` sends file contents to a model provider.** It also sends
-  bounded imported definitions and referenced type contracts, so the model
-  can see whether a callee already handles the
-  case it is about to flag; pass `calleeContext: false` to send only the file.
-  Third-party packages are never read. The deterministic tools (`analyze_file`,
-  `scan_project`, `map_dependencies`, `analyze_logs`) run entirely locally and send nothing
-  anywhere. If you point the MCP server at a private codebase, know which tools
-  your agent is calling.
-- **Very large files are analysed only in part.** Up to 120,000 characters
-  (roughly 3,500 lines) are sent to the model; beyond that the verdict covers a
-  selection of whole declarations and says so. Original line numbers are retained;
-  omitted code remains unreviewed. This still uses at most one model call.
-  Files over 4 MB (~120,000 lines) skip static analysis
-  entirely rather than being read into memory.
-- **The static score is a heuristic, not a proof.** It counts structural risk
-  factors — it does not know your invariants, and a high score is a hint about
-  where to look, not a defect report.
-- **Only JavaScript and TypeScript are analysed**, in these extensions: `.js`,
-  `.jsx`, `.mjs`, `.cjs`, `.ts`, `.tsx`, `.mts`, `.cts`. Decorators parse, so
-  Angular, Nest, TypeORM and MobX sources are analysed rather than skipped.
-  Single-file components are not supported: a `.vue` or `.svelte` file is never
-  read at all.
-- **The accuracy comparison uses development cases.** Sonnet reviewed 13 buggy
-  files and 15 clean controls three times per workflow. The report includes false
-  alarms and internal model usage. These results do not establish accuracy on arbitrary repositories
-  or lower total cost. See [bench/RESULTS.md](bench/RESULTS.md).
-
-## Security model
-
-- **No credentials are handled.** The extension stores only the chosen provider
-  id. Tokens stay with the CLI, which does its own auth. Nothing is read from
-  `~/.claude/.credentials.json` or `~/.codex/auth.json` beyond checking that the
-  file exists and is non-empty. The Copilot CLI keeps its token in the system
-  credential store, which is not read at all.
-- **No shell is invoked.** Every child process is `spawn`ed directly with an
-  argument array. Prompts and file contents travel over **stdin**, never argv.
-  On Windows, npm's `.cmd` shims are routed through `cmd.exe` with quoting this
-  project controls rather than `shell: true`.
-- **Windows CLI shim arguments are restricted.** Arguments containing double
-  quotes, `%`, `!`, NUL or line breaks are rejected before the process starts.
-  This also applies to model overrides and CLI installation paths; use a path
-  without those characters. Spaces are supported. Source and prompts travel
-  over stdin and are not subject to this restriction.
-- **The extension requires a trusted workspace** (`untrustedWorkspaces:
-  supported: false`), and `predictiveDebugger.pythonPath` is machine-scoped so a
-  repository cannot point the interpreter we execute at its own binary.
-- **Analysed source is treated as untrusted data.** A file could contain text
-  engineered to read as instructions. Claude runs with `--tools ""`, so it has
-  no tools to misuse; `codex exec` has no equivalent switch and can still read
-  files within its read-only sandbox; `copilot` is run with `shell`, `write` and
-  `url` tools denied and its built-in MCP servers off, which leaves it the same
-  read access as Codex. So the prompt marks the source explicitly as data and
-  the parsed `reason`/`pattern` fields are length-capped. Prefer the Claude
-  provider when analysing code you do not trust.
-- **The MCP tools accept absolute paths from the calling agent** and will read
-  any file the process can read — by design, since the point is to analyse a
-  codebase. Files above 4 MB are skipped rather than loaded.
-- JavaScript dependencies are bundled into the shipped server. Run `npm audit`
-  in a source checkout to check the dependencies used to build it. Auditing the
-  installed npm package does not inspect code inside the bundle.
-
-## Using it in VS Code
-
-The VS Code extension is still an unfinished preview. It is not available from
-the Marketplace and there is no prebuilt VSIX to install. To try it:
-
-1. Complete [Build from source](#build-from-source).
-2. Open the extracted Predictive Debugger folder in VS Code.
-3. Press <kbd>F5</kbd> to launch an Extension Development Host.
-4. Run one of these commands in the new VS Code window:
-
-| Command | What it does |
-| --- | --- |
-| `Predictive Debugger: Connect` | Pick a CLI, verify the sign-in works |
-| `Predictive Debugger: Predict Failures in Current File` | Analyse the open file |
-| `Predictive Debugger: Predict Failures Across Project` | Rank the whole workspace |
-
-Results land as diagnostics in the Problems panel and as a report in
-**Output → Predictive Debugger**.
-
-Use the *"Run Extension (bug-patterns test folder)"* launch configuration to
-test the project-wide command — VS Code refuses to open a folder that is already
-open in another window, so the dev host needs a different folder.
-
-## Using it from an agent (MCP)
-
-### Ask your agent to add it
-
-Open the project where you want to use
-Predictive Debugger and give your agent this instruction:
-
-> Add Predictive Debugger as a project-scoped MCP server for this project. The
-> server command is `npx` with arguments `-y predictive-debugger@latest`.
-> On native Windows, use `cmd` with arguments
-> `/d /c npx -y predictive-debugger@latest`. Verify that it starts and lists
-> its tools.
-
-For every project, replace "project-scoped" with "user-level". Project scope makes the
-server available only when you work in that project. User or global scope makes
-it available across projects. This setting controls where the MCP registration
-is loaded; it does not restrict which paths the server process can read.
-
-If your agent cannot change its own MCP configuration, use the matching manual
-instructions below.
-
-### Claude Code
-
-Run this in the project where you want to use the server. On macOS, Linux or WSL:
+Run in your project on macOS, Linux or WSL:
 
 ```bash
 claude mcp add --scope project predictive-debugger -- npx -y predictive-debugger@latest
@@ -267,10 +44,12 @@ On native Windows, from PowerShell:
 claude mcp add --scope project predictive-debugger -- cmd /d /c npx -y predictive-debugger@latest
 ```
 
-Use `--scope user` for every project. Restart Claude Code and check `/mcp`.
-See [Claude Code's MCP setup](https://code.claude.com/docs/en/mcp) for scope details.
+Use `--scope user` to make it available in every project.
 
-### Codex
+</details>
+
+<details>
+<summary><strong>Codex</strong></summary>
 
 For a user-level setup on macOS, Linux or WSL:
 
@@ -284,28 +63,15 @@ On native Windows, from PowerShell:
 codex mcp add predictive-debugger -- cmd /d /c npx -y predictive-debugger@latest
 ```
 
-Alternatively, add this block to `.codex/config.toml` inside a trusted project for a
-project-only setup. Add it to `~/.codex/config.toml` instead to make the server
-available in every project:
+For project-only setup or a longer startup timeout, see
+[Codex configuration](docs/setup.md#codex-project-configuration).
 
-```toml
-[mcp_servers.predictive-debugger]
-command = "npx"
-args = ["-y", "predictive-debugger@latest"]
-startup_timeout_sec = 60
-```
+</details>
 
-On native Windows, use `command = "cmd"` and
-`args = ["/d", "/c", "npx", "-y", "predictive-debugger@latest"]`.
-The startup timeout allows time for the first download. You can also add
-`startup_timeout_sec = 60` to the entry created by the CLI.
-Restart Codex and check `/mcp`. See
-[Codex MCP configuration](https://developers.openai.com/codex/mcp/).
+<details>
+<summary><strong>GitHub Copilot CLI</strong></summary>
 
-### GitHub Copilot CLI
-
-For a project-only setup, add this to `.mcp.json` in the project where you want
-to use the server:
+Add to `.mcp.json` in your project:
 
 ```json
 {
@@ -322,298 +88,100 @@ to use the server:
 On native Windows, use `"command": "cmd"` and
 `"args": ["/d", "/c", "npx", "-y", "predictive-debugger@latest"]`.
 
-For a user-level setup on macOS, Linux or WSL:
+For every project, see [Copilot user-level setup](docs/setup.md#copilot-user-level-setup).
+
+</details>
+
+### 2. Check the connection
+
+Restart your agent and check `/mcp` for `predictive-debugger` and its six tools.
+To check that the package downloads and print its version:
 
 ```bash
-copilot mcp add predictive-debugger -- npx -y predictive-debugger@latest
+npx -y predictive-debugger@latest --version
 ```
 
-On native Windows, from PowerShell:
+Running without `--version` starts a stdio server that waits for your agent's
+messages. See [setup help](docs/setup.md) for local builds and troubleshooting.
 
-```powershell
-copilot mcp add predictive-debugger -- cmd /d /c npx -y predictive-debugger@latest
+### 3. Ask your agent about the code
+
+```text
+Use Predictive Debugger to find the riskiest files in src/.
+Show the imports and tests connected to src/services/orders.ts.
+Check src/services/orders.ts for likely runtime failures.
+Find unusual entries in logs/app.log.
 ```
 
-Restart Copilot and check `/mcp`. See
-[Copilot CLI MCP configuration](https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-command-reference#mcp-server-configuration).
+## Tools
 
-### Updating
+| Tool | What it does | Model call |
+| --- | --- | --- |
+| `scan_project` | Rank source files by risk density. Excludes tests by default. | No |
+| `analyze_file` | Return complexity metrics, risk scores and contributing signals. | No |
+| `map_dependencies` | Find imports, reverse imports and connected test files, with source-line evidence. | No |
+| `analyze_logs` | Return log anomalies, ranked by severity and unusual wording. | No |
+| `predict_failures` | Get an independent model verdict with a line number, reason and confidence. Supports batches. | Yes |
+| `list_providers` | Check which supported CLIs are installed and their sign-in status. | No |
 
-The configurations above use `@latest`, so npm resolves the current release when
-your agent starts the server. Restart the agent or reconnect its MCP server to
-use an update. A running server keeps its current version.
+Start with `scan_project`, then read the files it highlights. Use
+`map_dependencies` to find related files and `predict_failures` when you want a
+second opinion. Pass several paths as `files` to review them concurrently.
 
-To force an update check and print the downloaded version:
+See the [tool reference](docs/tools.md) for parameters, result fields and limits.
 
-```bash
-npx --prefer-online -y predictive-debugger@latest --version
-```
+<details>
+<summary><strong>How the server asks agents to verify new code</strong></summary>
 
-Then restart your agent. `--prefer-online` forces npm to recheck cached package
-metadata. See [npm's cache options](https://docs.npmjs.com/cli/v11/commands/npm-exec/#a-note-on-caching).
-For controlled updates, replace `@latest` in your MCP configuration with a
-published version such as `@X.Y.Z`, then change it when you want to upgrade.
+The server's MCP instructions ask agents to check code they wrote in the current
+session from a fresh context. The routing depends on file count:
 
-### Using a local build
-
-After [building from source](#build-from-source), configure the server command as
-`node` and pass the absolute path to `dist/mcp-server.js` as its only argument.
-This works with the same agent configurations above. For example:
-
-```bash
-claude mcp add --scope project predictive-debugger -- node "/absolute/path/to/predictive-debugger/dist/mcp-server.js"
-```
-
-The repository's `.mcp.json` already uses `node ./dist/mcp-server.js`, so starting
-Claude Code or Copilot in this repository uses the local build. When switching an
-existing registration to `npx`, edit its command and arguments in place. A
-project entry can override a user-level entry with the same name.
-
-### Tools
-
-The first four are **deterministic**: no model call, no credentials, results in
-milliseconds. These are what a reviewing agent should reach for — the agent is
-already a model, so it needs facts, not a second opinion.
-
-| Tool | Purpose |
+| Change | Requested check |
 | --- | --- |
-| `analyze_file` | Complexity metrics + risk score and risk density for one file, with the signals that drove it |
-| `scan_project` | Rank a directory's source files by risk density — risk per line, not per file. Test files are excluded by default (`includeTests` to rank them) |
-| `map_dependencies` | Imports, reverse imports and tests connected by imports, with source-line evidence and bounded depth. File relationships, not runtime callers or test coverage |
-| `analyze_logs` | Score log lines by severity and unusual wording, return the anomalies |
-| `predict_failures` | Full pipeline including a second-opinion model verdict, an `actionable` precision gate, a `checked` list of the categories the model says it weighed, and an optional ranked `findings` list (`multi: true`) — spawns a CLI, 5–15s. Takes `files: [...]` to review a change set in one call, concurrently |
-| `list_providers` | Which CLIs are installed and signed in (for diagnosing failures) |
+| One file, including a feature contained in one file | A fresh `predict_failures` call |
+| Several files | A sub-agent scoped to the changed files and intended behavior, where the host supports it |
+| Mechanical correction with one clear answer | Neither check required |
 
-`predict_failures` is deliberately the odd one out. When an agent calls it, one
-model is asking another model to review code — worth it for an independent
-second opinion, wasteful as a default. The description tells the calling agent
-exactly that, so it reaches for `analyze_file` first.
+Per-file predictions cannot verify that several files agree or that a feature
+meets its requirements. The benefit of the sub-agent rule has not been measured.
 
-A typical agent review looks like: `scan_project` to find the risky files →
-read those files directly → optionally `predict_failures` on the one or two that
-look worst.
+</details>
 
-Use `map_dependencies` when deciding which other files belong in a review. Pass
-`directory` and a `file` inside it; `file` may be absolute or relative to that
-directory. `depth` defaults to 1 and supports up to 3 import hops in each direction.
-Each dependency or dependent includes a `via` chain with paths, import kinds and
-source lines. Entries marked `test: true` match test-path conventions; this does
-not establish that they execute the changed code.
+<a id="security-model"></a>
 
-The map includes tests and follows ESM imports/re-exports, type import expressions
-and literal dynamic imports. CommonJS requires/import assignments and nonliteral
-dynamic imports are reported as unresolved. `unresolved` lists outgoing imports
-from the requested file; `coverage.unresolved` counts unresolved references across
-the scanned project. Build, vendor and hidden directories are excluded. Source
-outside `directory` and undiscovered targets remain unresolved.
+## Privacy and limits
 
-`maxFiles` defaults to 1,000 and supports up to 2,000. Additional bounds are 20,000
-directory entries, 64 directory levels, 4 MB per source file, 32 MB of source reads
-per request and 10,000 import references. `limit` defaults to 50 across both
-neighbor lists, with a maximum of 200; the serialized reply is capped at 32,000
-characters. Read/parse failures appear in `issues`, scan limits in
-`coverage.scanLimited`, and reply omissions in `truncated`. The index refreshes
-on every request. A missing relationship in a partial scan is not proof of absence.
+- Static analysis, dependency maps and log analysis run locally. `predict_failures`
+  sends source and bounded dependency context to your CLI's model provider.
+  Set `calleeContext: false` to omit dependency context.
+- Credentials stay with the CLI. MCP tools can read paths the server process can
+  access; project-scoped setup does not restrict file access. See the
+  [security model](SECURITY.md#security-model).
+- JavaScript and TypeScript are supported, including JSX, TSX and decorators.
+  Vue and Svelte single-file components are not supported. Files above 4 MB are
+  rejected; large predictions may cover only selected declarations.
+- Risk scores and predictions can be wrong. The [benchmarks](bench/RESULTS.md)
+  use development cases and do not establish accuracy on arbitrary repositories.
+- Manually verified on Windows. CI covers Windows, macOS and Linux on Node 22
+  and 24; real CLI installations on macOS and Linux have not been manually verified.
 
-This tool makes no provider call, but its metadata and returned map occupy the
-calling agent's context. See the measured response sizes and local timings in
-[bench/DEPENDENCY-MAP-CHECKPOINT.md](bench/DEPENDENCY-MAP-CHECKPOINT.md).
+<a id="using-it-in-vs-code"></a>
 
-Reviewing several files at once, pass them as `files` rather than calling the
-tool once each. The verdicts are independent, so they run concurrently: a batch
-bills the same as the same files one at a time, and returns in roughly the time
-of the slowest one instead of the sum of all of them. The reply carries a
-`results` array in the order the paths were given, with `failures` listed
-separately so one unreadable file does not discard the rest of the batch.
-Calling once per file pays the provider's latency again for every file, and was
-the single largest contributor to how slow this tool felt.
+## VS Code preview
 
-Test files are left out of that ranking. They rank high for a structural reason
-rather than a real one — `riskDensity` weights async boundaries, and a spec file
-full of mocked awaits reads as async complexity without carrying the defect risk
-that weight stands in for. Scanning this project's own `src/` puts test files in
-five of the top six slots when they are included, and none when they are not.
-`includeTests: true` brings them back, for auditing a suite's own complexity.
-The VS Code project-wide command still covers tests: a human who asked for the
-whole workspace is not spending a per-file reading budget.
+An unfinished extension can show findings in the Problems panel. It requires a
+local build and is not available on the Marketplace or as a prebuilt VSIX.
+See [trying the extension](docs/vscode.md).
 
-### Dependency context
+## Documentation
 
-Dependency context supports direct ESM imports, calls on declared imported objects,
-referenced types, imported constructors, named/default binding re-exports and
-unambiguous `export *` barrels through at most four files. Local `tsconfig.json`
-path mappings support relative config inheritance. CommonJS exports, namespace
-re-exports, package-based config inheritance and injected instance methods remain
-unresolved. Conflicting or unreadable wildcard branches remain unknown rather
-than selecting the first matching definition. At most 24 dependency files are
-parsed per collection; each must be no larger than 4 MB. Each requested export
-has a 128-step traversal limit, including cached paths.
-
-The dependency text budget is the source length with a 1,000-character minimum and
-16,000-character maximum, with at most 12 definitions of 3,000 characters each.
-There is no automatic second model pass. Very small files can still cost more to ask
-about than to read; callers should read those directly when saving context is the goal.
-
-Oversized imported objects and static class members prioritize the called member, referenced
-fields and helpers within that same budget. Retained members stay in source order;
-omitted members and state are marked. Small definitions stay intact. Dynamic
-definitions, duplicate overrides, inheritance and decorators retain prefix
-truncation. This is bounded supporting evidence, not complete state-flow analysis.
-Benchmark results and measurement methods are in [bench/RESULTS.md](bench/RESULTS.md).
-
-### Verifying new code
-
-The server advertises MCP `instructions` asking the calling agent to have code
-it wrote in the session — a fix for something these tools flagged, or a feature
-it just finished — checked from outside the context that wrote it. Every
-`predict_failures` reply repeats the rule in one line as `review`, because not
-every client forwards `instructions` to the model and a tool result always
-reaches it.
-
-Which outside seat depends on how far the change reaches, and the two do not
-cost the same. **File count is the test** — not how large the change felt, and
-not whether it was a fix or a feature:
-
-| The change | The seat | Why |
-| --- | --- | --- |
-| Confined to one file, including a whole feature in one file | a fresh `predict_failures` on it | already a second model, and one call |
-| Spanning several files | a scoped sub-agent | `predict_failures` reads each file on its own and never sees how they have to agree |
-| Mechanical — a typo, a missing await, an off-by-one with one correct value | neither | the reasoning has one correct outcome to confirm |
-
-An earlier version of this rule also sent "anything whose correctness depends on
-what was asked for" to the sub-agent. That sounds narrow and is not: every
-feature exists to satisfy an ask, so it was true of essentially all non-trivial
-work and quietly made the expensive seat the default. Whether a change crosses a
-file boundary is a fact about the diff that an agent cannot argue itself past.
-
-A clean `predict_failures` on new code is not a clearance. It means the file is
-locally sound, which is not the same as the feature being right: this tool never
-saw what the code was meant to do.
-
-The sub-agent is scoped, and backgrounded where the host allows it. It is given
-the changed files and what was being attempted and asked to review only that,
-and nothing downstream waits on it. An unscoped agent rebuilds the project from
-cold and reports on code nobody touched; a blocking one doubles the wait on the
-turn a user is watching. Those are the two ways a rule like this gets switched
-off.
-
-This is here because an agent reviewing its own work is the weakest check
-available: the reasoning that made the code look right is still in its context,
-so the second look tends to confirm the first rather than test it. Left to the
-agent's own judgement, the review happens on some runs and not others; left to
-each user's project instructions, only the users who already knew about the
-failure mode get it. It is a floor rather than a rule — an agent is free to
-verify more often, and the mechanical exemption is what stops correcting a typo
-from costing two model passes.
-
-**The sub-agent half of this rule is not measured, and the trigger is kept
-narrow because of that.** Arms that spawn a sub-agent have been run, but only
-against code the reviewing agent did not write — which is the one setting where
-the self-confirmation this rule exists to correct cannot happen. That can price
-a sub-agent and cannot value it. So the claim here is an argument, not a result,
-and the trigger is held to the narrowest case the argument actually supports:
-changes that cross a file boundary, where a per-file tool structurally cannot
-see whether the files still agree.
-
-## Settings
-
-| Setting | Default | Purpose |
-| --- | --- | --- |
-| `predictiveDebugger.claudeModel` | *(CLI default)* | Model alias for the Claude CLI |
-| `predictiveDebugger.codexModel` | *(CLI default)* | Model for the Codex CLI |
-| `predictiveDebugger.copilotModel` | *(CLI default)* | Model for the GitHub Copilot CLI (`auto` lets Copilot pick) |
-| `predictiveDebugger.logFile` | *(none)* | Workspace-relative log file to fold into the score |
-| `predictiveDebugger.pythonPath` | auto | Interpreter for the log analyzer |
-| `predictiveDebugger.multipleFindings` | `false` | Ask for every demonstrable failure in a file, ranked, rather than the single most likely one — experimental |
-| `predictiveDebugger.maxFiles` | `25` | Cap on files per project run — each costs one CLI call |
-
-## How the score works
-
-`combinedScore` is the model verdict, nudged by two local signals:
-
-```
-0.90 × model verdict   likelihood the CLI's model assigns to a concrete
-                       failure, with a pattern name and line number
-0.10 × static risk     AST complexity: nested loops, long functions,
-                       async boundaries, unguarded mutation
-0.15 × log anomalies   share of log lines flagged as unusual — folded in
-                       only when a log file is supplied, with the other
-                       two weights renormalised to make room
-```
-
-The verdict dominates on purpose. On the benchmark corpus the static score
-separates buggy files from clean ones with an AUC of 0.33 — worse than a coin
-toss, because complexity tracks file length and half the planted bugs sit in
-short files. An earlier 0.4/0.4/0.2 blend pulled the combined score down to AUC
-0.74 from the verdict's own 0.91 and ranked a clean 200-line service above four
-of the six real defects; it also capped the score at 0.8 whenever no log file
-was given, since the log term then contributed nothing.
-
-The blend lives in `src/core/prediction/score.ts` as `combineScores`, separate
-from the pipeline that calls it, so the weights can be tested without a model
-call. Static risk and log analysis run locally and cost nothing. Only the model
-verdict spawns a CLI.
-
-Two static scores are reported, and they answer different questions.
-`riskScore` is the weighted signal sum under a smooth saturation
-(`x / (x + k)`) — how much is going on in this file. It grows with length, so
-ranking by it is close to ranking by size (ρ = 0.83 against raw token count).
-`riskDensity` divides the same signals by the length of the file and damps the
-ones that accumulate with it — mutations, branches, cyclomatic complexity — to a
-tenth of their weight. That is what `scan_project` orders by, because the agent
-pays per token and a defect in a 14-line helper is nearly free to check.
-
-Saturation rather than clamping matters for both: clamping made every
-non-trivial file score exactly 1, which destroyed the ranking `scan_project`
-exists to provide. Saturation is strictly monotonic, so heavier files always
-compare correctly and the result still cannot exceed 1.
-
-A file that cannot be parsed is reported with a `parseError` and a zero score
-rather than throwing, and a project scan that fails on one file keeps the
-results for the rest and lists the failures separately. Both behaviours are
-covered by tests — they were originally bugs the test suite caught.
-
-## Benchmarks
-
-See [benchmark results](bench/RESULTS.md) and [method and reproduction](bench/METHOD.md).
-
-## Development
-
-```bash
-npm run watch     # esbuild in watch mode (unminified, with sourcemaps)
-npm run check     # type-check only — esbuild does not type-check
-npm test          # Node's built-in runner, no test dependencies
-npm run test:package # pack, install through npx, and verify the installed MCP server
-npm run package   # build and produce a .vsix
-```
-
-**esbuild does no type checking.** `npm run build` runs `tsc --noEmit` first for
-exactly that reason, and CI runs them as separate steps so a type error is
-distinguishable from a bundling error. Tests run against the `tsc` output in
-`out/`, not the bundle.
-
-Tests live in `src/test/`. They cover the pure logic — the risk model, AST
-metrics, the score blend, model-reply parsing, Windows argument quoting, the
-source-tree walker, and the log analyzer's degradation contract. Anything that
-needs a signed-in CLI is deliberately not unit-tested;
-`.github/scripts/check-mcp.mjs` covers the MCP surface end to end without
-credentials.
-
-## Contributing
-
-**Bug reports are welcome; code contributions are not open yet.** The
-interfaces are still moving, and taking pull requests against them now would
-waste the work. See [CONTRIBUTING.md](CONTRIBUTING.md) for the reasoning, the
-setup, and what CI checks.
-
-A report about how this behaved on a real codebase is worth more here than
-usual: the accuracy figures come from generated corpora, so anything measured
-on code the author cannot see is filling a gap the benchmark structurally
-cannot.
-
-For anything security-relevant, follow [SECURITY.md](SECURITY.md) and report it
-privately rather than opening an issue.
+- [Advanced setup](docs/setup.md): provider login, project scope, updates and local builds.
+- [Tool reference](docs/tools.md): parameters, prediction results, dependency context and scoring.
+- [VS Code preview](docs/vscode.md): development host, commands and settings.
+- [Benchmarks](bench/RESULTS.md) and [method](bench/METHOD.md).
+- [Development and contributing](CONTRIBUTING.md). Bug reports are welcome; code contributions are not open yet.
+- [Security policy](SECURITY.md). Report vulnerabilities privately.
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+[MIT](LICENSE).
