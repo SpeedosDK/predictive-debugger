@@ -2,17 +2,13 @@ import fs from "fs/promises";
 import path from "path";
 import { loadBabel, PARSE_OPTIONS } from "./ast";
 import { loadPathAliases } from "./modulePaths";
+import { resolveModule } from "./moduleResolution";
+import { selectMemberContext } from "./memberContext";
 
 /**
- * One imported function the analysed file calls, with the source of its
- * definition.
- *
- * This exists because single-file scope produced a false positive that was
- * attributable to it entirely: the disproof of the flagged claim was that a
- * callee was idempotent, and that callee was one import away. The evidence
- * policy in `predictBug` asks the model to disprove a candidate before
- * reporting it; without the callee's body it has nothing to disprove it with,
- * so it assumes the worst about code it cannot see. See issue #4.
+ * An imported definition or type contract used by the analysed file.
+ * The model needs dependency evidence to check whether a callee already handles
+ * a suspected failure; a single-file prompt cannot establish that contract.
  */
 export interface CalleeContext {
     /** The name as it is called in the analysed file. */
@@ -41,28 +37,35 @@ const MAX_CALLEES = 12;
 const MAX_CALLEE_CHARS = 3_000;
 const MAX_TOTAL_CALLEE_CHARS = 16_000;
 
-/** Extensions we can parse, in the order a resolver should try them. */
-const RESOLVE_EXTENSIONS = [".ts", ".tsx", ".mts", ".cts", ".js", ".jsx", ".mjs", ".cjs"];
-
-/**
- * TypeScript's Node16 resolution has source files import each other by the
- * extension of the *emitted* file, so `./billing.js` on disk is `billing.ts`.
- * Without this mapping the one-hop lookup silently finds nothing in exactly the
- * codebases most likely to use it.
- */
-const EMITTED_TO_SOURCE: Record<string, string[]> = {
-    ".js": [".ts", ".tsx"],
-    ".mjs": [".mts"],
-    ".cjs": [".cts"]
-};
-
 interface ImportBinding {
     /** The module specifier as written. */
     source: string;
     /** The name exported by that module, or "default", or "*" for a namespace. */
     imported: string;
     member?: string;
+    /** `export default identifier` copies a value rather than forwarding a binding. */
+    snapshot?: string;
 }
+
+interface ExportDefinition {
+    local: string;
+    text?: string;
+    excerpted?: boolean;
+}
+
+interface ResolvedDefinition {
+    identity: string;
+    file: string;
+    source?: string;
+    excerpted?: boolean;
+}
+
+type DefinitionResolution = ResolvedDefinition | "missing" | "unknown";
+
+// Missing exports allow another wildcard branch to resolve; unknown exports
+// cannot rule out a conflicting binding and must stop resolution.
+type ExportLookupResult = ExportDefinition | ImportBinding | { stars: string[] } | "missing" | "unknown";
+type ExportLookup = (imported: string, callName: string, budget: number, member?: string) => ExportLookupResult;
 
 interface CallSite {
     /** Local binding the call resolves through. */
@@ -76,7 +79,7 @@ interface CallSite {
 /**
  * Resolve imported calls and referenced type contracts within a fixed context budget.
  *
- * Follows at most four files through explicit re-exports, without following
+ * Follows at most four files through re-exports, without following
  * calls inside dependencies. Cycles and large dependencies yield less context.
  *
  * Never throws. An unresolvable import, an unreadable file, or a syntax error
@@ -102,7 +105,7 @@ export async function collectCalleeContext(
 
     const wanted = rankCallees(imports, calls);
     const dir = path.dirname(path.resolve(filePath));
-    const definitionCache = new Map<string, Awaited<ReturnType<typeof readExportedDefinitions>>>();
+    const definitionCache = new Map<string, ExportLookup | undefined>();
     const resolutionCache = new Map<string, string | undefined>();
     const aliases = await loadPathAliases(dir);
     const collected: CalleeContext[] = [];
@@ -122,21 +125,44 @@ export async function collectCalleeContext(
         return resolutionCache.get(key);
     };
     const definitionFor = async (
-        fromDir: string, binding: ImportBinding, name: string, seen = new Set<string>()
-    ): Promise<{ source: string; file: string } | undefined> => {
+        fromDir: string, binding: ImportBinding, name: string, budget: number,
+        seen = new Set<string>(), work = { remaining: 128 }
+    ): Promise<DefinitionResolution> => {
+        if (work.remaining-- <= 0) return "unknown";
         const resolved = await resolve(fromDir, binding.source);
-        if (!resolved || resolved === path.resolve(filePath) || seen.has(resolved) || seen.size >= 4) return undefined;
-        seen.add(resolved);
+        if (!resolved || resolved === path.resolve(filePath)) return "unknown";
+        const key = `${resolved}\0${binding.imported}`;
+        if (seen.has(key)) return "missing";
+        if (seen.size >= 4) return "unknown";
+        const next = new Set(seen).add(key);
         if (!definitionCache.has(resolved)) {
-            if (definitionCache.size >= 24) return undefined;
+            if (definitionCache.size >= 24) return "unknown";
             const dependency = await fs.stat(resolved).then(stat => stat.size <= 4 * 1024 * 1024
                 ? fs.readFile(resolved, "utf8") : undefined).catch(() => undefined);
             definitionCache.set(resolved, dependency === undefined ? undefined : await readExportedDefinitions(dependency));
         }
-        const definition = definitionCache.get(resolved)?.(binding.imported, name, binding.member);
-        if (typeof definition === "string") return { source: definition, file: resolved };
-        if (definition) return definitionFor(path.dirname(resolved), { ...definition, member: binding.member }, name, seen);
-        return undefined;
+        const lookup = definitionCache.get(resolved);
+        if (!lookup) return "unknown";
+        const definition = lookup(binding.imported, name, budget, binding.member);
+        if (typeof definition === "string") return definition;
+        if ("local" in definition) return { identity: `${resolved}\0${definition.local}`,
+            source: definition.text, file: resolved, excerpted: definition.excerpted };
+        if ("stars" in definition) {
+            let found: DefinitionResolution = "missing";
+            for (const source of definition.stars) {
+                const candidate = await definitionFor(path.dirname(resolved), { ...binding, source }, name, budget, next, work);
+                // An unreadable branch might export a conflicting binding. Absence
+                // and uncertainty must stay distinct when checking star exports.
+                if (candidate === "unknown") return "unknown";
+                if (candidate === "missing") continue;
+                if (typeof found !== "string" && found.identity !== candidate.identity) return "unknown";
+                found = candidate;
+            }
+            return found;
+        }
+        const forwarded = await definitionFor(path.dirname(resolved), { ...definition, member: binding.member }, name, budget, next, work);
+        return typeof forwarded !== "string" && definition.snapshot
+            ? { ...forwarded, identity: `${resolved}\0${definition.snapshot}` } : forwarded;
     };
     const totalBudget = Math.min(MAX_TOTAL_CALLEE_CHARS, Math.max(1_000, code.length));
     let spent = 0;
@@ -146,10 +172,6 @@ export async function collectCalleeContext(
             break;
         }
 
-        const resolved = await definitionFor(dir, binding, name);
-        if (!resolved) continue;
-        const definition = resolved.source;
-
         const budget = Math.min(MAX_CALLEE_CHARS, totalBudget - spent);
         // A cut so short it cannot even show the signature is worse than no
         // entry at all: it spends tokens to tell the model nothing.
@@ -157,8 +179,12 @@ export async function collectCalleeContext(
             break;
         }
 
-        const excerpted = definition.length > budget;
-        const source = excerpted ? `${cutAtLineBoundary(definition, budget - 12)}\n  /* … */` : definition;
+        const resolved = await definitionFor(dir, binding, name, budget);
+        if (typeof resolved === "string" || resolved.source === undefined) continue;
+        const definition = resolved.source;
+        const cut = definition.length > budget;
+        const excerpted = resolved.excerpted || cut;
+        const source = cut ? `${cutAtLineBoundary(definition, budget - 12)}\n  /* … */` : definition;
 
         spent += source.length;
         collected.push({
@@ -215,7 +241,7 @@ async function readCallGraph(
             if (!binding || !binding.path.parentPath?.isImportDeclaration()) return;
             calls.push({ local: name.name, order: order++, typeOnly: true });
         },
-        "CallExpression|OptionalCallExpression"(path: any) {
+        "CallExpression|OptionalCallExpression|NewExpression"(path: any) {
             const callee = path.node.callee;
             const local = callee.type === "Identifier" ? callee.name
                 : (callee.type === "MemberExpression" || callee.type === "OptionalMemberExpression") && callee.object.type === "Identifier"
@@ -297,45 +323,6 @@ function record(
     }
 }
 
-/** Try the extension candidates, then the directory's index file. */
-async function resolveModule(fromDir: string, specifier: string): Promise<string | undefined> {
-    if (!specifier.startsWith(".")) {
-        return undefined;
-    }
-
-    const base = path.resolve(fromDir, specifier);
-    const extension = path.extname(base);
-
-    const candidates: string[] = [];
-    if (extension) {
-        candidates.push(base);
-        const stem = base.slice(0, -extension.length);
-        for (const swapped of EMITTED_TO_SOURCE[extension] ?? []) {
-            candidates.push(`${stem}${swapped}`);
-        }
-    }
-    for (const ext of RESOLVE_EXTENSIONS) {
-        candidates.push(`${base}${ext}`);
-    }
-    for (const ext of RESOLVE_EXTENSIONS) {
-        candidates.push(path.join(base, `index${ext}`));
-    }
-
-    for (const candidate of candidates) {
-        if (await isFile(candidate)) {
-            return candidate;
-        }
-    }
-    return undefined;
-}
-
-async function isFile(candidate: string): Promise<boolean> {
-    return fs
-        .stat(candidate)
-        .then((stat) => stat.isFile())
-        .catch(() => false);
-}
-
 /**
  * Index a dependency once and return a lookup for its exported source.
  *
@@ -345,11 +332,14 @@ async function isFile(candidate: string): Promise<boolean> {
  */
 async function readExportedDefinitions(
     code: string
-): Promise<((imported: string, callName: string, member?: string) => string | ImportBinding | undefined) | undefined> {
+): Promise<ExportLookup | undefined> {
     let ast: any;
     try {
         const { parse } = await loadBabel();
         ast = parse(code, PARSE_OPTIONS);
+        // A script may expose CommonJS exports that this ESM index cannot prove
+        // absent, so it cannot clear a competing wildcard branch.
+        if (ast.errors?.length || ast.program.sourceType !== "module") return undefined;
     } catch {
         return undefined;
     }
@@ -357,8 +347,12 @@ async function readExportedDefinitions(
     const declarations = new Map<string, { start: number; end: number; prefix: string }>();
     const aliases = new Map<string, string>();
     const reexports = new Map<string, ImportBinding>();
+    const imports = new Map<string, ImportBinding>();
+    const stars = new Set<string>();
+    const unsupported = new Set<string>();
     const nodes = new Map<string, any>();
     let defaultRange: { start: number; end: number; prefix: string } | undefined;
+    let defaultSnapshot = false;
 
     const collect = (node: any, exportedNames: Set<string>): void => {
         if (!node) {
@@ -389,13 +383,38 @@ async function readExportedDefinitions(
                         prefix: `${node.kind} `
                     });
                     exportedNames.add(declarator.id.name);
+                } else {
+                    const names = (pattern: any): void => {
+                        if (!pattern) return;
+                        if (pattern.type === "Identifier") exportedNames.add(pattern.name);
+                        else if (pattern.type === "ObjectPattern") pattern.properties.forEach((entry: any) =>
+                            names(entry.type === "RestElement" ? entry.argument : entry.value));
+                        else if (pattern.type === "ArrayPattern") pattern.elements.forEach(names);
+                        else if (pattern.type === "AssignmentPattern") names(pattern.left);
+                        else if (pattern.type === "RestElement") names(pattern.argument);
+                    };
+                    names(declarator.id);
                 }
             }
         }
+        if (node.id?.name) exportedNames.add(node.id.name);
     };
 
     const exported = new Set<string>();
     for (const node of ast.program.body) {
+        if (node.type === "ImportDeclaration") {
+            for (const specifier of node.specifiers) {
+                const imported = specifier.type === "ImportDefaultSpecifier" ? "default"
+                    : specifier.type === "ImportNamespaceSpecifier" ? "*"
+                    : specifier.imported.name ?? specifier.imported.value;
+                imports.set(specifier.local.name, { source: node.source.value, imported });
+            }
+            continue;
+        }
+        if (node.type === "ExportAllDeclaration") {
+            stars.add(node.source.value);
+            continue;
+        }
         if (node.type === "ExportNamedDeclaration") {
             if (node.declaration) {
                 collect(node.declaration, exported);
@@ -405,7 +424,7 @@ async function readExportedDefinitions(
                     if (specifier.type === "ExportSpecifier") {
                         reexports.set(specifier.exported.name ?? specifier.exported.value,
                             { source: node.source.value, imported: specifier.local.name ?? specifier.local.value });
-                    }
+                    } else unsupported.add(specifier.exported.name ?? specifier.exported.value);
                 }
             } else {
                 for (const specifier of node.specifiers) {
@@ -424,7 +443,7 @@ async function readExportedDefinitions(
             const declaration = node.declaration;
             if (declaration?.id?.name) {
                 aliases.set("default", declaration.id.name);
-                collect(declaration, exported);
+                collect(declaration, new Set());
             } else if (declaration?.type === "Identifier") {
                 // `export default foo;` names a declaration made elsewhere in
                 // the file, exactly like a named alias does. Without this the
@@ -433,6 +452,7 @@ async function readExportedDefinitions(
                 // nothing, since it burns tokens to say that a function is
                 // itself.
                 aliases.set("default", declaration.name);
+                defaultSnapshot = true;
             } else if (typeof declaration?.start === "number") {
                 defaultRange = {
                     start: declaration.start,
@@ -445,31 +465,42 @@ async function readExportedDefinitions(
         collect(node, new Set());
     }
 
-    return (imported, callName, member) => {
-        if (reexports.has(imported)) return reexports.get(imported);
+    return (imported, callName, budget, member) => {
+        const reexport = reexports.get(imported);
+        if (reexport) return reexport;
+        if (unsupported.has(imported)) return "unknown";
+        const local = aliases.get(imported) ?? imported;
+        if (aliases.has(imported) && imports.has(local)) {
+            const binding = imports.get(local)!;
+            if (binding.imported === "*") return "unknown";
+            return { ...binding, ...(imported === "default" && defaultSnapshot ? { snapshot: "*default*" } : {}) };
+        }
+        const explicit = exported.has(imported) || aliases.has(imported) || imported === "default" && defaultRange;
+        if (!explicit) return imported !== "default" && stars.size ? { stars: [...stars] } : "missing";
+        const identity = imported === "default" && defaultSnapshot ? "*default*" : local;
         if (member) {
-            const local = aliases.get(imported) ?? imported;
             const node = nodes.get(local);
             const members = node?.type === "ObjectExpression" ? node.properties :
                 node?.type === "ClassDeclaration" ? node.body.body.filter((entry: any) => entry.static) : [];
             if (!members.some((entry: any) => !entry.computed &&
-                (entry.key?.name ?? entry.key?.value) === member)) return undefined;
+                (entry.key?.name ?? entry.key?.value) === member)) return { local: identity };
         }
         if (imported === "default") {
             const aliased = aliases.get("default");
             const range = aliased ? declarations.get(aliased) : defaultRange;
             if (!range) {
-                return undefined;
+                return { local: identity };
             }
             const prefix = aliased ? "" : `const ${callName} = `;
-            return `${prefix}${slice(code, range)}`;
+            return { local: identity, ...(member ? selectMemberContext(code, nodes.get(aliased!), member, range, budget, aliased!)
+                : { text: `${prefix}${slice(code, range)}` }) };
         }
-        const local = aliases.get(imported) ?? imported;
         const range = declarations.get(local);
         if (!range || (!exported.has(local) && !aliases.has(imported))) {
-            return undefined;
+            return { local: identity };
         }
-        return slice(code, range);
+        return { local: identity, ...(member ? selectMemberContext(code, nodes.get(local), member, range, budget, local)
+            : { text: slice(code, range) }) };
     };
 }
 

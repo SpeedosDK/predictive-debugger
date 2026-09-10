@@ -14,8 +14,12 @@ const hash = value => createHash('sha256').update(value).digest('hex');
 const flag = (name, fallback) => process.argv.find(a => a.startsWith(`--${name}=`))?.slice(name.length + 3) ?? fallback;
 const model = flag('model', 'sonnet');
 const trials = Number(flag('trials', '3'));
-const output = path.resolve(here, flag('output', 'results-v06-v07.json'));
+const output = path.resolve(here, flag('output', 'results-v072-full.json'));
 const previous = path.resolve(flag('previous', path.join(root, '.tmp/benchmark-master')));
+// Defaults match the comparison published in RESULTS.md. Its config hash includes these labels,
+// so a plain rerun resumes and validates it instead of starting a new experiment.
+const baselineLabel = flag('baseline-label', 'v0.7.1 (released)');
+const candidateLabel = flag('candidate-label', 'v0.7.2 candidate (feat/dependency-context)');
 const realCli = which('claude');
 if (!realCli || !Number.isInteger(trials) || trials < 1) throw Error('CLI and positive trials required.');
 const work = path.join(os.tmpdir(), 'predictive-debugger-workflows');
@@ -55,8 +59,8 @@ const revision = await runProcess({ file: which('git'), args: ['rev-parse', 'HEA
 if (revision.code !== 0) throw Error('Cannot identify baseline commit.');
 const baselineVersion = JSON.parse(await fs.readFile(path.join(previous, 'package.json'), 'utf8')).version;
 const config = { model, trials, cliVersion, bundles,
-    baseline: { revision: revision.stdout.trim(), version: baselineVersion, label: 'v0.6 baseline (master)' },
-    candidate: { label: 'v0.7 candidate', note: 'Unreleased working build, identified by bundle hash.' },
+    baseline: { revision: revision.stdout.trim(), version: baselineVersion, label: baselineLabel },
+    candidate: { label: candidateLabel, note: 'Unreleased working build, identified by bundle hash.' },
     targets, corpus: await treeHashes(stage),
     runnerHash: hash(await fs.readFile(fileURLToPath(import.meta.url))),
     wrapperHash: hash(await fs.readFile(path.join(here, 'capture-cli.cjs'))) };

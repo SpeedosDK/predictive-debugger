@@ -35,3 +35,6 @@ bench/**
 # package.json. The MCP server bundle rides along so a single install provides
 # both surfaces, and tools/ holds the Python log analyzer, which is spawned as a
 # separate process and therefore cannot be bundled.
+
+# --- Promo video source (Remotion) ------------------------------------------
+promo/**

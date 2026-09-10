@@ -6,6 +6,59 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.8.0] - 2026-09-10
+
+### Added
+
+- Added npm distribution for `npx -y predictive-debugger@latest`, with agent
+  setup and update instructions for Claude Code, Codex and Copilot CLI.
+  Added `--version` and `--help`, and a CI check that installs the tarball through
+  `npx` in an isolated cache and exercises the installed MCP server.
+- Added the deterministic `map_dependencies` MCP tool for bounded imports,
+  reverse imports and connected test files, with source-line evidence and explicit
+  coverage limits. It shares module-path resolution with prediction context and
+  makes no provider call. MCP instructions route relationship questions to it.
+- Dependency context resolves unambiguous wildcard barrels, imported named/default
+  bindings that are re-exported, and calls to imported constructors. Conflicts are
+  checked by originating binding; unknown branches and traversal limits produce
+  less context instead of a guessed definition. Namespace re-exports and CommonJS
+  remain unsupported.
+
+### Fixed
+
+- Dependency maps now mark coverage as limited when directory discovery reaches
+  its depth cap, alongside the existing issue detail.
+- Oversized imported object and static class context prioritizes the called
+  member and referenced state/helpers within the existing character limits.
+  An unrelated earlier method could previously consume the budget and hide the
+  called method. Omissions are explicit; small definitions remain unchanged.
+  Dynamic definitions retain the previous truncation behavior.
+
+### Changed
+
+- Benchmark reports and graphs label this release v0.8.0. Raw experiment names
+  and measured build hashes remain unchanged.
+- npm packages include only the MCP bundle, Python helper and package docs.
+  JavaScript dependencies are bundled at build time, so `npx` does not need to
+  install them separately. Publishing runs the tests and packaged-server check.
+- Clarified member-selection rules, export resolution states and map traversal
+  without changing the 37 benchmark prediction prompts.
+- Broader dependency evidence enabled more detections in targeted tests and used
+  3% more total tokens than v0.7.1 in the complete comparison. The report separates
+  the original cases from new dependency cases and compares tokens, with no monetary
+  savings claim. See [benchmark results](bench/RESULTS.md).
+- Shared batch caching is deferred after [profiling](bench/BATCH-PARSING-CHECKPOINT.md)
+  found little repeated indexing time worth saving.
+- Release comparisons reuse compatible saved results for the latest official
+  release and test only the candidate. Detailed results belong in `bench/`, with
+  a brief explanation of behavior and token usage in release notes.
+
+### Removed
+
+- Superseded development checkpoint runs, proxy-baseline experiments and duplicate
+  benchmark reports. Retained the complete comparison, its supporting historical
+  inputs, and the final dependency-map and batch-parsing measurements.
+
 ## [0.7.1] — 2026-09-07
 
 ### Fixed
@@ -636,7 +689,8 @@ README.
 - `@types/vscode` was newer than the declared `engines.vscode`, which prevented
   packaging and allowed use of APIs missing from the minimum supported version.
 
-[Unreleased]: https://github.com/SpeedosDK/predictive-debugger/compare/v0.7.1...HEAD
+[Unreleased]: https://github.com/SpeedosDK/predictive-debugger/compare/v0.8.0...HEAD
+[0.8.0]: https://github.com/SpeedosDK/predictive-debugger/compare/v0.7.1...v0.8.0
 [0.7.1]: https://github.com/SpeedosDK/predictive-debugger/compare/v0.7.0...v0.7.1
 [0.7.0]: https://github.com/SpeedosDK/predictive-debugger/compare/v0.6.0...v0.7.0
 [0.6.0]: https://github.com/SpeedosDK/predictive-debugger/compare/v0.5.2...v0.6.0

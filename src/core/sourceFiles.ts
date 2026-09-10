@@ -24,6 +24,10 @@ const SKIP_DIRECTORIES = new Set([
     "coverage"
 ]);
 
+export function isSkippedSourceDirectory(name: string): boolean {
+    return SKIP_DIRECTORIES.has(name) || name.startsWith(".");
+}
+
 /**
  * Directory names whose contents are tests by convention.
  *
@@ -73,7 +77,7 @@ export async function collectSourceFiles(dir: string): Promise<string[]> {
         const full = path.join(dir, entry.name);
 
         if (entry.isDirectory()) {
-            if (SKIP_DIRECTORIES.has(entry.name) || entry.name.startsWith(".")) {
+            if (isSkippedSourceDirectory(entry.name)) {
                 continue;
             }
             found.push(...(await collectSourceFiles(full)));

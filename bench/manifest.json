@@ -2,7 +2,7 @@
   "generatedBy": "bench/generate-corpus.mjs",
   "language": "javascript",
   "corpus": "corpus",
-  "fileCount": 48,
+  "fileCount": 71,
   "controls": [
     "src/services/orderService.js",
     "src/api/adminController.js",
@@ -118,6 +118,7 @@
     }
   ],
   "accuracy": {
+    "fileCount": 23,
     "note": "Development cases, not a held-out accuracy claim. Both billing variants are clean because normalization is idempotent.",
     "bugs": [
       {
@@ -134,13 +135,164 @@
           ]
         ],
         "summary": "Row permits an absent discount, which is dereferenced without a guard."
+      },
+      {
+        "file": "src/accuracy/late-member.ts",
+        "pattern": "null-reference",
+        "line": 3,
+        "acceptableLines": [
+          3
+        ],
+        "acceptableRanges": [
+          [
+            2,
+            4
+          ]
+        ],
+        "summary": "The directory Map starts empty; get returns undefined for a missing id, then displayName dereferences name."
+      },
+      {
+        "file": "src/accuracy/wildcard-discount.ts",
+        "pattern": "null-reference",
+        "line": 3,
+        "acceptableLines": [
+          3
+        ],
+        "acceptableRanges": [
+          [
+            2,
+            4
+          ]
+        ],
+        "summary": "The wildcard-exported Row contract permits an absent discount, dereferenced without a guard."
+      },
+      {
+        "file": "src/accuracy/forwarded-coupon.ts",
+        "pattern": "null-reference",
+        "line": 3,
+        "acceptableLines": [
+          3
+        ],
+        "acceptableRanges": [
+          [
+            2,
+            4
+          ]
+        ],
+        "summary": "couponFor forwards resolveCoupon, which returns undefined; discount dereferences amount."
+      },
+      {
+        "file": "src/accuracy/constructed-reading.ts",
+        "pattern": "other",
+        "line": 3,
+        "acceptableLines": [
+          3
+        ],
+        "acceptableRanges": [
+          [
+            2,
+            4
+          ]
+        ],
+        "summary": "Reading converts its input to a string; display calls the numeric toFixed method on that string."
       }
     ],
     "controls": [
       "src/accuracy/discount.fixed.ts",
       "src/accuracy/billing.ts",
-      "src/accuracy/billing.fixed.ts"
+      "src/accuracy/billing.fixed.ts",
+      "src/accuracy/late-member.fixed.ts",
+      "src/accuracy/late-normalizer.ts",
+      "src/accuracy/wildcard-discount.fixed.ts",
+      "src/accuracy/forwarded-coupon.fixed.ts",
+      "src/accuracy/constructed-reading.fixed.ts"
+    ]
+  },
+  "dependencyMap": {
+    "fileCount": 8,
+    "note": "Static file relationships only. Test filenames indicate connections, not execution coverage.",
+    "edges": [
+      {
+        "from": "src/dependencies/entry.ts",
+        "to": "src/dependencies/barrel.ts",
+        "line": 1,
+        "kind": "import"
+      },
+      {
+        "from": "src/dependencies/entry.ts",
+        "to": "src/dependencies/types.ts",
+        "line": 2,
+        "kind": "import",
+        "typeOnly": true
+      },
+      {
+        "from": "src/dependencies/entry.ts",
+        "to": "src/dependencies/lazy.ts",
+        "line": 4,
+        "kind": "dynamic-import"
+      },
+      {
+        "from": "src/dependencies/barrel.ts",
+        "to": "src/dependencies/leaf.ts",
+        "line": 1,
+        "kind": "re-export"
+      },
+      {
+        "from": "src/dependencies/barrel.ts",
+        "to": "src/dependencies/types.ts",
+        "line": 2,
+        "kind": "re-export"
+      },
+      {
+        "from": "src/dependencies/lazy.ts",
+        "to": "src/dependencies/entry.ts",
+        "line": 1,
+        "kind": "import"
+      },
+      {
+        "from": "src/dependencies/consumer.ts",
+        "to": "src/dependencies/entry.ts",
+        "line": 1,
+        "kind": "import"
+      },
+      {
+        "from": "src/dependencies/entry.test.ts",
+        "to": "src/dependencies/consumer.ts",
+        "line": 1,
+        "kind": "import"
+      }
     ],
-    "fileCount": 8
+    "queries": [
+      {
+        "file": "src/dependencies/entry.ts",
+        "depth": 2,
+        "dependencies": [
+          "barrel.ts",
+          "types.ts",
+          "lazy.ts",
+          "leaf.ts"
+        ],
+        "dependents": [
+          "consumer.ts",
+          "lazy.ts",
+          "entry.test.ts"
+        ],
+        "unresolvedLines": [
+          5
+        ]
+      },
+      {
+        "file": "src/dependencies/leaf.ts",
+        "depth": 3,
+        "dependencies": [],
+        "dependents": [
+          "barrel.ts",
+          "entry.ts",
+          "consumer.ts",
+          "lazy.ts"
+        ],
+        "unresolvedLines": []
+      }
+    ]
   }
 }

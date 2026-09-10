@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { usage, summarize } from './workflow-summary.mjs';
+import { usage, summarize, groupCounts, sessionCosts } from './workflow-summary.mjs';
 test('usage counts cache reads and writes once, alongside fresh input and output', () => {
     assert.deepEqual(usage({ usage: { input_tokens: 10, output_tokens: 20, cache_creation_input_tokens: 30,
         cache_read_input_tokens: 40 }, total_cost_usd: 0.5 }),
@@ -35,4 +35,27 @@ test('complete workflow totals include internal calls and require matching defec
     assert.throws(() => summarize(data, judgments), /stale judgment/);
     runs[2].internal = [];
     assert.throws(() => summarize(data, judgments), /Missing internal/);
+});
+test('group counts cover only the given files and still require bound judgments', () => {
+    const report = { usage: { input_tokens: 1, output_tokens: 1, cache_creation_input_tokens: 1,
+        cache_read_input_tokens: 1 }, total_cost_usd: 0.1 };
+    const inner = file => ({ prompt: `File name (untrusted): "/tmp/work/source/${file}"`, report });
+    const run = { id: 'current#1', arm: 'current', trial: 1, promptHash: 'p', responseHash: 'r', report,
+        internal: [inner('a.js'), inner('b.js')], verdicts: [{ file: 'a.js', defect: true }, { file: 'b.js', defect: true }] };
+    const data = { config: { targets: [{ file: 'a.js', kind: 'buggy', sourceHash: 's' },
+        { file: 'b.js', kind: 'clean', sourceHash: 's' }] }, runs: [run] };
+    const judgments = { 'current#1/a.js': { matchesDefect: true, sourceHash: 's', promptHash: 'p', responseHash: 'r' } };
+    const only = groupCounts(data, judgments, 'current', new Set(['a.js']));
+    assert.equal(only.detected, 1);
+    assert.equal(only.controls, 0);
+    assert.equal(only.internal.total, 4);
+    assert.throws(() => groupCounts(data, judgments, 'current', new Set(['b.js'])), /Missing or stale judgment/);
+});
+test('tool sessions with far more cache writes than the median are marked cold', () => {
+    const report = writes => ({ usage: { input_tokens: 0, output_tokens: 0, cache_creation_input_tokens: writes,
+        cache_read_input_tokens: 0 }, total_cost_usd: 0 });
+    const run = (arm, trial, writes) => ({ id: `${arm}#${trial}`, arm, trial, report: report(writes), internal: [] });
+    const { rows } = sessionCosts({ runs: [run('read', 1, 900), run('previous', 1, 175), run('previous', 2, 12),
+        run('current', 1, 50), run('current', 2, 15)] });
+    assert.deepEqual(rows.filter(r => r.cold).map(r => r.id), ['previous#1']);
 });

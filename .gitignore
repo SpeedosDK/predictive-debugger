@@ -11,6 +11,13 @@
 # --- Packaged extension -----------------------------------------------------
 *.vsix
 
+# --- Promo video (local only) -----------------------------------------------
+# The Remotion promo project is kept out of the repository by choice. It is
+# also listed in .npmignore and .vscodeignore, which is not redundant: npm and
+# vsce pack the working tree rather than what git tracks, so a local promo/
+# would otherwise ride along in the tarball and the VSIX.
+/promo
+
 # --- Secrets ----------------------------------------------------------------
 .env
 .env.local

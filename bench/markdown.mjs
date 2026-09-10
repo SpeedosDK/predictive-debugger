@@ -2,67 +2,105 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { summarize } from './workflow-summary.mjs';
+import { summarize, groupCounts, sessionCosts } from './workflow-summary.mjs';
 const here = path.dirname(fileURLToPath(import.meta.url));
 const fmt = n => n.toLocaleString('en-US');
-const money = n => '$' + n.toFixed(3);
-export function renderReport(arms, reusedBaselines = false) {
+const change = (a, b) => Math.round(100 * (a / b - 1));
+const ARMS = ['read', 'previous', 'current'];
+
+/**
+ * `groups.original` holds the cases shared with `prior`, the previously published comparison, so the
+ * same test can be checked against numbers readers have already seen; `groups.added` are the new cases.
+ */
+export function renderReport({ arms, groups, sessions, prior, trials }) {
     const [read, previous, current] = arms;
-    const fewerTokens = Math.round(100 * (1 - current.total.total / read.total.total));
-    const previousSaving = Math.round(100 * (1 - current.total.cost / previous.total.cost));
-    const directDifference = Math.round(100 * (current.total.cost / read.total.cost - 1));
+    const o = groups.original, a = groups.added;
+    const cases = g => (g.current.bugs + g.current.controls) / trials;
+    const cells = f => arms.map(f).join(' | ');
+    const found = g => ARMS.map(arm => `${g[arm].detected}/${g[arm].bugs}`).join(' | ');
+    const more = n => `${Math.abs(n)}% ${n >= 0 ? 'more' : 'fewer'}`;
+    const sameScore = o.previous.detected === prior.detected && o.previous.bugs === prior.bugs;
     return `# Benchmark results
 
-**${current.detected}/${current.bugs} planted bug trials matched, plus ${current.otherVerified ?? 0} verified alternative ${(current.otherVerified ?? 0) === 1 ? 'finding' : 'findings'}. ${current.falseAlarms} false alarms.**
+**v0.8.0 identified ${current.detected}/${current.bugs} planted bug trials with ${current.falseAlarms} false alarms.**
 
-Sonnet reviewed the same 28 JavaScript and TypeScript cases three times per workflow.
-The baseline is the pinned master commit, not an intermediate development prompt.
-v0.7 is an unreleased candidate. ${reusedBaselines ? 'The candidate has 84 fresh predictions; master and reading baselines reuse matching saved sessions.' : 'All sessions and internal model calls were run fresh.'}
+Sonnet reviewed ${cases(o) + cases(a)} JavaScript and TypeScript cases ${trials} times per workflow, every session fresh:
+the ${cases(o)} cases from the [previous results](results-v07-balanced.json) and ${cases(a)} new dependency cases.
+The baseline is tagged v0.7.1; v0.8.0 labels the measured candidate build.
+The saved records retain its original v0.7.2 label and exact bundle hash.
 
 ![Detection and false alarms](charts/detection.svg)
 
-| Across three trials | Agent reads files | v0.6 master | v0.7 candidate |
+| Across three trials | Agent reads files | v0.7.1 | v0.8.0 |
 |---|---:|---:|---:|
-| Planted defects identified | ${arms.map(a => `${a.detected}/${a.bugs}`).join(' | ')} |
-| Other verified findings in buggy files | ${arms.map(a => a.otherVerified ?? 0).join(' | ')} |
-| False alarms on clean files | ${arms.map(a => `${a.falseAlarms}/${a.controls}`).join(' | ')} |
-| Total reported tokens | ${arms.map(a => fmt(a.total.total)).join(' | ')} |
-| CLI-estimated cost | ${arms.map(a => money(a.total.cost)).join(' | ')} |
+| Original ${cases(o)} cases: defects found | ${found(o)} |
+| New ${cases(a)} cases: defects found | ${found(a)} |
+| Total planted bug trials found | ${cells(r => `${r.detected}/${r.bugs}`)} |
+| Other verified findings | ${cells(r => r.otherVerified ?? 0)} |
+| False alarms on clean files | ${cells(r => `${r.falseAlarms}/${r.controls}`)} |
+| Total reported tokens | ${cells(r => fmt(r.total.total))} |
 
+## Why v0.7.1 scores lower than before
+
+${sameScore
+        ? `On the original cases v0.7.1 found ${o.previous.detected}/${o.previous.bugs}, the same as v0.7 in the previous results.`
+        : `On the original cases v0.7.1 found ${o.previous.detected}/${o.previous.bugs}; v0.7 found ${prior.detected}/${prior.bugs} in the previous results.`}
+The test grew from ${cases(o)} to ${cases(o) + cases(a)} cases to exercise dependency resolution that the old cases barely covered.
+Each new bug case needs a definition from another file. v0.7.1 leaves it out of its prompt and found
+${a.previous.detected}/${a.previous.bugs}; v0.8.0 includes it and found ${a.current.detected}/${a.current.bugs}.
+Direct reading can inspect those dependencies and found ${a.read.detected}/${a.read.bugs} new bug trials,
+which explains its stronger showing against v0.7.1 on the expanded test.
+${previous.falseAlarms ? `
+v0.7.1's ${previous.falseAlarms} false ${previous.falseAlarms === 1 ? 'alarm is' : 'alarms are'} on clean files whose tool prompt has not changed since the previous
+results, where v0.7 raised ${prior.falseAlarms || 'none'}. The model now scores them just above the reporting cut. v0.8.0
+sends the same prompt; these results do not establish a precision improvement ([analysis](RESULTS-v072-full.md#the-false-alarms-come-from-the-model-not-the-build)).
+` : ''}
 ![Caller and internal model usage](charts/usage.svg)
 
-The candidate workflow cost **${Math.abs(previousSaving)}% ${previousSaving >= 0 ? 'less' : 'more'} than the v0.6 master workflow** in this run.
-It cost **${Math.abs(directDifference)}% ${directDifference >= 0 ? 'more' : 'less'} than direct reading**.
-It used ${Math.abs(fewerTokens)}% ${fewerTokens >= 0 ? 'fewer' : 'more'} total tokens than direct reading.
-${previous.detected === current.detected && previous.falseAlarms === current.falseAlarms ? 'Both tool versions tied on detection and false alarms in this fresh comparison.' : `The v0.6 baseline detected ${previous.detected}/${previous.bugs}; the v0.7 candidate detected ${current.detected}/${current.bugs}.`}
+v0.8.0 used ${more(change(current.total.total, previous.total.total))} tokens than v0.7.1 and ${more(change(current.total.total, read.total.total))} than direct reading.
 
-Tokens include fresh input, output, cache writes and cache reads across the caller
-and internal models. Cache state was not reset; ${reusedBaselines ? 'baseline sessions were recorded earlier' : 'run order rotated'}. These are observed
-CLI cost estimates, not subscription invoices or a guarantee of future savings.
+All ${3 * trials} sessions completed with a verdict for every file; no results are unavailable.
+Tokens include caller and internal model usage, including cache reads and writes.
 
-There are 13 distinct buggy files and 15 clean controls. Repeated trials are not
-additional bugs. These development cases informed the tool's prompt, so this is
-not a held-out accuracy estimate. Findings were reviewed for defect identity,
-not just a matching line number.
+There are ${current.bugs / trials} buggy files and ${current.controls / trials} clean controls; repeated trials are not additional bugs.
+These development cases informed the tool, so this is not a held-out accuracy estimate.
 
-[Method and reproduction](METHOD.md) | [Raw runs](results-v07-balanced.json) |
-[Defect judgments](judgments-v07-balanced.json) | [Token breakdown](workflow-summary.json)
+[Method and reproduction](METHOD.md) | [Full analysis](RESULTS-v072-full.md) | [Raw runs](results-v072-full.json) |
+[Defect judgments](judgments-v072-full.json) | [Token breakdown](workflow-summary.json)
 `;
 }
+
+async function readJson(name) {
+    return JSON.parse(await fs.readFile(path.join(here, name), 'utf8'));
+}
+
 async function main() {
-    const data = JSON.parse(await fs.readFile(path.join(here, 'results-v07-balanced.json'), 'utf8'));
-    const baseline = JSON.parse(await fs.readFile(path.join(here, 'baseline-master.json'), 'utf8'));
+    const data = await readJson('results-v072-full.json');
+    const baseline = await readJson('baseline-master.json');
     if (data.config.baseline?.revision !== baseline.revision || data.config.baseline?.version !== baseline.version) {
-        throw Error('The saved experiment does not use the pinned master baseline.');
+        throw Error('The saved experiment does not use the pinned release baseline.');
     }
-    const judgments = JSON.parse(await fs.readFile(path.join(here, 'judgments-v07-balanced.json'), 'utf8'));
+    const judgments = await readJson('judgments-v072-full.json');
+    const prior = await readJson('results-v07-balanced.json');
+    const originalFiles = new Set(prior.config.targets.map(t => t.file));
+    const addedFiles = new Set(data.config.targets.map(t => t.file).filter(f => !originalFiles.has(f)));
     const arms = summarize(data, judgments);
+    const groups = { original: {}, added: {} };
+    for (const arm of ARMS) {
+        groups.original[arm] = groupCounts(data, judgments, arm, originalFiles);
+        groups.added[arm] = groupCounts(data, judgments, arm, addedFiles);
+    }
+    const sessions = sessionCosts(data);
+    // The previous comparison's candidate arm is the v0.7 build its published results describe.
+    const v07 = summarize(prior, await readJson('judgments-v07-balanced.json'))[2];
+    const priorScore = { detected: v07.detected, bugs: v07.bugs, falseAlarms: v07.falseAlarms, controls: v07.controls };
+    const trials = data.config.trials;
     await fs.writeFile(path.join(here, 'workflow-summary.json'), JSON.stringify({
-        completedAt: data.updatedAt, configHash: data.configHash,
+        completedAt: data.updatedAt, configHash: data.configHash, cliVersion: data.config.cliVersion, trials,
         baseline: data.config.baseline, candidate: data.config.candidate, bundles: data.config.bundles,
-        reusedBaselines: data.reusedBaselines, arms
+        arms, groups, sessions, previousResults: { file: 'results-v07-balanced.json', ...priorScore }
     }, null, 2) + '\n');
-    await fs.writeFile(path.join(here, 'RESULTS.md'), renderReport(arms, Boolean(data.reusedBaselines)));
+    await fs.writeFile(path.join(here, 'RESULTS.md'), renderReport({ arms, groups, sessions, prior: priorScore, trials }));
     console.log('Wrote report and validated graph data. Run python bench/plot-workflows.py to render graphs.');
 }
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

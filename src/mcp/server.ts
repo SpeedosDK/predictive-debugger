@@ -3,6 +3,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
 import { analyzeFile } from "../core/analysis/risk";
+import { mapDependencies } from "../core/analysis/dependencies";
 import { analyzeLogs } from "../core/logs/analyzeLogs";
 import {
     actionableFindings,
@@ -24,6 +25,7 @@ import { ProviderId } from "../providers/types";
  * in JavaScript, so the fallback applies there instead of throwing.
  */
 declare const __PACKAGE_VERSION__: string | undefined;
+const VERSION = typeof __PACKAGE_VERSION__ === "string" ? __PACKAGE_VERSION__ : "0.0.0-dev";
 
 const registry = new ProviderRegistry();
 
@@ -41,7 +43,8 @@ const registry = new ProviderRegistry();
  */
 const INSTRUCTIONS = [
     "Deterministic tools first: scan_project and analyze_file cost nothing and answer most " +
-        "questions about where the risk sits. predict_failures spawns a second model, so call " +
+        "questions about where the risk sits. Use map_dependencies for imports, reverse imports " +
+        "and tests connected by imports. predict_failures spawns a second model, so call " +
         "it when you want a verdict independent of your own.",
     "When you point these tools at code you wrote in this session -- a fix for something they " +
         "flagged, or a feature you just finished -- have it checked from outside the context " +
@@ -73,7 +76,7 @@ const INSTRUCTIONS = [
 const server = new McpServer(
     {
         name: "predictive-debugger",
-        version: typeof __PACKAGE_VERSION__ === "string" ? __PACKAGE_VERSION__ : "0.0.0-dev"
+        version: VERSION
     },
     { instructions: INSTRUCTIONS }
 );
@@ -100,6 +103,31 @@ function failure(message: string) {
 }
 
 /* ---- Deterministic tools: no model call, no credentials, milliseconds. ---- */
+
+server.registerTool(
+    "map_dependencies",
+    {
+        title: "Map a file's dependency neighborhood",
+        description: "Find a file's local imports, reverse imports and tests connected by imports. " +
+            "Each relationship includes a source path and line as evidence. Static file relationships, " +
+            "not runtime callers or test coverage. Scans JavaScript/TypeScript including tests, with " +
+            "bounded work and explicit unresolved imports and scan limits. Deterministic; no provider call.",
+        inputSchema: {
+            directory: z.string().describe("Project directory; source outside this directory is excluded"),
+            file: z.string().describe("Source file, absolute or relative to directory"),
+            depth: z.number().int().min(1).max(3).optional().describe("Import hops in each direction, default 1"),
+            limit: z.number().int().min(1).max(200).optional().describe("Total neighboring files to return, default 50"),
+            maxFiles: z.number().int().min(1).max(2000).optional().describe("Maximum source files to discover, default 1000")
+        }
+    },
+    async (options) => {
+        try {
+            return json(await mapDependencies(options));
+        } catch (error) {
+            return failure(`Could not map dependencies: ${message(error)}`);
+        }
+    }
+);
 
 server.registerTool(
     "analyze_file",
@@ -491,6 +519,27 @@ function message(err: unknown): string {
 }
 
 async function main(): Promise<void> {
+    const args = process.argv.slice(2);
+    if (args.length === 1 && ["--version", "-v"].includes(args[0])) {
+        process.stdout.write(`${VERSION}\n`);
+        return;
+    }
+    if (args.length === 1 && ["--help", "-h"].includes(args[0])) {
+        process.stdout.write(
+            "Usage: predictive-debugger-mcp [--version | --help]\n\n" +
+            "Start the Predictive Debugger MCP server over stdio with no arguments.\n" +
+            "Configure your agent to run: npx -y predictive-debugger@latest\n" +
+            "On Windows, use: cmd /d /c npx -y predictive-debugger@latest\n\n" +
+            "--version, -v  Print the installed version and exit.\n" +
+            "--help, -h     Show this help and exit.\n"
+        );
+        return;
+    }
+    if (args.length > 0) {
+        process.stderr.write("Unknown arguments. Run predictive-debugger-mcp --help for usage.\n");
+        process.exitCode = 1;
+        return;
+    }
     // stdout is the JSON-RPC channel; anything we want to say goes to stderr.
     await server.connect(new StdioServerTransport());
     process.stderr.write("predictive-debugger MCP server ready\n");

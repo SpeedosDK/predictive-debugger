@@ -53,14 +53,27 @@ point an MCP-capable assistant at it, which the sections below walk through.
    GitHub Copilot CLI. This project has no AI model of its own — it borrows
    whichever one of these you're signed into. Install one first if you don't
    have one; there's nothing for this project to borrow otherwise.
-3. Predictive Debugger downloaded and built using the instructions below.
 
 ## Download and install
 
-Predictive Debugger is not published to npm or the VS Code Marketplace. Download
-the project from GitHub and build it locally:
+The MCP server supports `npx`, which downloads and runs the package without a
+global install or a source build. The VS Code extension still uses a local build.
 
-1. Open the [v0.7.1 release](https://github.com/SpeedosDK/predictive-debugger/releases/tag/v0.7.1).
+Download the current npm release and print its version:
+
+```bash
+npx -y predictive-debugger@latest --version
+```
+
+Then follow [Using it from an agent](#using-it-from-an-agent-mcp). Your agent
+starts the server when it needs it. Running the command without `--version`
+starts a stdio server that waits for MCP messages.
+
+### Build from source
+
+Use this for development or the VS Code preview:
+
+1. Open the [v0.8.0 release](https://github.com/SpeedosDK/predictive-debugger/releases/tag/v0.8.0).
 2. Under **Assets**, select **Source code (zip)**.
 3. Extract the ZIP to a permanent location. Your MCP configuration will point
    to a file inside this folder, so moving it later will break that path.
@@ -99,8 +112,8 @@ To try the unfinished editor extension, see
 ```
 src/
   core/            analysis engine — no VS Code, no MCP, no I/O beyond files
-    analysis/      AST metrics (ast.ts), heuristic risk (risk.ts), one-hop
-                   import resolution for prompt context (callees.ts)
+    analysis/      AST metrics (ast.ts), heuristic risk (risk.ts), dependency
+                   context (callees.ts), file relationships (dependencies.ts)
     logs/          wrapper around tools/log-analyzer
     prediction/    model-backed prediction: one file, or a whole project
     sourceFiles.ts shared source-tree walker
@@ -134,14 +147,13 @@ Read this before relying on it.
   sign-in.
 - **The VS Code extension is unfinished.** It is not published to the VS Code
   Marketplace or distributed as an installable VSIX. You can try it from the
-  source folder using the development workflow below. The MCP server is built
-  and configured directly from the downloaded source.
+  source folder using the development workflow below.
 - **`predict_failures` sends file contents to a model provider.** It also sends
   bounded imported definitions and referenced type contracts, so the model
   can see whether a callee already handles the
   case it is about to flag; pass `calleeContext: false` to send only the file.
   Third-party packages are never read. The deterministic tools (`analyze_file`,
-  `scan_project`, `analyze_logs`) run entirely locally and send nothing
+  `scan_project`, `map_dependencies`, `analyze_logs`) run entirely locally and send nothing
   anywhere. If you point the MCP server at a private codebase, know which tools
   your agent is calling.
 - **Very large files are analysed only in part.** Up to 120,000 characters
@@ -193,16 +205,17 @@ Read this before relying on it.
 - **The MCP tools accept absolute paths from the calling agent** and will read
   any file the process can read — by design, since the point is to analyse a
   codebase. Files above 4 MB are skipped rather than loaded.
-- `npm audit` reported 0 vulnerabilities across 111 production dependencies as
-  of 2026-09-05. Re-run it rather than trusting this line.
+- JavaScript dependencies are bundled into the shipped server. Run `npm audit`
+  in a source checkout to check the dependencies used to build it. Auditing the
+  installed npm package does not inspect code inside the bundle.
 
 ## Using it in VS Code
 
 The VS Code extension is still an unfinished preview. It is not available from
 the Marketplace and there is no prebuilt VSIX to install. To try it:
 
-1. Complete [Download and install](#download-and-install).
-2. Open the extracted `predictive-debugger-0.5.2` folder in VS Code.
+1. Complete [Build from source](#build-from-source).
+2. Open the extracted Predictive Debugger folder in VS Code.
 3. Press <kbd>F5</kbd> to launch an Extension Development Host.
 4. Run one of these commands in the new VS Code window:
 
@@ -223,24 +236,16 @@ open in another window, so the dev host needs a different folder.
 
 ### Ask your agent to add it
 
-Your coding agent can usually configure the MCP server for you. After running
-`npm run build`, copy the full path to `dist/mcp-server.js`. Open the project
-where you want to use Predictive Debugger and give the agent one of these
-instructions:
+Open the project where you want to use
+Predictive Debugger and give your agent this instruction:
 
 > Add Predictive Debugger as a project-scoped MCP server for this project. The
-> server command is `node` and its entry point is
-> `/absolute/path/to/predictive-debugger-0.5.2/dist/mcp-server.js`. Verify that
-> the server starts and lists its tools.
+> server command is `npx` with arguments `-y predictive-debugger@latest`.
+> On native Windows, use `cmd` with arguments
+> `/d /c npx -y predictive-debugger@latest`. Verify that it starts and lists
+> its tools.
 
-Or, to make it available in every project:
-
-> Add Predictive Debugger as a user-level MCP server so it is available in all
-> my projects. The server command is `node` and its entry point is
-> `/absolute/path/to/predictive-debugger-0.5.2/dist/mcp-server.js`. Verify that
-> the server starts and lists its tools.
-
-Replace the example with the real path on your machine. Project scope makes the
+For every project, replace "project-scoped" with "user-level". Project scope makes the
 server available only when you work in that project. User or global scope makes
 it available across projects. This setting controls where the MCP registration
 is loaded; it does not restrict which paths the server process can read.
@@ -250,39 +255,54 @@ instructions below.
 
 ### Claude Code
 
-A project-scoped `.mcp.json` is included in the download. It points at
-`dist/mcp-server.js`, so after building you can start Claude Code from the
-downloaded folder:
+Run this in the project where you want to use the server. On macOS, Linux or WSL:
 
 ```bash
-claude
+claude mcp add --scope project predictive-debugger -- npx -y predictive-debugger@latest
 ```
 
-To add it to another project, run this from that project's folder:
+On native Windows, from PowerShell:
 
-```bash
-claude mcp add --scope project predictive-debugger -- node /absolute/path/to/dist/mcp-server.js
+```powershell
+claude mcp add --scope project predictive-debugger -- cmd /d /c npx -y predictive-debugger@latest
 ```
 
-To make it available in every project, use user scope:
-
-```bash
-claude mcp add --scope user predictive-debugger -- node /absolute/path/to/dist/mcp-server.js
-```
+Use `--scope user` for every project. Restart Claude Code and check `/mcp`.
+See [Claude Code's MCP setup](https://code.claude.com/docs/en/mcp) for scope details.
 
 ### Codex
 
-Add the following block to `.codex/config.toml` inside a trusted project for a
+For a user-level setup on macOS, Linux or WSL:
+
+```bash
+codex mcp add predictive-debugger -- npx -y predictive-debugger@latest
+```
+
+On native Windows, from PowerShell:
+
+```powershell
+codex mcp add predictive-debugger -- cmd /d /c npx -y predictive-debugger@latest
+```
+
+Alternatively, add this block to `.codex/config.toml` inside a trusted project for a
 project-only setup. Add it to `~/.codex/config.toml` instead to make the server
 available in every project:
 
 ```toml
 [mcp_servers.predictive-debugger]
-command = "node"
-args = ["/absolute/path/to/dist/mcp-server.js"]
+command = "npx"
+args = ["-y", "predictive-debugger@latest"]
+startup_timeout_sec = 60
 ```
 
-### GitHub Copilot
+On native Windows, use `command = "cmd"` and
+`args = ["/d", "/c", "npx", "-y", "predictive-debugger@latest"]`.
+The startup timeout allows time for the first download. You can also add
+`startup_timeout_sec = 60` to the entry created by the CLI.
+Restart Codex and check `/mcp`. See
+[Codex MCP configuration](https://developers.openai.com/codex/mcp/).
+
+### GitHub Copilot CLI
 
 For a project-only setup, add this to `.mcp.json` in the project where you want
 to use the server:
@@ -291,23 +311,67 @@ to use the server:
 {
   "mcpServers": {
     "predictive-debugger": {
-      "command": "node",
-      "args": ["/absolute/path/to/dist/mcp-server.js"]
+      "command": "npx",
+      "args": ["-y", "predictive-debugger@latest"],
+      "tools": ["*"]
     }
   }
 }
 ```
 
-To add it to your Copilot user configuration and make it available across
-projects, run:
+On native Windows, use `"command": "cmd"` and
+`"args": ["/d", "/c", "npx", "-y", "predictive-debugger@latest"]`.
+
+For a user-level setup on macOS, Linux or WSL:
 
 ```bash
-copilot mcp add predictive-debugger -- node /absolute/path/to/dist/mcp-server.js
+copilot mcp add predictive-debugger -- npx -y predictive-debugger@latest
 ```
+
+On native Windows, from PowerShell:
+
+```powershell
+copilot mcp add predictive-debugger -- cmd /d /c npx -y predictive-debugger@latest
+```
+
+Restart Copilot and check `/mcp`. See
+[Copilot CLI MCP configuration](https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-command-reference#mcp-server-configuration).
+
+### Updating
+
+The configurations above use `@latest`, so npm resolves the current release when
+your agent starts the server. Restart the agent or reconnect its MCP server to
+use an update. A running server keeps its current version.
+
+To force an update check and print the downloaded version:
+
+```bash
+npx --prefer-online -y predictive-debugger@latest --version
+```
+
+Then restart your agent. `--prefer-online` forces npm to recheck cached package
+metadata. See [npm's cache options](https://docs.npmjs.com/cli/v11/commands/npm-exec/#a-note-on-caching).
+For controlled updates, replace `@latest` in your MCP configuration with a
+published version such as `@X.Y.Z`, then change it when you want to upgrade.
+
+### Using a local build
+
+After [building from source](#build-from-source), configure the server command as
+`node` and pass the absolute path to `dist/mcp-server.js` as its only argument.
+This works with the same agent configurations above. For example:
+
+```bash
+claude mcp add --scope project predictive-debugger -- node "/absolute/path/to/predictive-debugger/dist/mcp-server.js"
+```
+
+The repository's `.mcp.json` already uses `node ./dist/mcp-server.js`, so starting
+Claude Code or Copilot in this repository uses the local build. When switching an
+existing registration to `npx`, edit its command and arguments in place. A
+project entry can override a user-level entry with the same name.
 
 ### Tools
 
-The first three are **deterministic**: no model call, no credentials, results in
+The first four are **deterministic**: no model call, no credentials, results in
 milliseconds. These are what a reviewing agent should reach for — the agent is
 already a model, so it needs facts, not a second opinion.
 
@@ -315,6 +379,7 @@ already a model, so it needs facts, not a second opinion.
 | --- | --- |
 | `analyze_file` | Complexity metrics + risk score and risk density for one file, with the signals that drove it |
 | `scan_project` | Rank a directory's source files by risk density — risk per line, not per file. Test files are excluded by default (`includeTests` to rank them) |
+| `map_dependencies` | Imports, reverse imports and tests connected by imports, with source-line evidence and bounded depth. File relationships, not runtime callers or test coverage |
 | `analyze_logs` | Score log lines by severity and unusual wording, return the anomalies |
 | `predict_failures` | Full pipeline including a second-opinion model verdict, an `actionable` precision gate, a `checked` list of the categories the model says it weighed, and an optional ranked `findings` list (`multi: true`) — spawns a CLI, 5–15s. Takes `files: [...]` to review a change set in one call, concurrently |
 | `list_providers` | Which CLIs are installed and signed in (for diagnosing failures) |
@@ -327,6 +392,32 @@ exactly that, so it reaches for `analyze_file` first.
 A typical agent review looks like: `scan_project` to find the risky files →
 read those files directly → optionally `predict_failures` on the one or two that
 look worst.
+
+Use `map_dependencies` when deciding which other files belong in a review. Pass
+`directory` and a `file` inside it; `file` may be absolute or relative to that
+directory. `depth` defaults to 1 and supports up to 3 import hops in each direction.
+Each dependency or dependent includes a `via` chain with paths, import kinds and
+source lines. Entries marked `test: true` match test-path conventions; this does
+not establish that they execute the changed code.
+
+The map includes tests and follows ESM imports/re-exports, type import expressions
+and literal dynamic imports. CommonJS requires/import assignments and nonliteral
+dynamic imports are reported as unresolved. `unresolved` lists outgoing imports
+from the requested file; `coverage.unresolved` counts unresolved references across
+the scanned project. Build, vendor and hidden directories are excluded. Source
+outside `directory` and undiscovered targets remain unresolved.
+
+`maxFiles` defaults to 1,000 and supports up to 2,000. Additional bounds are 20,000
+directory entries, 64 directory levels, 4 MB per source file, 32 MB of source reads
+per request and 10,000 import references. `limit` defaults to 50 across both
+neighbor lists, with a maximum of 200; the serialized reply is capped at 32,000
+characters. Read/parse failures appear in `issues`, scan limits in
+`coverage.scanLimited`, and reply omissions in `truncated`. The index refreshes
+on every request. A missing relationship in a partial scan is not proof of absence.
+
+This tool makes no provider call, but its metadata and returned map occupy the
+calling agent's context. See the measured response sizes and local timings in
+[bench/DEPENDENCY-MAP-CHECKPOINT.md](bench/DEPENDENCY-MAP-CHECKPOINT.md).
 
 Reviewing several files at once, pass them as `files` rather than calling the
 tool once each. The verdicts are independent, so they run concurrently: a batch
@@ -345,6 +436,30 @@ five of the top six slots when they are included, and none when they are not.
 `includeTests: true` brings them back, for auditing a suite's own complexity.
 The VS Code project-wide command still covers tests: a human who asked for the
 whole workspace is not spending a per-file reading budget.
+
+### Dependency context
+
+Dependency context supports direct ESM imports, calls on declared imported objects,
+referenced types, imported constructors, named/default binding re-exports and
+unambiguous `export *` barrels through at most four files. Local `tsconfig.json`
+path mappings support relative config inheritance. CommonJS exports, namespace
+re-exports, package-based config inheritance and injected instance methods remain
+unresolved. Conflicting or unreadable wildcard branches remain unknown rather
+than selecting the first matching definition. At most 24 dependency files are
+parsed per collection; each must be no larger than 4 MB. Each requested export
+has a 128-step traversal limit, including cached paths.
+
+The dependency text budget is the source length with a 1,000-character minimum and
+16,000-character maximum, with at most 12 definitions of 3,000 characters each.
+There is no automatic second model pass. Very small files can still cost more to ask
+about than to read; callers should read those directly when saving context is the goal.
+
+Oversized imported objects and static class members prioritize the called member, referenced
+fields and helpers within that same budget. Retained members stay in source order;
+omitted members and state are marked. Small definitions stay intact. Dynamic
+definitions, duplicate overrides, inheritance and decorators retain prefix
+truncation. This is bounded supporting evidence, not complete state-flow analysis.
+Benchmark results and measurement methods are in [bench/RESULTS.md](bench/RESULTS.md).
 
 ### Verifying new code
 
@@ -458,23 +573,9 @@ rather than throwing, and a project scan that fails on one file keeps the
 results for the rest and lists the failures separately. Both behaviours are
 covered by tests — they were originally bugs the test suite caught.
 
-## Measured results
+## Benchmarks
 
-[bench/RESULTS.md](bench/RESULTS.md) compares direct Sonnet reading, the previous
-prompt version of the tool and the current tool across the same 28 development cases.
-The graphs show verified defect detections, false alarms, total reported tokens and
-CLI-estimated cost, including the model calls inside the tool.
-
-```bash
-npm run bench           # rebuild both versions, resume sessions, generate report and graphs
-node bench/markdown.mjs  # regenerate report and validated plot data without model calls
-python bench/plot-workflows.py
-```
-
-Install the plotting dependency from `bench/requirements.txt` first. The Windows
-runner checkpoints each complete agent session and stops on incomplete results.
-Changed source, builds or settings require a new output filename.
-See [method and reproduction](bench/METHOD.md).
+See [benchmark results](bench/RESULTS.md) and [method and reproduction](bench/METHOD.md).
 
 ## Development
 
@@ -482,6 +583,7 @@ See [method and reproduction](bench/METHOD.md).
 npm run watch     # esbuild in watch mode (unminified, with sourcemaps)
 npm run check     # type-check only — esbuild does not type-check
 npm test          # Node's built-in runner, no test dependencies
+npm run test:package # pack, install through npx, and verify the installed MCP server
 npm run package   # build and produce a .vsix
 ```
 
@@ -515,23 +617,3 @@ privately rather than opening an issue.
 ## License
 
 MIT — see [LICENSE](LICENSE).
-
-
-### Accuracy experiments and cost
-
-Dependency context supports direct ESM imports, calls on declared imported objects,
-referenced types, explicit named re-exports through at most four files, and local
-`tsconfig.json` path mappings with relative config inheritance. It does not resolve
-CommonJS exports, `export *` barrels, package-based config inheritance, or injected
-instance methods. Unresolved dependencies remain unknown. At most 24 dependency
-files are parsed per collection; each must be no larger than 4 MB.
-
-The dependency text budget is the source length with a 1,000-character minimum and
-16,000-character maximum, with at most 12 definitions of 3,000 characters each.
-There is no automatic second model pass. Very small files can still cost more to ask
-about than to read; callers should read those directly when saving context is the goal.
-
-The full workflow comparison uses the original JavaScript and TypeScript cases plus
-four dependency cases. See [bench/METHOD.md](bench/METHOD.md) for build reconstruction,
-usage accounting, adjudication and reproduction. The corpus informed prompt tuning,
-so these are development results rather than held-out accuracy estimates.

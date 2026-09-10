@@ -38,10 +38,15 @@ Host. For the MCP server, `npm run build` then point your agent at
 ```bash
 npm run check     # tsc --noEmit; esbuild does no type checking
 npm test
+npm run build
+node .github/scripts/check-mcp.mjs
+npm run test:package
 ```
 
-CI runs these on Linux, macOS and Windows across Node 22 and 24, plus a
-smoke test that the bundled MCP server starts and lists its tools.
+CI runs these on Linux, macOS and Windows across Node 22 and 24. The package
+check runs `npm pack`, installs the tarball through `npx` from an empty cache
+outside the repository, and verifies its version, MCP tools and Python helper.
+It runs offline after packing and requires no provider credentials.
 
 ## Branches and releases
 
@@ -52,11 +57,44 @@ smoke test that the bundled MCP server starts and lists its tools.
 
 Work targets `develop` unless it fixes something already released.
 
-Cutting a release means: move the `[Unreleased]` entries in
-[CHANGELOG.md](CHANGELOG.md) under a dated version heading, set the version in
-`package.json` to match (the MCP server reports it and `prepack` rebuilds from
-it, so that one edit covers both), merge `develop` into `master`, and tag the
-merge `vX.Y.Z`.
+Keep feature work and the release bump in separate commits. The
+`chore(release): X.Y.Z` commit moves `[Unreleased]` in
+[CHANGELOG.md](CHANGELOG.md) under a dated version heading and updates both
+`package.json` and `package-lock.json`. Merge `develop` into `master` by pull
+request, then tag the release `vX.Y.Z`.
+
+### Publishing the MCP package to npm
+
+The package name is `predictive-debugger`; its executable is
+`predictive-debugger-mcp`. npm can infer that executable because it is the only
+`bin` entry, so users run `npx -y predictive-debugger@latest`.
+
+Merge the release from `develop` into `master` by pull request and wait for every
+master CI job to pass. Tag that tested commit, then publish from a clean checkout
+of the tag using an npm account that can publish this package:
+
+```bash
+npm ci
+npm login
+npm publish --dry-run
+npm publish --access public
+```
+
+`prepublishOnly` runs the test suite and the isolated package check. `prepack`
+builds both bundles and injects the package version into the MCP server. The
+tarball contains the built MCP server and Python helper, so consumers need no
+build tools or separate npm dependencies. `.npmignore` controls this tarball;
+`.vscodeignore` controls the VS Code package.
+
+After publishing, verify the registry copy from a directory outside this repo:
+
+```bash
+npx --prefer-online -y predictive-debugger@latest --version
+```
+
+Add it to an agent with the README instructions and check that its MCP tools are
+available. Publish later stable versions with the same process; configurations
+using `@latest` resolve the new release when the server next starts.
 
 ## How this codebase is organised
 

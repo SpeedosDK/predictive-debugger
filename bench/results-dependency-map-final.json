@@ -1,0 +1,1994 @@
+{
+  "config": {
+    "trials": 5,
+    "providerCalls": 0,
+    "manifestHash": "1e3d24e13b51d0ea46119b2df96b2343d80229705f6fa5d25cc26a141f936990",
+    "corpusHashes": [
+      {
+        "file": "src/accuracy/barrel.ts",
+        "hash": "6b3b5d76d72ffd004f88af567dddc0492e0106eea46a6a569f1193668a6b6eaf"
+      },
+      {
+        "file": "src/accuracy/billing.fixed.ts",
+        "hash": "136ae9c26b1e93f59714f10f346bac4e0888386164e2269b7d9d30b3c48eb963"
+      },
+      {
+        "file": "src/accuracy/billing.ts",
+        "hash": "16a5a80c7719b16c54718e24afcc3b7b046455d24f2bdf920a73e2f5695a0927"
+      },
+      {
+        "file": "src/accuracy/constructed-reading.fixed.ts",
+        "hash": "2c3dbdb2694524abab03691f82c4c1d2d581ffad0e6441b003439c40fc4e7441"
+      },
+      {
+        "file": "src/accuracy/constructed-reading.ts",
+        "hash": "468050c90c52a0959c209527182c81e0b589ffa338e975cefe248bac78df7633"
+      },
+      {
+        "file": "src/accuracy/contracts.ts",
+        "hash": "45ab58811f4a85e7549ac180325ad10a2dc4d0988efc61ccc50a2e49d45397e3"
+      },
+      {
+        "file": "src/accuracy/coupon-source.ts",
+        "hash": "123beb7e37bc95cffdba765c45449bc4e217c3c12e7387e503f4766b843e4cb1"
+      },
+      {
+        "file": "src/accuracy/coupon.barrel.ts",
+        "hash": "7e03e7e79c81f7277d6ace51530841e80d77d3d346b3b278c497a0b7e459e25c"
+      },
+      {
+        "file": "src/accuracy/discount.fixed.ts",
+        "hash": "ce5687fb3fcd2bd894425456dcc4a586dbc3a9c6646baf5f24a4f4fb48526c49"
+      },
+      {
+        "file": "src/accuracy/discount.ts",
+        "hash": "06c2ffaf47268ba297773e4951e85c3c3b64cd15a2b8520a584435ef77fc4a65"
+      },
+      {
+        "file": "src/accuracy/forwarded-coupon.fixed.ts",
+        "hash": "c4847ecc88cf90bc764f356fdf8df5927b4d907c0bb9531cbc74854edc721406"
+      },
+      {
+        "file": "src/accuracy/forwarded-coupon.ts",
+        "hash": "bac2a9673d197bdff07ca8127d2f3c2fca6c0486c332b309545330a9ebeb128a"
+      },
+      {
+        "file": "src/accuracy/large-directory.ts",
+        "hash": "cdfa8a60084f12b0b64d4c42c9bcbfc2023066758fb4b74a4cff6e1920eea0c6"
+      },
+      {
+        "file": "src/accuracy/large-normalizer.ts",
+        "hash": "a490038798d1866f5da1ddb86362d1bb74e6074b64517bffe1f1c00e42a5e8c0"
+      },
+      {
+        "file": "src/accuracy/late-member.fixed.ts",
+        "hash": "ad5a2a4b4a77a285e861cd64e6bfcab1952e24bd09a8f537d6f06e8bc34cd91f"
+      },
+      {
+        "file": "src/accuracy/late-member.ts",
+        "hash": "e1c168da3505c5abc0d8a5dd5c68cea048aa94e0679492438c899dbb1506d25c"
+      },
+      {
+        "file": "src/accuracy/late-normalizer.ts",
+        "hash": "fd220454bd2cbc8cfc661ee175e47e787b060b102e63d7df7abe35baea7eae1d"
+      },
+      {
+        "file": "src/accuracy/normalizer.barrel.ts",
+        "hash": "f67bddd2184586f6285aeecb7286c9a6629dcaabd19ea7c8f4b6bf1b5161b3ce"
+      },
+      {
+        "file": "src/accuracy/normalizer.ts",
+        "hash": "a93ef90c6fea4c57a680774619e6b140dcbfa4ebf7c4356f76ebe4ca405591ce"
+      },
+      {
+        "file": "src/accuracy/reading.ts",
+        "hash": "e7e1ac55b8f88ac7c02d86b00b9cc21c4991ba4c404755c03ec309a045662057"
+      },
+      {
+        "file": "src/accuracy/wildcard-discount.fixed.ts",
+        "hash": "397c02e337b225614b3a10cbc62b3bfc2ce6a1082a3ab3d4a1a20e2750286da5"
+      },
+      {
+        "file": "src/accuracy/wildcard-discount.ts",
+        "hash": "9dbcff59e710be827be727cb75e5f6bd7c7cf40d2a3a237bcb3d4730e1e2bd66"
+      },
+      {
+        "file": "src/accuracy/wildcard.barrel.ts",
+        "hash": "1aebb9b9556d94773c24dceb80ff471148bdc8db69c1126c8fc17293c61018ce"
+      },
+      {
+        "file": "src/api/adminController.js",
+        "hash": "5630dcd0c575715dd2784150d0465f9a53b2bc9040a46d534f043ff373611817"
+      },
+      {
+        "file": "src/api/customerController.js",
+        "hash": "ed185763667f66b3f7c733f4380f5afe28c6ba93f7bf29d94895894018a9dfdc"
+      },
+      {
+        "file": "src/api/healthController.js",
+        "hash": "716b4456c7d5ca017ffe79df1007a5002a1c8fa54b932339a986a255463ab1e3"
+      },
+      {
+        "file": "src/api/invoiceController.js",
+        "hash": "234ac3e258cc0478a589ea094b36c9b8db498764b9143497c64a79dbe0944aa3"
+      },
+      {
+        "file": "src/api/orderController.js",
+        "hash": "2bb1eba2cebf6d89e527deba41ad1b437de05f3952238dd8fea8a8a86636682d"
+      },
+      {
+        "file": "src/api/refundController.js",
+        "hash": "691c8f6e252c2041220636dc02f92cd87b2e59a4fe5b3fac004b015a47cd9cb8"
+      },
+      {
+        "file": "src/api/shipmentController.js",
+        "hash": "415e0dbefaa4075ce2ecfc5ef079819b293f32ed9d316f48eded8f90ff7e2264"
+      },
+      {
+        "file": "src/api/webhookController.js",
+        "hash": "b1f16ed3b048b50a49d2161f542e0191e759bd9469b1f058a47b2bd91e4618bf"
+      },
+      {
+        "file": "src/dependencies/barrel.ts",
+        "hash": "705ae2292eb56431944a32bcb537d59a4ec7a4bbe5f9769928a2785eda4ee891"
+      },
+      {
+        "file": "src/dependencies/consumer.ts",
+        "hash": "1b67556bfc66dc06c00ac38774259523b493f9a7a79dbfa6c500b1c88540c67e"
+      },
+      {
+        "file": "src/dependencies/entry.test.ts",
+        "hash": "88c8fce6590fd0529f74647464ea1b249ff4ca26daf08cf089fc1a6e6ff434aa"
+      },
+      {
+        "file": "src/dependencies/entry.ts",
+        "hash": "cf7616ab250a814ceccca1b7d6300e1448569673a26b253eb1e0d2545a2ac9c5"
+      },
+      {
+        "file": "src/dependencies/lazy.ts",
+        "hash": "8712e32d922126e3df500557499d045eb71d2174ac69585928a9e4597d0089b3"
+      },
+      {
+        "file": "src/dependencies/leaf.ts",
+        "hash": "5d8f65d2774e206bc9f7a7a4ad39ca2dc563b5c31e46ab57ef4874961237ce29"
+      },
+      {
+        "file": "src/dependencies/types.ts",
+        "hash": "eceb1bde3b69a922628b935da37284875df28469d0b3ec3524fac72a61164ec5"
+      },
+      {
+        "file": "src/dependencies/unrelated.test.ts",
+        "hash": "c03339ec10e5f64fe286ab8e0c701ba8222826364b782bbe23fa2693047dadce"
+      },
+      {
+        "file": "src/lib/currency.js",
+        "hash": "19b3fb1cb12b0b1778cee7cfbc427630e3196fd3fa8428b8f7cf42d9b1456239"
+      },
+      {
+        "file": "src/lib/dateWindow.js",
+        "hash": "0a8530dd6c81bda7560c42e74c6bfbc3b064e82d90cfe16a9e0bfe3f22953351"
+      },
+      {
+        "file": "src/lib/env.js",
+        "hash": "531f9ee492335dc9d06cec9e327c4a93e030803a8d401a6ef7f1832be0abea4a"
+      },
+      {
+        "file": "src/lib/headers.js",
+        "hash": "94e25cf60eb42a9d079389bcb5f16b7570e54294b707dd9be3d5ab052e935801"
+      },
+      {
+        "file": "src/lib/ids.js",
+        "hash": "65573736c28a947bd5300f19675dd50a337d0cf06c52064a2c16073096401761"
+      },
+      {
+        "file": "src/lib/paging.js",
+        "hash": "7d4c18276f8ec5aee21b4e013b5a596ec20cee809bf5ee972c074d0b2ffbb02d"
+      },
+      {
+        "file": "src/lib/retry.js",
+        "hash": "4c54b5e486ee9f5ba09a38fc6bfb55285d00ebe53c3c83d8894f1eb51463d698"
+      },
+      {
+        "file": "src/lib/serialise.js",
+        "hash": "cfbfb03b77805ef79a9043c28941704d0a440188ff04bd0986fe6c8bda9a93a6"
+      },
+      {
+        "file": "src/lib/strings.js",
+        "hash": "5dae1ed700f78ee8a2ec089d46fb80405b45fb401a66524555e198e94a321dad"
+      },
+      {
+        "file": "src/models/cartTotals.js",
+        "hash": "6eaa471ab94bf8ba1218f229e8822656e21a0ffa6e615fcec47033cadd6d6747"
+      },
+      {
+        "file": "src/models/customer.js",
+        "hash": "50b75b74685e6c9a8fde0f558111f51cb4aeff7e23d38c39ab59bb4df9e6c94e"
+      },
+      {
+        "file": "src/models/invoice.js",
+        "hash": "ab9d298d219dde0ca99e91039dab62b3d6a43bcafcac80b7ef48de3e8ba7e668"
+      },
+      {
+        "file": "src/models/order.js",
+        "hash": "8e6e92b8b6813dddd7d455dfcfff06340ac038a26d7958b8bffd0963839b7230"
+      },
+      {
+        "file": "src/models/payment.js",
+        "hash": "668718314f6d8a02d5e14340e376c25dd9b8d39eb3f3cb95fff49b0843db1198"
+      },
+      {
+        "file": "src/models/shipment.js",
+        "hash": "4f78ff3a2868d1028fe436a256b6091d2c147ccc45aa8b18263609dded8546f5"
+      },
+      {
+        "file": "src/repositories/auditRepository.js",
+        "hash": "b633b129f6d2b37de85b3e09e1da33eab81f9268b9e73815fdd122c57a0f3537"
+      },
+      {
+        "file": "src/repositories/customerRepository.js",
+        "hash": "8c120e450953643d0412f4ccb7931841515d7fc25c7715323fafc31a82e221a2"
+      },
+      {
+        "file": "src/repositories/invoiceRepository.js",
+        "hash": "b289b4430f456dbb700ee0b2134913e7e3317b266a17c7d1e632dd420f3c7817"
+      },
+      {
+        "file": "src/repositories/orderRepository.js",
+        "hash": "87629188e443ef4d031bb5397517bcdf41533f213ce48a7b765ff1f2508da827"
+      },
+      {
+        "file": "src/repositories/paymentRepository.js",
+        "hash": "f0ae7bc6b4dbd760efe6d3b56b8a96db67fc6aca0fd978db52efb27e59993e85"
+      },
+      {
+        "file": "src/repositories/shipmentRepository.js",
+        "hash": "15e0a117660ad45642cd5d3ae726a0c2e0c95aea07fe8cd5b3e1b47b1ab75efd"
+      },
+      {
+        "file": "src/services/auditService.js",
+        "hash": "c3c12456989d0c7f66660338235bc8b5235fc345a8c6bec24549ca903612d972"
+      },
+      {
+        "file": "src/services/customerService.js",
+        "hash": "256a34970abdbf781d3580750ac560f4ede0f486e5cd728eb32efe3f76eac318"
+      },
+      {
+        "file": "src/services/inventoryService.js",
+        "hash": "d38ac20410e079ba47c3eef0b10eeda28129bd39b3579f3be7b3a8ebb53d6245"
+      },
+      {
+        "file": "src/services/invoiceService.js",
+        "hash": "ad4f580e64ffe81ad58940ca869c05f69d2c102ed6cd1ebcb2e39eed7f20c06f"
+      },
+      {
+        "file": "src/services/notificationService.js",
+        "hash": "ca48c546e70b344a8ae60c403f094db1d57e6baedcd0d0c205264c3b4970e65d"
+      },
+      {
+        "file": "src/services/orderService.js",
+        "hash": "a6375c377f66193b1f93ef32f339e9acd754b44b7ac7b6971cd2b75560a999f0"
+      },
+      {
+        "file": "src/services/pricingService.js",
+        "hash": "c8b67a8be15f8a09c3c3d5a902fc33999f902f46b7b23cbcfef8aa1e7cff1614"
+      },
+      {
+        "file": "src/services/refundService.js",
+        "hash": "4ffbca2a41bcb4a76d06d14ce5160f1d670875d52fc60a485b4310decc8bc99b"
+      },
+      {
+        "file": "src/services/shipmentService.js",
+        "hash": "e1935a0d66fc87399b0fba998bd613b450c5e1ef570c5128e886b464fe253985"
+      },
+      {
+        "file": "src/services/taxService.js",
+        "hash": "7b9c7a749f47702c44a84145f731cf9ba860e008c9839400739e7a3d2a972547"
+      },
+      {
+        "file": "src/workers/reconciliationWorker.js",
+        "hash": "898eb9ee68e1b07d1b167d88d03a5ff395db82c0727442058d53a100e06929af"
+      }
+    ],
+    "runnerHash": "137a2aae18b8cd7b2ad5a810dfae1404764013a074ab0a9eae29a2720a808f2a",
+    "metadata": {
+      "baseline": {
+        "tools": [
+          {
+            "name": "analyze_file",
+            "title": "Analyze one source file",
+            "description": "Return static complexity metrics and a heuristic risk score (0-1) for a single JavaScript or TypeScript file. Deterministic and fast — no model call. Call this when reviewing a file to find out where the structural risk sits (nested loops, long functions, async boundaries, unguarded mutation) before reading the whole file yourself.",
+            "inputSchema": {
+              "type": "object",
+              "properties": {
+                "file": {
+                  "type": "string",
+                  "description": "Absolute path to a .js/.jsx/.ts/.tsx file"
+                }
+              },
+              "required": [
+                "file"
+              ],
+              "$schema": "http://json-schema.org/draft-07/schema#"
+            },
+            "execution": {
+              "taskSupport": "forbidden"
+            }
+          },
+          {
+            "name": "scan_project",
+            "title": "Rank a project's files by risk",
+            "description": "Walk a directory and rank its JavaScript/TypeScript files by risk density — how concentrated the failure-prone code is, not how big the file is. Test files are left out by default; pass includeTests to rank them too. Deterministic and fast — no model call. Call this at the start of a code review to decide which files are worth your attention, instead of reading the tree in arbitrary order.",
+            "inputSchema": {
+              "type": "object",
+              "properties": {
+                "directory": {
+                  "type": "string",
+                  "description": "Absolute path to the directory to scan"
+                },
+                "limit": {
+                  "description": "Maximum number of files to return (default 50)",
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "maximum": 500
+                },
+                "verbose": {
+                  "description": "Include the raw metric counts for every file (default false)",
+                  "type": "boolean"
+                },
+                "includeTests": {
+                  "description": "Rank test files too — *.spec.*, *.test.*, and anything under __tests__/test/tests/spec/__mocks__ (default false). They rank high for a structural reason rather than a real one: mocked awaits read as async complexity. Turn this on to audit a suite's own complexity.",
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "directory"
+              ],
+              "$schema": "http://json-schema.org/draft-07/schema#"
+            },
+            "execution": {
+              "taskSupport": "forbidden"
+            }
+          },
+          {
+            "name": "analyze_logs",
+            "title": "Find anomalous log lines",
+            "description": "Score a log file's lines by severity and how unusual their wording is, and return the anomalies, worst first. Deterministic — no model call, no API key. Call this when you have a log file and want the handful of lines worth reading rather than the whole file.",
+            "inputSchema": {
+              "type": "object",
+              "properties": {
+                "logFile": {
+                  "type": "string",
+                  "description": "Absolute path to the log file"
+                },
+                "threshold": {
+                  "description": "Anomaly score cutoff, 0-1 (default 0.5)",
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                }
+              },
+              "required": [
+                "logFile"
+              ],
+              "$schema": "http://json-schema.org/draft-07/schema#"
+            },
+            "execution": {
+              "taskSupport": "forbidden"
+            }
+          },
+          {
+            "name": "predict_failures",
+            "title": "Predict the most likely runtime failure in a file",
+            "description": "Combine static analysis with a second-opinion verdict from the signed-in Claude Code, Codex, or GitHub Copilot CLI, returning the most likely runtime failure with a line number and reason. `status` distinguishes actionable, uncertain, no-finding, and unavailable results. `checked` lists the bug categories the model reports having considered, so a clean file weighed against the whole catalogue is distinguishable from one where it stopped early; it is a self-report, and an empty list means no coverage was reported. Pass `multi: true` to get every finding the model can demonstrate, ranked, in a `findings` array instead of one verdict — experimental, and more findings per call is also more surface for false positives per call. Treat it as a defect only when `actionable` is true; that applies the measured score >= 0.7 precision gate. This spawns another model and takes 5-15 seconds, so only call it when you specifically want an independent second opinion. If you are yourself reviewing the code, use analyze_file and read the source instead. Reviewing several files? Pass them all as `files` in one call rather than calling once per file: the verdicts run concurrently, so the batch costs the same and takes about as long as a single file.",
+            "inputSchema": {
+              "type": "object",
+              "properties": {
+                "file": {
+                  "description": "Absolute path to a .js/.jsx/.ts/.tsx file",
+                  "type": "string"
+                },
+                "files": {
+                  "description": "Absolute paths to review in one call, run concurrently. Prefer this over one call per file when checking a change set: the verdicts are independent, so a batch bills the same as the same files one at a time but finishes in roughly the time of the slowest one. Replies carry a `results` array in the order given. Supersedes `file`.",
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "concurrency": {
+                  "description": "Verdicts in flight at once for a batch (default 4). Lower it if the provider starts rate-limiting.",
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 8
+                },
+                "provider": {
+                  "description": "Which CLI to ask (default: whichever is installed)",
+                  "type": "string",
+                  "enum": [
+                    "claude",
+                    "codex",
+                    "copilot"
+                  ]
+                },
+                "model": {
+                  "description": "Model override passed to the CLI",
+                  "type": "string"
+                },
+                "calleeContext": {
+                  "description": "Also send bounded imported definitions and referenced type contracts so the model can check dependency behavior (default true). Turning this off reduces input tokens but removes that evidence.",
+                  "type": "boolean"
+                },
+                "multi": {
+                  "description": "Return every finding the model can demonstrate, ranked by score, rather than the single most likely one (default false). Experimental: the precision gate was measured on one-finding replies, so `actionable` is less well characterised here.",
+                  "type": "boolean"
+                },
+                "logFile": {
+                  "description": "Optional log file to fold into the combined score",
+                  "type": "string"
+                },
+                "verbose": {
+                  "description": "Include the static metric counts and the full log breakdown (default false)",
+                  "type": "boolean"
+                }
+              },
+              "$schema": "http://json-schema.org/draft-07/schema#"
+            },
+            "execution": {
+              "taskSupport": "forbidden"
+            }
+          },
+          {
+            "name": "list_providers",
+            "title": "Show available CLI providers",
+            "description": "Report which supported CLIs (Claude Code, Codex, GitHub Copilot) are installed and signed in. Call this to diagnose why predict_failures is failing.",
+            "inputSchema": {
+              "type": "object",
+              "properties": {},
+              "$schema": "http://json-schema.org/draft-07/schema#"
+            },
+            "execution": {
+              "taskSupport": "forbidden"
+            }
+          }
+        ],
+        "instructions": "Deterministic tools first: scan_project and analyze_file cost nothing and answer most questions about where the risk sits. predict_failures spawns a second model, so call it when you want a verdict independent of your own.\n\nWhen you point these tools at code you wrote in this session -- a fix for something they flagged, or a feature you just finished -- have it checked from outside the context that wrote it. Re-reading your own work in the context that produced it is the weakest check available, because the reasoning that made it look right is still in scope and tends to confirm itself.\n\nWhich outside seat depends on how far the change reaches. A change confined to one file, including a whole feature in one file: a fresh predict_failures on it, a second model for one call. A change spanning several files: a sub-agent where the host has them, because predict_failures reads each file on its own and never sees how they have to agree. File count is the test -- not how large the change felt, and not whether it was a fix or a feature. A clean predict_failures on new code is not a clearance -- it means the file is locally sound, not that the feature is right.\n\nReviewing more than one file: pass them all as `files` in a single predict_failures call. The verdicts are independent and run concurrently, so a batch bills the same as the same files one at a time and returns in roughly the time of the slowest one. Calling once per file pays that wait again for every file and is the main reason this tool feels slow.\n\nScope the sub-agent: give it the changed files and what you were trying to do, and ask it to review only that. An unscoped agent rebuilds the project from cold and reports on code nobody touched, which is what makes this expensive. Where the host can run it in the background, do not block on it: this is a second opinion on work already done, not a gate the next step waits behind. Do this at minimum for actionable findings and for changes that span files, and use your judgement above that. A mechanical fix -- a typo, a missing await, an off-by-one with one correct value -- needs neither seat.",
+        "estimatedTokens": 1799,
+        "hash": "39a3473a81276adff632bb2920eb748b7af8a5305673c50f918757fe3d19e231",
+        "bundleHash": "a2c5d51ee775290624b0dfd1fb151d96f1056b13f48bfe664ed514a311a0f393"
+      },
+      "candidate": {
+        "tools": [
+          {
+            "name": "map_dependencies",
+            "title": "Map a file's dependency neighborhood",
+            "description": "Find a file's local imports, reverse imports and tests connected by imports. Each relationship includes a source path and line as evidence. Static file relationships, not runtime callers or test coverage. Scans JavaScript/TypeScript including tests, with bounded work and explicit unresolved imports and scan limits. Deterministic; no provider call.",
+            "inputSchema": {
+              "type": "object",
+              "properties": {
+                "directory": {
+                  "type": "string",
+                  "description": "Project directory; source outside this directory is excluded"
+                },
+                "file": {
+                  "type": "string",
+                  "description": "Source file, absolute or relative to directory"
+                },
+                "depth": {
+                  "description": "Import hops in each direction, default 1",
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 3
+                },
+                "limit": {
+                  "description": "Total neighboring files to return, default 50",
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 200
+                },
+                "maxFiles": {
+                  "description": "Maximum source files to discover, default 1000",
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 2000
+                }
+              },
+              "required": [
+                "directory",
+                "file"
+              ],
+              "$schema": "http://json-schema.org/draft-07/schema#"
+            },
+            "execution": {
+              "taskSupport": "forbidden"
+            }
+          },
+          {
+            "name": "analyze_file",
+            "title": "Analyze one source file",
+            "description": "Return static complexity metrics and a heuristic risk score (0-1) for a single JavaScript or TypeScript file. Deterministic and fast — no model call. Call this when reviewing a file to find out where the structural risk sits (nested loops, long functions, async boundaries, unguarded mutation) before reading the whole file yourself.",
+            "inputSchema": {
+              "type": "object",
+              "properties": {
+                "file": {
+                  "type": "string",
+                  "description": "Absolute path to a .js/.jsx/.ts/.tsx file"
+                }
+              },
+              "required": [
+                "file"
+              ],
+              "$schema": "http://json-schema.org/draft-07/schema#"
+            },
+            "execution": {
+              "taskSupport": "forbidden"
+            }
+          },
+          {
+            "name": "scan_project",
+            "title": "Rank a project's files by risk",
+            "description": "Walk a directory and rank its JavaScript/TypeScript files by risk density — how concentrated the failure-prone code is, not how big the file is. Test files are left out by default; pass includeTests to rank them too. Deterministic and fast — no model call. Call this at the start of a code review to decide which files are worth your attention, instead of reading the tree in arbitrary order.",
+            "inputSchema": {
+              "type": "object",
+              "properties": {
+                "directory": {
+                  "type": "string",
+                  "description": "Absolute path to the directory to scan"
+                },
+                "limit": {
+                  "description": "Maximum number of files to return (default 50)",
+                  "type": "integer",
+                  "exclusiveMinimum": 0,
+                  "maximum": 500
+                },
+                "verbose": {
+                  "description": "Include the raw metric counts for every file (default false)",
+                  "type": "boolean"
+                },
+                "includeTests": {
+                  "description": "Rank test files too — *.spec.*, *.test.*, and anything under __tests__/test/tests/spec/__mocks__ (default false). They rank high for a structural reason rather than a real one: mocked awaits read as async complexity. Turn this on to audit a suite's own complexity.",
+                  "type": "boolean"
+                }
+              },
+              "required": [
+                "directory"
+              ],
+              "$schema": "http://json-schema.org/draft-07/schema#"
+            },
+            "execution": {
+              "taskSupport": "forbidden"
+            }
+          },
+          {
+            "name": "analyze_logs",
+            "title": "Find anomalous log lines",
+            "description": "Score a log file's lines by severity and how unusual their wording is, and return the anomalies, worst first. Deterministic — no model call, no API key. Call this when you have a log file and want the handful of lines worth reading rather than the whole file.",
+            "inputSchema": {
+              "type": "object",
+              "properties": {
+                "logFile": {
+                  "type": "string",
+                  "description": "Absolute path to the log file"
+                },
+                "threshold": {
+                  "description": "Anomaly score cutoff, 0-1 (default 0.5)",
+                  "type": "number",
+                  "minimum": 0,
+                  "maximum": 1
+                }
+              },
+              "required": [
+                "logFile"
+              ],
+              "$schema": "http://json-schema.org/draft-07/schema#"
+            },
+            "execution": {
+              "taskSupport": "forbidden"
+            }
+          },
+          {
+            "name": "predict_failures",
+            "title": "Predict the most likely runtime failure in a file",
+            "description": "Combine static analysis with a second-opinion verdict from the signed-in Claude Code, Codex, or GitHub Copilot CLI, returning the most likely runtime failure with a line number and reason. `status` distinguishes actionable, uncertain, no-finding, and unavailable results. `checked` lists the bug categories the model reports having considered, so a clean file weighed against the whole catalogue is distinguishable from one where it stopped early; it is a self-report, and an empty list means no coverage was reported. Pass `multi: true` to get every finding the model can demonstrate, ranked, in a `findings` array instead of one verdict — experimental, and more findings per call is also more surface for false positives per call. Treat it as a defect only when `actionable` is true; that applies the measured score >= 0.7 precision gate. This spawns another model and takes 5-15 seconds, so only call it when you specifically want an independent second opinion. If you are yourself reviewing the code, use analyze_file and read the source instead. Reviewing several files? Pass them all as `files` in one call rather than calling once per file: the verdicts run concurrently, so the batch costs the same and takes about as long as a single file.",
+            "inputSchema": {
+              "type": "object",
+              "properties": {
+                "file": {
+                  "description": "Absolute path to a .js/.jsx/.ts/.tsx file",
+                  "type": "string"
+                },
+                "files": {
+                  "description": "Absolute paths to review in one call, run concurrently. Prefer this over one call per file when checking a change set: the verdicts are independent, so a batch bills the same as the same files one at a time but finishes in roughly the time of the slowest one. Replies carry a `results` array in the order given. Supersedes `file`.",
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "concurrency": {
+                  "description": "Verdicts in flight at once for a batch (default 4). Lower it if the provider starts rate-limiting.",
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 8
+                },
+                "provider": {
+                  "description": "Which CLI to ask (default: whichever is installed)",
+                  "type": "string",
+                  "enum": [
+                    "claude",
+                    "codex",
+                    "copilot"
+                  ]
+                },
+                "model": {
+                  "description": "Model override passed to the CLI",
+                  "type": "string"
+                },
+                "calleeContext": {
+                  "description": "Also send bounded imported definitions and referenced type contracts so the model can check dependency behavior (default true). Turning this off reduces input tokens but removes that evidence.",
+                  "type": "boolean"
+                },
+                "multi": {
+                  "description": "Return every finding the model can demonstrate, ranked by score, rather than the single most likely one (default false). Experimental: the precision gate was measured on one-finding replies, so `actionable` is less well characterised here.",
+                  "type": "boolean"
+                },
+                "logFile": {
+                  "description": "Optional log file to fold into the combined score",
+                  "type": "string"
+                },
+                "verbose": {
+                  "description": "Include the static metric counts and the full log breakdown (default false)",
+                  "type": "boolean"
+                }
+              },
+              "$schema": "http://json-schema.org/draft-07/schema#"
+            },
+            "execution": {
+              "taskSupport": "forbidden"
+            }
+          },
+          {
+            "name": "list_providers",
+            "title": "Show available CLI providers",
+            "description": "Report which supported CLIs (Claude Code, Codex, GitHub Copilot) are installed and signed in. Call this to diagnose why predict_failures is failing.",
+            "inputSchema": {
+              "type": "object",
+              "properties": {},
+              "$schema": "http://json-schema.org/draft-07/schema#"
+            },
+            "execution": {
+              "taskSupport": "forbidden"
+            }
+          }
+        ],
+        "instructions": "Deterministic tools first: scan_project and analyze_file cost nothing and answer most questions about where the risk sits. Use map_dependencies for imports, reverse imports and tests connected by imports. predict_failures spawns a second model, so call it when you want a verdict independent of your own.\n\nWhen you point these tools at code you wrote in this session -- a fix for something they flagged, or a feature you just finished -- have it checked from outside the context that wrote it. Re-reading your own work in the context that produced it is the weakest check available, because the reasoning that made it look right is still in scope and tends to confirm itself.\n\nWhich outside seat depends on how far the change reaches. A change confined to one file, including a whole feature in one file: a fresh predict_failures on it, a second model for one call. A change spanning several files: a sub-agent where the host has them, because predict_failures reads each file on its own and never sees how they have to agree. File count is the test -- not how large the change felt, and not whether it was a fix or a feature. A clean predict_failures on new code is not a clearance -- it means the file is locally sound, not that the feature is right.\n\nReviewing more than one file: pass them all as `files` in a single predict_failures call. The verdicts are independent and run concurrently, so a batch bills the same as the same files one at a time and returns in roughly the time of the slowest one. Calling once per file pays that wait again for every file and is the main reason this tool feels slow.\n\nScope the sub-agent: give it the changed files and what you were trying to do, and ask it to review only that. An unscoped agent rebuilds the project from cold and reports on code nobody touched, which is what makes this expensive. Where the host can run it in the background, do not block on it: this is a second opinion on work already done, not a gate the next step waits behind. Do this at minimum for actionable findings and for changes that span files, and use your judgement above that. A mechanical fix -- a typo, a missing await, an off-by-one with one correct value -- needs neither seat.",
+        "estimatedTokens": 2054,
+        "hash": "0bf41ab6982905981eed73504399a46f47a31d635ab0ee31aa03483146988bc9",
+        "bundleHash": "4d2b4c764343f6b3136984651bdb366d12d03b1f3b1dfc9e8eef7b22a0a59063"
+      }
+    }
+  },
+  "configHash": "3bad31b923bda1bbdcc31d420cce1ce2c567d967d624d63ca8755703cb6a9333",
+  "measuredAt": "2026-09-09T20:17:03.538Z",
+  "status": "complete",
+  "records": [
+    {
+      "trial": 1,
+      "query": {
+        "file": "src/dependencies/entry.ts",
+        "depth": 2,
+        "dependencies": [
+          "barrel.ts",
+          "types.ts",
+          "lazy.ts",
+          "leaf.ts"
+        ],
+        "dependents": [
+          "consumer.ts",
+          "lazy.ts",
+          "entry.test.ts"
+        ],
+        "unresolvedLines": [
+          5
+        ]
+      },
+      "wallMs": 160.31780000000003,
+      "estimatedReplyTokens": 473,
+      "replyBytes": 1750,
+      "responseHash": "40519e5bb30ceb33deb7a61750794a5b7ef9fbeb20827b9ff809624ad59b797a",
+      "result": {
+        "file": "src/dependencies/entry.ts",
+        "depth": 2,
+        "scope": "Static file relationships, not runtime calls or test coverage. Tests are identified by path convention.",
+        "dependencies": [
+          {
+            "file": "src/dependencies/barrel.ts",
+            "via": [
+              {
+                "from": "src/dependencies/entry.ts",
+                "to": "src/dependencies/barrel.ts",
+                "line": 1,
+                "kind": "import"
+              }
+            ]
+          },
+          {
+            "file": "src/dependencies/lazy.ts",
+            "via": [
+              {
+                "from": "src/dependencies/entry.ts",
+                "to": "src/dependencies/lazy.ts",
+                "line": 4,
+                "kind": "dynamic-import"
+              }
+            ]
+          },
+          {
+            "file": "src/dependencies/types.ts",
+            "via": [
+              {
+                "from": "src/dependencies/entry.ts",
+                "to": "src/dependencies/types.ts",
+                "line": 2,
+                "kind": "import",
+                "typeOnly": true
+              }
+            ]
+          },
+          {
+            "file": "src/dependencies/leaf.ts",
+            "via": [
+              {
+                "from": "src/dependencies/entry.ts",
+                "to": "src/dependencies/barrel.ts",
+                "line": 1,
+                "kind": "import"
+              },
+              {
+                "from": "src/dependencies/barrel.ts",
+                "to": "src/dependencies/leaf.ts",
+                "line": 1,
+                "kind": "re-export"
+              }
+            ]
+          }
+        ],
+        "dependents": [
+          {
+            "file": "src/dependencies/consumer.ts",
+            "via": [
+              {
+                "from": "src/dependencies/consumer.ts",
+                "to": "src/dependencies/entry.ts",
+                "line": 1,
+                "kind": "import"
+              }
+            ]
+          },
+          {
+            "file": "src/dependencies/lazy.ts",
+            "via": [
+              {
+                "from": "src/dependencies/lazy.ts",
+                "to": "src/dependencies/entry.ts",
+                "line": 1,
+                "kind": "import"
+              }
+            ]
+          },
+          {
+            "file": "src/dependencies/entry.test.ts",
+            "test": true,
+            "via": [
+              {
+                "from": "src/dependencies/entry.test.ts",
+                "to": "src/dependencies/consumer.ts",
+                "line": 1,
+                "kind": "import"
+              },
+              {
+                "from": "src/dependencies/consumer.ts",
+                "to": "src/dependencies/entry.ts",
+                "line": 1,
+                "kind": "import"
+              }
+            ]
+          }
+        ],
+        "totalNeighbors": 7,
+        "returned": 7,
+        "truncated": false,
+        "unresolved": [
+          {
+            "file": "src/dependencies/entry.ts",
+            "line": 5,
+            "reason": "nonliteral dynamic import"
+          }
+        ],
+        "issues": [],
+        "coverage": {
+          "discoveredFiles": 71,
+          "indexedFiles": 71,
+          "visitedEntries": 80,
+          "bytesRead": 191488,
+          "edges": 25,
+          "unresolved": 10,
+          "focusUnresolved": 1,
+          "issues": 0,
+          "scanLimited": false
+        }
+      }
+    },
+    {
+      "trial": 1,
+      "query": {
+        "file": "src/dependencies/leaf.ts",
+        "depth": 3,
+        "dependencies": [],
+        "dependents": [
+          "barrel.ts",
+          "entry.ts",
+          "consumer.ts",
+          "lazy.ts"
+        ],
+        "unresolvedLines": []
+      },
+      "wallMs": 86.72759999999994,
+      "estimatedReplyTokens": 404,
+      "replyBytes": 1494,
+      "responseHash": "fc8fcabfbe4996fbac44e2944a227f536f1500c7a98b92060c5c32f442fe4f45",
+      "result": {
+        "file": "src/dependencies/leaf.ts",
+        "depth": 3,
+        "scope": "Static file relationships, not runtime calls or test coverage. Tests are identified by path convention.",
+        "dependencies": [],
+        "dependents": [
+          {
+            "file": "src/dependencies/barrel.ts",
+            "via": [
+              {
+                "from": "src/dependencies/barrel.ts",
+                "to": "src/dependencies/leaf.ts",
+                "line": 1,
+                "kind": "re-export"
+              }
+            ]
+          },
+          {
+            "file": "src/dependencies/entry.ts",
+            "via": [
+              {
+                "from": "src/dependencies/entry.ts",
+                "to": "src/dependencies/barrel.ts",
+                "line": 1,
+                "kind": "import"
+              },
+              {
+                "from": "src/dependencies/barrel.ts",
+                "to": "src/dependencies/leaf.ts",
+                "line": 1,
+                "kind": "re-export"
+              }
+            ]
+          },
+          {
+            "file": "src/dependencies/consumer.ts",
+            "via": [
+              {
+                "from": "src/dependencies/consumer.ts",
+                "to": "src/dependencies/entry.ts",
+                "line": 1,
+                "kind": "import"
+              },
+              {
+                "from": "src/dependencies/entry.ts",
+                "to": "src/dependencies/barrel.ts",
+                "line": 1,
+                "kind": "import"
+              },
+              {
+                "from": "src/dependencies/barrel.ts",
+                "to": "src/dependencies/leaf.ts",
+                "line": 1,
+                "kind": "re-export"
+              }
+            ]
+          },
+          {
+            "file": "src/dependencies/lazy.ts",
+            "via": [
+              {
+                "from": "src/dependencies/lazy.ts",
+                "to": "src/dependencies/entry.ts",
+                "line": 1,
+                "kind": "import"
+              },
+              {
+                "from": "src/dependencies/entry.ts",
+                "to": "src/dependencies/barrel.ts",
+                "line": 1,
+                "kind": "import"
+              },
+              {
+                "from": "src/dependencies/barrel.ts",
+                "to": "src/dependencies/leaf.ts",
+                "line": 1,
+                "kind": "re-export"
+              }
+            ]
+          }
+        ],
+        "totalNeighbors": 4,
+        "returned": 4,
+        "truncated": false,
+        "unresolved": [],
+        "issues": [],
+        "coverage": {
+          "discoveredFiles": 71,
+          "indexedFiles": 71,
+          "visitedEntries": 80,
+          "bytesRead": 191488,
+          "edges": 25,
+          "unresolved": 10,
+          "focusUnresolved": 0,
+          "issues": 0,
+          "scanLimited": false
+        }
+      }
+    },
+    {
+      "trial": 2,
+      "query": {
+        "file": "src/dependencies/entry.ts",
+        "depth": 2,
+        "dependencies": [
+          "barrel.ts",
+          "types.ts",
+          "lazy.ts",
+          "leaf.ts"
+        ],
+        "dependents": [
+          "consumer.ts",
+          "lazy.ts",
+          "entry.test.ts"
+        ],
+        "unresolvedLines": [
+          5
+        ]
+      },
+      "wallMs": 90.50390000000004,
+      "estimatedReplyTokens": 473,
+      "replyBytes": 1750,
+      "responseHash": "40519e5bb30ceb33deb7a61750794a5b7ef9fbeb20827b9ff809624ad59b797a",
+      "result": {
+        "file": "src/dependencies/entry.ts",
+        "depth": 2,
+        "scope": "Static file relationships, not runtime calls or test coverage. Tests are identified by path convention.",
+        "dependencies": [
+          {
+            "file": "src/dependencies/barrel.ts",
+            "via": [
+              {
+                "from": "src/dependencies/entry.ts",
+                "to": "src/dependencies/barrel.ts",
+                "line": 1,
+                "kind": "import"
+              }
+            ]
+          },
+          {
+            "file": "src/dependencies/lazy.ts",
+            "via": [
+              {
+                "from": "src/dependencies/entry.ts",
+                "to": "src/dependencies/lazy.ts",
+                "line": 4,
+                "kind": "dynamic-import"
+              }
+            ]
+          },
+          {
+            "file": "src/dependencies/types.ts",
+            "via": [
+              {
+                "from": "src/dependencies/entry.ts",
+                "to": "src/dependencies/types.ts",
+                "line": 2,
+                "kind": "import",
+                "typeOnly": true
+              }
+            ]
+          },
+          {
+            "file": "src/dependencies/leaf.ts",
+            "via": [
+              {
+                "from": "src/dependencies/entry.ts",
+                "to": "src/dependencies/barrel.ts",
+                "line": 1,
+                "kind": "import"
+              },
+              {
+                "from": "src/dependencies/barrel.ts",
+                "to": "src/dependencies/leaf.ts",
+                "line": 1,
+                "kind": "re-export"
+              }
+            ]
+          }
+        ],
+        "dependents": [
+          {
+            "file": "src/dependencies/consumer.ts",
+            "via": [
+              {
+                "from": "src/dependencies/consumer.ts",
+                "to": "src/dependencies/entry.ts",
+                "line": 1,
+                "kind": "import"
+              }
+            ]
+          },
+          {
+            "file": "src/dependencies/lazy.ts",
+            "via": [
+              {
+                "from": "src/dependencies/lazy.ts",
+                "to": "src/dependencies/entry.ts",
+                "line": 1,
+                "kind": "import"
+              }
+            ]
+          },
+          {
+            "file": "src/dependencies/entry.test.ts",
+            "test": true,
+            "via": [
+              {
+                "from": "src/dependencies/entry.test.ts",
+                "to": "src/dependencies/consumer.ts",
+                "line": 1,
+                "kind": "import"
+              },
+              {
+                "from": "src/dependencies/consumer.ts",
+                "to": "src/dependencies/entry.ts",
+                "line": 1,
+                "kind": "import"
+              }
+            ]
+          }
+        ],
+        "totalNeighbors": 7,
+        "returned": 7,
+        "truncated": false,
+        "unresolved": [
+          {
+            "file": "src/dependencies/entry.ts",
+            "line": 5,
+            "reason": "nonliteral dynamic import"
+          }
+        ],
+        "issues": [],
+        "coverage": {
+          "discoveredFiles": 71,
+          "indexedFiles": 71,
+          "visitedEntries": 80,
+          "bytesRead": 191488,
+          "edges": 25,
+          "unresolved": 10,
+          "focusUnresolved": 1,
+          "issues": 0,
+          "scanLimited": false
+        }
+      }
+    },
+    {
+      "trial": 2,
+      "query": {
+        "file": "src/dependencies/leaf.ts",
+        "depth": 3,
+        "dependencies": [],
+        "dependents": [
+          "barrel.ts",
+          "entry.ts",
+          "consumer.ts",
+          "lazy.ts"
+        ],
+        "unresolvedLines": []
+      },
+      "wallMs": 83.5806,
+      "estimatedReplyTokens": 404,
+      "replyBytes": 1494,
+      "responseHash": "fc8fcabfbe4996fbac44e2944a227f536f1500c7a98b92060c5c32f442fe4f45",
+      "result": {
+        "file": "src/dependencies/leaf.ts",
+        "depth": 3,
+        "scope": "Static file relationships, not runtime calls or test coverage. Tests are identified by path convention.",
+        "dependencies": [],
+        "dependents": [
+          {
+            "file": "src/dependencies/barrel.ts",
+            "via": [
+              {
+                "from": "src/dependencies/barrel.ts",
+                "to": "src/dependencies/leaf.ts",
+                "line": 1,
+                "kind": "re-export"
+              }
+            ]
+          },
+          {
+            "file": "src/dependencies/entry.ts",
+            "via": [
+              {
+                "from": "src/dependencies/entry.ts",
+                "to": "src/dependencies/barrel.ts",
+                "line": 1,
+                "kind": "import"
+              },
+              {
+                "from": "src/dependencies/barrel.ts",
+                "to": "src/dependencies/leaf.ts",
+                "line": 1,
+                "kind": "re-export"
+              }
+            ]
+          },
+          {
+            "file": "src/dependencies/consumer.ts",
+            "via": [
+              {
+                "from": "src/dependencies/consumer.ts",
+                "to": "src/dependencies/entry.ts",
+                "line": 1,
+                "kind": "import"
+              },
+              {
+                "from": "src/dependencies/entry.ts",
+                "to": "src/dependencies/barrel.ts",
+                "line": 1,
+                "kind": "import"
+              },
+              {
+                "from": "src/dependencies/barrel.ts",
+                "to": "src/dependencies/leaf.ts",
+                "line": 1,
+                "kind": "re-export"
+              }
+            ]
+          },
+          {
+            "file": "src/dependencies/lazy.ts",
+            "via": [
+              {
+                "from": "src/dependencies/lazy.ts",
+                "to": "src/dependencies/entry.ts",
+                "line": 1,
+                "kind": "import"
+              },
+              {
+                "from": "src/dependencies/entry.ts",
+                "to": "src/dependencies/barrel.ts",
+                "line": 1,
+                "kind": "import"
+              },
+              {
+                "from": "src/dependencies/barrel.ts",
+                "to": "src/dependencies/leaf.ts",
+                "line": 1,
+                "kind": "re-export"
+              }
+            ]
+          }
+        ],
+        "totalNeighbors": 4,
+        "returned": 4,
+        "truncated": false,
+        "unresolved": [],
+        "issues": [],
+        "coverage": {
+          "discoveredFiles": 71,
+          "indexedFiles": 71,
+          "visitedEntries": 80,
+          "bytesRead": 191488,
+          "edges": 25,
+          "unresolved": 10,
+          "focusUnresolved": 0,
+          "issues": 0,
+          "scanLimited": false
+        }
+      }
+    },
+    {
+      "trial": 3,
+      "query": {
+        "file": "src/dependencies/entry.ts",
+        "depth": 2,
+        "dependencies": [
+          "barrel.ts",
+          "types.ts",
+          "lazy.ts",
+          "leaf.ts"
+        ],
+        "dependents": [
+          "consumer.ts",
+          "lazy.ts",
+          "entry.test.ts"
+        ],
+        "unresolvedLines": [
+          5
+        ]
+      },
+      "wallMs": 90.99869999999999,
+      "estimatedReplyTokens": 473,
+      "replyBytes": 1750,
+      "responseHash": "40519e5bb30ceb33deb7a61750794a5b7ef9fbeb20827b9ff809624ad59b797a",
+      "result": {
+        "file": "src/dependencies/entry.ts",
+        "depth": 2,
+        "scope": "Static file relationships, not runtime calls or test coverage. Tests are identified by path convention.",
+        "dependencies": [
+          {
+            "file": "src/dependencies/barrel.ts",
+            "via": [
+              {
+                "from": "src/dependencies/entry.ts",
+                "to": "src/dependencies/barrel.ts",
+                "line": 1,
+                "kind": "import"
+              }
+            ]
+          },
+          {
+            "file": "src/dependencies/lazy.ts",
+            "via": [
+              {
+                "from": "src/dependencies/entry.ts",
+                "to": "src/dependencies/lazy.ts",
+                "line": 4,
+                "kind": "dynamic-import"
+              }
+            ]
+          },
+          {
+            "file": "src/dependencies/types.ts",
+            "via": [
+              {
+                "from": "src/dependencies/entry.ts",
+                "to": "src/dependencies/types.ts",
+                "line": 2,
+                "kind": "import",
+                "typeOnly": true
+              }
+            ]
+          },
+          {
+            "file": "src/dependencies/leaf.ts",
+            "via": [
+              {
+                "from": "src/dependencies/entry.ts",
+                "to": "src/dependencies/barrel.ts",
+                "line": 1,
+                "kind": "import"
+              },
+              {
+                "from": "src/dependencies/barrel.ts",
+                "to": "src/dependencies/leaf.ts",
+                "line": 1,
+                "kind": "re-export"
+              }
+            ]
+          }
+        ],
+        "dependents": [
+          {
+            "file": "src/dependencies/consumer.ts",
+            "via": [
+              {
+                "from": "src/dependencies/consumer.ts",
+                "to": "src/dependencies/entry.ts",
+                "line": 1,
+                "kind": "import"
+              }
+            ]
+          },
+          {
+            "file": "src/dependencies/lazy.ts",
+            "via": [
+              {
+                "from": "src/dependencies/lazy.ts",
+                "to": "src/dependencies/entry.ts",
+                "line": 1,
+                "kind": "import"
+              }
+            ]
+          },
+          {
+            "file": "src/dependencies/entry.test.ts",
+            "test": true,
+            "via": [
+              {
+                "from": "src/dependencies/entry.test.ts",
+                "to": "src/dependencies/consumer.ts",
+                "line": 1,
+                "kind": "import"
+              },
+              {
+                "from": "src/dependencies/consumer.ts",
+                "to": "src/dependencies/entry.ts",
+                "line": 1,
+                "kind": "import"
+              }
+            ]
+          }
+        ],
+        "totalNeighbors": 7,
+        "returned": 7,
+        "truncated": false,
+        "unresolved": [
+          {
+            "file": "src/dependencies/entry.ts",
+            "line": 5,
+            "reason": "nonliteral dynamic import"
+          }
+        ],
+        "issues": [],
+        "coverage": {
+          "discoveredFiles": 71,
+          "indexedFiles": 71,
+          "visitedEntries": 80,
+          "bytesRead": 191488,
+          "edges": 25,
+          "unresolved": 10,
+          "focusUnresolved": 1,
+          "issues": 0,
+          "scanLimited": false
+        }
+      }
+    },
+    {
+      "trial": 3,
+      "query": {
+        "file": "src/dependencies/leaf.ts",
+        "depth": 3,
+        "dependencies": [],
+        "dependents": [
+          "barrel.ts",
+          "entry.ts",
+          "consumer.ts",
+          "lazy.ts"
+        ],
+        "unresolvedLines": []
+      },
+      "wallMs": 78.26999999999998,
+      "estimatedReplyTokens": 404,
+      "replyBytes": 1494,
+      "responseHash": "fc8fcabfbe4996fbac44e2944a227f536f1500c7a98b92060c5c32f442fe4f45",
+      "result": {
+        "file": "src/dependencies/leaf.ts",
+        "depth": 3,
+        "scope": "Static file relationships, not runtime calls or test coverage. Tests are identified by path convention.",
+        "dependencies": [],
+        "dependents": [
+          {
+            "file": "src/dependencies/barrel.ts",
+            "via": [
+              {
+                "from": "src/dependencies/barrel.ts",
+                "to": "src/dependencies/leaf.ts",
+                "line": 1,
+                "kind": "re-export"
+              }
+            ]
+          },
+          {
+            "file": "src/dependencies/entry.ts",
+            "via": [
+              {
+                "from": "src/dependencies/entry.ts",
+                "to": "src/dependencies/barrel.ts",
+                "line": 1,
+                "kind": "import"
+              },
+              {
+                "from": "src/dependencies/barrel.ts",
+                "to": "src/dependencies/leaf.ts",
+                "line": 1,
+                "kind": "re-export"
+              }
+            ]
+          },
+          {
+            "file": "src/dependencies/consumer.ts",
+            "via": [
+              {
+                "from": "src/dependencies/consumer.ts",
+                "to": "src/dependencies/entry.ts",
+                "line": 1,
+                "kind": "import"
+              },
+              {
+                "from": "src/dependencies/entry.ts",
+                "to": "src/dependencies/barrel.ts",
+                "line": 1,
+                "kind": "import"
+              },
+              {
+                "from": "src/dependencies/barrel.ts",
+                "to": "src/dependencies/leaf.ts",
+                "line": 1,
+                "kind": "re-export"
+              }
+            ]
+          },
+          {
+            "file": "src/dependencies/lazy.ts",
+            "via": [
+              {
+                "from": "src/dependencies/lazy.ts",
+                "to": "src/dependencies/entry.ts",
+                "line": 1,
+                "kind": "import"
+              },
+              {
+                "from": "src/dependencies/entry.ts",
+                "to": "src/dependencies/barrel.ts",
+                "line": 1,
+                "kind": "import"
+              },
+              {
+                "from": "src/dependencies/barrel.ts",
+                "to": "src/dependencies/leaf.ts",
+                "line": 1,
+                "kind": "re-export"
+              }
+            ]
+          }
+        ],
+        "totalNeighbors": 4,
+        "returned": 4,
+        "truncated": false,
+        "unresolved": [],
+        "issues": [],
+        "coverage": {
+          "discoveredFiles": 71,
+          "indexedFiles": 71,
+          "visitedEntries": 80,
+          "bytesRead": 191488,
+          "edges": 25,
+          "unresolved": 10,
+          "focusUnresolved": 0,
+          "issues": 0,
+          "scanLimited": false
+        }
+      }
+    },
+    {
+      "trial": 4,
+      "query": {
+        "file": "src/dependencies/entry.ts",
+        "depth": 2,
+        "dependencies": [
+          "barrel.ts",
+          "types.ts",
+          "lazy.ts",
+          "leaf.ts"
+        ],
+        "dependents": [
+          "consumer.ts",
+          "lazy.ts",
+          "entry.test.ts"
+        ],
+        "unresolvedLines": [
+          5
+        ]
+      },
+      "wallMs": 79.74720000000002,
+      "estimatedReplyTokens": 473,
+      "replyBytes": 1750,
+      "responseHash": "40519e5bb30ceb33deb7a61750794a5b7ef9fbeb20827b9ff809624ad59b797a",
+      "result": {
+        "file": "src/dependencies/entry.ts",
+        "depth": 2,
+        "scope": "Static file relationships, not runtime calls or test coverage. Tests are identified by path convention.",
+        "dependencies": [
+          {
+            "file": "src/dependencies/barrel.ts",
+            "via": [
+              {
+                "from": "src/dependencies/entry.ts",
+                "to": "src/dependencies/barrel.ts",
+                "line": 1,
+                "kind": "import"
+              }
+            ]
+          },
+          {
+            "file": "src/dependencies/lazy.ts",
+            "via": [
+              {
+                "from": "src/dependencies/entry.ts",
+                "to": "src/dependencies/lazy.ts",
+                "line": 4,
+                "kind": "dynamic-import"
+              }
+            ]
+          },
+          {
+            "file": "src/dependencies/types.ts",
+            "via": [
+              {
+                "from": "src/dependencies/entry.ts",
+                "to": "src/dependencies/types.ts",
+                "line": 2,
+                "kind": "import",
+                "typeOnly": true
+              }
+            ]
+          },
+          {
+            "file": "src/dependencies/leaf.ts",
+            "via": [
+              {
+                "from": "src/dependencies/entry.ts",
+                "to": "src/dependencies/barrel.ts",
+                "line": 1,
+                "kind": "import"
+              },
+              {
+                "from": "src/dependencies/barrel.ts",
+                "to": "src/dependencies/leaf.ts",
+                "line": 1,
+                "kind": "re-export"
+              }
+            ]
+          }
+        ],
+        "dependents": [
+          {
+            "file": "src/dependencies/consumer.ts",
+            "via": [
+              {
+                "from": "src/dependencies/consumer.ts",
+                "to": "src/dependencies/entry.ts",
+                "line": 1,
+                "kind": "import"
+              }
+            ]
+          },
+          {
+            "file": "src/dependencies/lazy.ts",
+            "via": [
+              {
+                "from": "src/dependencies/lazy.ts",
+                "to": "src/dependencies/entry.ts",
+                "line": 1,
+                "kind": "import"
+              }
+            ]
+          },
+          {
+            "file": "src/dependencies/entry.test.ts",
+            "test": true,
+            "via": [
+              {
+                "from": "src/dependencies/entry.test.ts",
+                "to": "src/dependencies/consumer.ts",
+                "line": 1,
+                "kind": "import"
+              },
+              {
+                "from": "src/dependencies/consumer.ts",
+                "to": "src/dependencies/entry.ts",
+                "line": 1,
+                "kind": "import"
+              }
+            ]
+          }
+        ],
+        "totalNeighbors": 7,
+        "returned": 7,
+        "truncated": false,
+        "unresolved": [
+          {
+            "file": "src/dependencies/entry.ts",
+            "line": 5,
+            "reason": "nonliteral dynamic import"
+          }
+        ],
+        "issues": [],
+        "coverage": {
+          "discoveredFiles": 71,
+          "indexedFiles": 71,
+          "visitedEntries": 80,
+          "bytesRead": 191488,
+          "edges": 25,
+          "unresolved": 10,
+          "focusUnresolved": 1,
+          "issues": 0,
+          "scanLimited": false
+        }
+      }
+    },
+    {
+      "trial": 4,
+      "query": {
+        "file": "src/dependencies/leaf.ts",
+        "depth": 3,
+        "dependencies": [],
+        "dependents": [
+          "barrel.ts",
+          "entry.ts",
+          "consumer.ts",
+          "lazy.ts"
+        ],
+        "unresolvedLines": []
+      },
+      "wallMs": 72.88259999999991,
+      "estimatedReplyTokens": 404,
+      "replyBytes": 1494,
+      "responseHash": "fc8fcabfbe4996fbac44e2944a227f536f1500c7a98b92060c5c32f442fe4f45",
+      "result": {
+        "file": "src/dependencies/leaf.ts",
+        "depth": 3,
+        "scope": "Static file relationships, not runtime calls or test coverage. Tests are identified by path convention.",
+        "dependencies": [],
+        "dependents": [
+          {
+            "file": "src/dependencies/barrel.ts",
+            "via": [
+              {
+                "from": "src/dependencies/barrel.ts",
+                "to": "src/dependencies/leaf.ts",
+                "line": 1,
+                "kind": "re-export"
+              }
+            ]
+          },
+          {
+            "file": "src/dependencies/entry.ts",
+            "via": [
+              {
+                "from": "src/dependencies/entry.ts",
+                "to": "src/dependencies/barrel.ts",
+                "line": 1,
+                "kind": "import"
+              },
+              {
+                "from": "src/dependencies/barrel.ts",
+                "to": "src/dependencies/leaf.ts",
+                "line": 1,
+                "kind": "re-export"
+              }
+            ]
+          },
+          {
+            "file": "src/dependencies/consumer.ts",
+            "via": [
+              {
+                "from": "src/dependencies/consumer.ts",
+                "to": "src/dependencies/entry.ts",
+                "line": 1,
+                "kind": "import"
+              },
+              {
+                "from": "src/dependencies/entry.ts",
+                "to": "src/dependencies/barrel.ts",
+                "line": 1,
+                "kind": "import"
+              },
+              {
+                "from": "src/dependencies/barrel.ts",
+                "to": "src/dependencies/leaf.ts",
+                "line": 1,
+                "kind": "re-export"
+              }
+            ]
+          },
+          {
+            "file": "src/dependencies/lazy.ts",
+            "via": [
+              {
+                "from": "src/dependencies/lazy.ts",
+                "to": "src/dependencies/entry.ts",
+                "line": 1,
+                "kind": "import"
+              },
+              {
+                "from": "src/dependencies/entry.ts",
+                "to": "src/dependencies/barrel.ts",
+                "line": 1,
+                "kind": "import"
+              },
+              {
+                "from": "src/dependencies/barrel.ts",
+                "to": "src/dependencies/leaf.ts",
+                "line": 1,
+                "kind": "re-export"
+              }
+            ]
+          }
+        ],
+        "totalNeighbors": 4,
+        "returned": 4,
+        "truncated": false,
+        "unresolved": [],
+        "issues": [],
+        "coverage": {
+          "discoveredFiles": 71,
+          "indexedFiles": 71,
+          "visitedEntries": 80,
+          "bytesRead": 191488,
+          "edges": 25,
+          "unresolved": 10,
+          "focusUnresolved": 0,
+          "issues": 0,
+          "scanLimited": false
+        }
+      }
+    },
+    {
+      "trial": 5,
+      "query": {
+        "file": "src/dependencies/entry.ts",
+        "depth": 2,
+        "dependencies": [
+          "barrel.ts",
+          "types.ts",
+          "lazy.ts",
+          "leaf.ts"
+        ],
+        "dependents": [
+          "consumer.ts",
+          "lazy.ts",
+          "entry.test.ts"
+        ],
+        "unresolvedLines": [
+          5
+        ]
+      },
+      "wallMs": 76.88020000000006,
+      "estimatedReplyTokens": 473,
+      "replyBytes": 1750,
+      "responseHash": "40519e5bb30ceb33deb7a61750794a5b7ef9fbeb20827b9ff809624ad59b797a",
+      "result": {
+        "file": "src/dependencies/entry.ts",
+        "depth": 2,
+        "scope": "Static file relationships, not runtime calls or test coverage. Tests are identified by path convention.",
+        "dependencies": [
+          {
+            "file": "src/dependencies/barrel.ts",
+            "via": [
+              {
+                "from": "src/dependencies/entry.ts",
+                "to": "src/dependencies/barrel.ts",
+                "line": 1,
+                "kind": "import"
+              }
+            ]
+          },
+          {
+            "file": "src/dependencies/lazy.ts",
+            "via": [
+              {
+                "from": "src/dependencies/entry.ts",
+                "to": "src/dependencies/lazy.ts",
+                "line": 4,
+                "kind": "dynamic-import"
+              }
+            ]
+          },
+          {
+            "file": "src/dependencies/types.ts",
+            "via": [
+              {
+                "from": "src/dependencies/entry.ts",
+                "to": "src/dependencies/types.ts",
+                "line": 2,
+                "kind": "import",
+                "typeOnly": true
+              }
+            ]
+          },
+          {
+            "file": "src/dependencies/leaf.ts",
+            "via": [
+              {
+                "from": "src/dependencies/entry.ts",
+                "to": "src/dependencies/barrel.ts",
+                "line": 1,
+                "kind": "import"
+              },
+              {
+                "from": "src/dependencies/barrel.ts",
+                "to": "src/dependencies/leaf.ts",
+                "line": 1,
+                "kind": "re-export"
+              }
+            ]
+          }
+        ],
+        "dependents": [
+          {
+            "file": "src/dependencies/consumer.ts",
+            "via": [
+              {
+                "from": "src/dependencies/consumer.ts",
+                "to": "src/dependencies/entry.ts",
+                "line": 1,
+                "kind": "import"
+              }
+            ]
+          },
+          {
+            "file": "src/dependencies/lazy.ts",
+            "via": [
+              {
+                "from": "src/dependencies/lazy.ts",
+                "to": "src/dependencies/entry.ts",
+                "line": 1,
+                "kind": "import"
+              }
+            ]
+          },
+          {
+            "file": "src/dependencies/entry.test.ts",
+            "test": true,
+            "via": [
+              {
+                "from": "src/dependencies/entry.test.ts",
+                "to": "src/dependencies/consumer.ts",
+                "line": 1,
+                "kind": "import"
+              },
+              {
+                "from": "src/dependencies/consumer.ts",
+                "to": "src/dependencies/entry.ts",
+                "line": 1,
+                "kind": "import"
+              }
+            ]
+          }
+        ],
+        "totalNeighbors": 7,
+        "returned": 7,
+        "truncated": false,
+        "unresolved": [
+          {
+            "file": "src/dependencies/entry.ts",
+            "line": 5,
+            "reason": "nonliteral dynamic import"
+          }
+        ],
+        "issues": [],
+        "coverage": {
+          "discoveredFiles": 71,
+          "indexedFiles": 71,
+          "visitedEntries": 80,
+          "bytesRead": 191488,
+          "edges": 25,
+          "unresolved": 10,
+          "focusUnresolved": 1,
+          "issues": 0,
+          "scanLimited": false
+        }
+      }
+    },
+    {
+      "trial": 5,
+      "query": {
+        "file": "src/dependencies/leaf.ts",
+        "depth": 3,
+        "dependencies": [],
+        "dependents": [
+          "barrel.ts",
+          "entry.ts",
+          "consumer.ts",
+          "lazy.ts"
+        ],
+        "unresolvedLines": []
+      },
+      "wallMs": 71.91629999999986,
+      "estimatedReplyTokens": 404,
+      "replyBytes": 1494,
+      "responseHash": "fc8fcabfbe4996fbac44e2944a227f536f1500c7a98b92060c5c32f442fe4f45",
+      "result": {
+        "file": "src/dependencies/leaf.ts",
+        "depth": 3,
+        "scope": "Static file relationships, not runtime calls or test coverage. Tests are identified by path convention.",
+        "dependencies": [],
+        "dependents": [
+          {
+            "file": "src/dependencies/barrel.ts",
+            "via": [
+              {
+                "from": "src/dependencies/barrel.ts",
+                "to": "src/dependencies/leaf.ts",
+                "line": 1,
+                "kind": "re-export"
+              }
+            ]
+          },
+          {
+            "file": "src/dependencies/entry.ts",
+            "via": [
+              {
+                "from": "src/dependencies/entry.ts",
+                "to": "src/dependencies/barrel.ts",
+                "line": 1,
+                "kind": "import"
+              },
+              {
+                "from": "src/dependencies/barrel.ts",
+                "to": "src/dependencies/leaf.ts",
+                "line": 1,
+                "kind": "re-export"
+              }
+            ]
+          },
+          {
+            "file": "src/dependencies/consumer.ts",
+            "via": [
+              {
+                "from": "src/dependencies/consumer.ts",
+                "to": "src/dependencies/entry.ts",
+                "line": 1,
+                "kind": "import"
+              },
+              {
+                "from": "src/dependencies/entry.ts",
+                "to": "src/dependencies/barrel.ts",
+                "line": 1,
+                "kind": "import"
+              },
+              {
+                "from": "src/dependencies/barrel.ts",
+                "to": "src/dependencies/leaf.ts",
+                "line": 1,
+                "kind": "re-export"
+              }
+            ]
+          },
+          {
+            "file": "src/dependencies/lazy.ts",
+            "via": [
+              {
+                "from": "src/dependencies/lazy.ts",
+                "to": "src/dependencies/entry.ts",
+                "line": 1,
+                "kind": "import"
+              },
+              {
+                "from": "src/dependencies/entry.ts",
+                "to": "src/dependencies/barrel.ts",
+                "line": 1,
+                "kind": "import"
+              },
+              {
+                "from": "src/dependencies/barrel.ts",
+                "to": "src/dependencies/leaf.ts",
+                "line": 1,
+                "kind": "re-export"
+              }
+            ]
+          }
+        ],
+        "totalNeighbors": 4,
+        "returned": 4,
+        "truncated": false,
+        "unresolved": [],
+        "issues": [],
+        "coverage": {
+          "discoveredFiles": 71,
+          "indexedFiles": 71,
+          "visitedEntries": 80,
+          "bytesRead": 191488,
+          "edges": 25,
+          "unresolved": 10,
+          "focusUnresolved": 0,
+          "issues": 0,
+          "scanLimited": false
+        }
+      }
+    }
+  ],
+  "note": "No provider was invoked. Reply and MCP metadata token estimates use gpt-tokenizer. Scan timing includes stdio overhead; the first call is cold. This is a new capability, not a before/after speed comparison."
+}

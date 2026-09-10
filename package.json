@@ -1,14 +1,14 @@
 {
   "name": "predictive-debugger",
   "displayName": "Predictive Debugger",
-  "version": "0.7.1",
+  "version": "0.8.0",
   "description": "Predicts where code is likely to fail. Ships as a VS Code extension and as an MCP server that coding agents can call while reviewing code. Auth is borrowed from the Claude Code, Codex, or GitHub Copilot CLI you are already signed in to.",
   "author": "SpeedosDK",
   "license": "MIT",
   "publisher": "speedosdk",
   "repository": {
     "type": "git",
-    "url": "https://github.com/SpeedosDK/predictive-debugger.git"
+    "url": "git+https://github.com/SpeedosDK/predictive-debugger.git"
   },
   "bugs": {
     "url": "https://github.com/SpeedosDK/predictive-debugger/issues"
@@ -33,7 +33,11 @@
   ],
   "main": "./dist/extension.js",
   "bin": {
-    "predictive-debugger-mcp": "./dist/mcp-server.js"
+    "predictive-debugger-mcp": "dist/mcp-server.js"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   },
   "scripts": {
     "check": "tsc -p tsconfig.json --noEmit",
@@ -44,25 +48,21 @@
     "watch:tsc": "tsc -p tsconfig.json --watch",
     "pretest": "npm run compile",
     "test": "node --test \"out/test/**/*.test.js\" \"bench/*.test.mjs\"",
+    "test:package": "node .github/scripts/check-npx.mjs",
     "mcp": "node ./dist/mcp-server.js",
     "prepack": "npm run build",
+    "prepublishOnly": "npm test && npm run test:package",
     "package": "npm run build && vsce package --allow-missing-repository --skip-license",
     "vscode:prepublish": "npm run build",
     "bundle:dev": "node esbuild.mjs",
-    "bench": "npm run compile && npm run build && node .github/scripts/check-mcp.mjs && node bench/prepare-master.mjs && node bench/workflows.mjs --output=results-v07-balanced.json && node bench/markdown.mjs && python bench/plot-workflows.py",
-    "bench:agents": "node bench/workflows.mjs --output=results-v07-balanced.json"
+    "bench": "npm run compile && npm run build && node .github/scripts/check-mcp.mjs && node bench/prepare-master.mjs && node bench/workflows.mjs --output=results-v072-full.json && node bench/markdown.mjs && python bench/plot-workflows.py && node bench/report-v072-full.mjs && python bench/plot-v072-full.py",
+    "bench:agents": "node bench/workflows.mjs --output=results-v072-full.json"
   },
   "engines": {
     "vscode": "^1.85.0",
     "node": ">=22.0.0"
   },
   "activationEvents": [],
-  "dependencies": {
-    "@babel/parser": "^8.0.4",
-    "@babel/traverse": "^8.0.4",
-    "@modelcontextprotocol/sdk": "^1.30.0",
-    "zod": "^4.4.3"
-  },
   "contributes": {
     "commands": [
       {
@@ -124,11 +124,15 @@
     }
   },
   "devDependencies": {
+    "@babel/parser": "^8.0.4",
+    "@babel/traverse": "^8.0.4",
+    "@modelcontextprotocol/sdk": "^1.30.0",
     "@types/node": "^26.2.0",
     "@types/vscode": "~1.85.0",
     "esbuild": "^0.28.2",
     "gpt-tokenizer": "^3.0.1",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "zod": "^4.4.3"
   },
   "capabilities": {
     "untrustedWorkspaces": {
