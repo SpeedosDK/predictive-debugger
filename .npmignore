@@ -27,3 +27,6 @@ bench/
 .gitattributes
 **/*.map
 *.vsix
+
+# Promo video source (Remotion). Not part of either distribution.
+promo/

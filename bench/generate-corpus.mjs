@@ -11,6 +11,7 @@ import fs from "fs/promises";
 import path from "path";
 import { fileURLToPath } from "url";
 import { writeAccuracyCases } from "./accuracy-cases.mjs";
+import { writeDependencyCases } from "./dependency-cases.mjs";
 import { acceptableRanges } from "./enclosing-function.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -775,12 +776,14 @@ async function main() {
     // Line numbers are derived from an anchor rather than written by hand, so
     // the manifest cannot drift out of sync with the source it describes.
     const accuracy = await writeAccuracyCases(root);
+    const dependencyMap = await writeDependencyCases(root);
     const manifest = {
         generatedBy: "bench/generate-corpus.mjs",
         accuracy,
+        dependencyMap,
         language: "javascript",
         corpus: "corpus",
-        fileCount: written.length + accuracy.fileCount,
+        fileCount: written.length + accuracy.fileCount + dependencyMap.fileCount,
         // The per-file harness used to hardcode these. Naming them here keeps
         // the answer key and the control group in one file, so a corpus can be
         // measured without the harness knowing anything about it.

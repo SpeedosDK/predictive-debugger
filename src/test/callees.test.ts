@@ -420,3 +420,335 @@ describe("type contract scope and cost", () => {
         assert.ok(callees.reduce((sum, c) => sum + c.source.length, 0) <= 1000);
     });
 });
+
+describe("oversized imported members", () => {
+    const noisy = `noisy() {\n${"console.log('unrelated');\n".repeat(180)}}`;
+
+    it("keeps a late called method, its state and transitive helpers within the small-file budget", async () => {
+        const [context] = await collect({
+            "index.ts": 'import { client } from "./client"; client.get();',
+            "client.ts": `export const client = { ${noisy}, value: 42,
+                normalize() { return this.value; }, get() { return this.normalize(); } };`
+        });
+        assert.match(context.source, /get\(\) \{ return this.normalize\(\); \}/);
+        assert.match(context.source, /normalize\(\) \{ return this.value; \}/);
+        assert.match(context.source, /value: 42/);
+        assert.doesNotMatch(context.source, /unrelated/);
+        assert.match(context.source, /omitted members\/state/);
+        assert.equal(context.excerpted, true);
+        assert.ok(context.source.length <= 1000);
+        const { parse } = await babel.loadBabel();
+        assert.doesNotThrow(() => parse(context.source, babel.PARSE_OPTIONS));
+    });
+
+    it("preserves small objects byte for byte", async () => {
+        const declaration = 'const client = { value: 3, get() { return this.value; }, reset() { this.value = 0; } };';
+        const [context] = await collect({
+            "index.ts": 'import { client } from "./client"; client.get();',
+            "client.ts": `export ${declaration}`
+        });
+        assert.equal(context.source, declaration.slice(0, -1));
+        assert.equal(context.excerpted, undefined);
+    });
+
+    it("retains getter/setter pairs, arrow properties and state writers when they fit", async () => {
+        const [context] = await collect({
+            "index.ts": 'import { client } from "./client"; client.get();',
+            "client.ts": `export const client = { ${noisy}, _value: 3,
+                get value() { return this._value; }, set value(n) { this._value = n; },
+                reset() { this._value = 0; }, get: () => 42 };`
+        });
+        assert.match(context.source, /get: \(\) => 42/);
+        assert.match(context.source, /set value\(n\)/);
+        assert.match(context.source, /get value\(\)/);
+        assert.match(context.source, /reset\(\)/);
+    });
+
+    it("keeps class static state and private helpers in original order", async () => {
+        const [context] = await collect({
+            "index.ts": 'import { Client } from "./client"; Client.get();',
+            "client.ts": `export class Client { static ${noisy}
+                static value = 3; static { this.value = 4; }
+                static #normalize() { return this.value; }
+                static get() { return this.#normalize(); } }`
+        });
+        assert.match(context.source, /static get\(\)/);
+        assert.match(context.source, /static #normalize\(\)/);
+        assert.ok(context.source.indexOf('static value = 3') < context.source.indexOf('this.value = 4'));
+        assert.ok(context.source.length <= 1000);
+        const { parse } = await babel.loadBabel();
+        assert.doesNotThrow(() => parse(context.source, babel.PARSE_OPTIONS));
+    });
+
+    it("applies selection through aliases and explicit barrel re-exports", async () => {
+        const [context] = await collect({
+            "index.ts": 'import client from "./barrel"; client.get();',
+            "barrel.ts": 'export { default } from "./client";',
+            "client.ts": `const client = { ${noisy}, get() { return 42; } }; export default client;`
+        });
+        assert.match(context.source, /get\(\) \{ return 42; \}/);
+        assert.equal(context.from, './client.ts');
+        assert.equal(context.excerpted, true);
+    });
+
+    it("marks missing state when a referenced field cannot fit", async () => {
+        const [context] = await collect({
+            "index.ts": 'import { client } from "./client"; client.get();',
+            "client.ts": `export const client = { data: '${'x'.repeat(4000)}', get() { return this.data; } };`
+        });
+        assert.match(context.source, /get\(\) \{ return this.data; \}/);
+        assert.doesNotMatch(context.source, /data: '/);
+        assert.match(context.source, /omitted members\/state/);
+        assert.equal(context.excerpted, true);
+        assert.ok(context.source.length <= 1000);
+    });
+
+    it("starts an oversized method excerpt at the called method", async () => {
+        const [context] = await collect({
+            "index.ts": 'import { client } from "./client"; client.get();',
+            "client.ts": `export const client = { ${noisy}, get() {\n${'console.log("called");\n'.repeat(180)}} };`
+        });
+        assert.match(context.source, /get\(\)/);
+        assert.match(context.source, /called/);
+        assert.doesNotMatch(context.source, /unrelated/);
+        assert.equal(context.excerpted, true);
+        assert.ok(context.source.length <= 1000);
+    });
+
+    it("does not prune spreads, computed keys or inherited classes", async () => {
+        for (const source of [
+            `export const client = { ${noisy}, get() { return 1; }, ...overrides };`,
+            `export const client = { ${noisy}, get() { return 1; }, [key]() { return 2; } };`,
+            `export const client = { ${noisy}, get() { return 1; }, get() { return 2; } };`,
+            `export class client extends Parent { static ${noisy} static get() { return super.get(); } }`
+        ]) {
+            const [context] = await collect({
+                "index.ts": 'import { client } from "./client"; client.get();',
+                "client.ts": source
+            });
+            assert.match(context.source, /unrelated/);
+            assert.equal(context.excerpted, true);
+        }
+    });
+
+    it("does not loop on mutually recursive helpers or exceed the shared budget", async () => {
+        const contexts = await collect({
+            "index.ts": 'import { client } from "./client"; client.get(); client.other();',
+            "client.ts": `export const client = { ${noisy}, a() { return this.b(); },
+                b() { return this.a(); }, get() { return this.a(); }, other() { return 1; } };`
+        });
+        assert.equal(contexts.length, 2);
+        assert.ok(contexts.reduce((sum, context) => sum + context.source.length, 0) <= 1000);
+        assert.match(contexts[0].source, /a\(\) \{ return this.b\(\); \}/);
+        assert.match(contexts[0].source, /b\(\) \{ return this.a\(\); \}/);
+    });
+});
+
+describe("bounded export resolution", () => {
+    it("follows wildcard barrels for named functions and referenced types", async () => {
+        const contexts = await collect({
+            "index.ts": 'import { guard, type Row } from "./barrel"; guard(); let row: Row;',
+            "barrel.ts": 'export * from "./helpers"; export * from "./types";',
+            "helpers.ts": 'export function guard() { return 1; }',
+            "types.ts": 'export interface Row { value?: number }'
+        });
+        assert.deepEqual(contexts.map(context => context.name), ['guard', 'Row']);
+        assert.equal(contexts[0].from, './helpers.ts');
+        assert.match(contexts[1].source, /value\?: number/);
+    });
+
+    it("prefers explicit exports over conflicting stars", async () => {
+        const [context] = await collect({
+            "index.ts": 'import { guard } from "./barrel"; guard();',
+            "barrel.ts": 'export * from "./a"; export { guard } from "./b";',
+            "a.ts": 'export function guard() { return 1; }',
+            "b.ts": 'export function guard() { return 2; }'
+        });
+        assert.match(context.source, /return 2/);
+    });
+
+    it("does not choose between conflicting star bindings, even with identical source", async () => {
+        for (const second of ['export function guard() { return 1; }', 'export function guard() { return 2; }']) {
+            assert.deepEqual(await collect({
+                "index.ts": 'import { guard } from "./barrel"; guard();',
+                "barrel.ts": 'export * from "./a"; export * from "./b";',
+                "a.ts": 'export function guard() { return 1; }',
+                "b.ts": second
+            }), []);
+        }
+    });
+
+    it("deduplicates diamond paths to the same binding", async () => {
+        const [context] = await collect({
+            "index.ts": 'import { guard } from "./barrel"; guard();',
+            "barrel.ts": 'export * from "./a"; export * from "./b";',
+            "a.ts": 'export { helper as guard } from "./helpers";',
+            "b.ts": 'import { helper } from "./helpers"; export { helper as guard };',
+            "helpers.ts": 'export function helper() { return 42; }'
+        });
+        assert.equal(context.from, './helpers.ts');
+        assert.match(context.source, /return 42/);
+    });
+
+    it("distinguishes different bindings in the same terminal module", async () => {
+        assert.deepEqual(await collect({
+            "index.ts": 'import { guard } from "./barrel"; guard();',
+            "barrel.ts": 'export * from "./a"; export * from "./b";',
+            "a.ts": 'export { first as guard } from "./helpers";',
+            "b.ts": 'export { second as guard } from "./helpers";',
+            "helpers.ts": 'export function first() {} export function second() {}'
+        }), []);
+    });
+
+    it("keeps ambiguity even if only one candidate has the requested object member", async () => {
+        assert.deepEqual(await collect({
+            "index.ts": 'import { client } from "./barrel"; client.get();',
+            "barrel.ts": 'export * from "./a"; export * from "./b";',
+            "a.ts": 'export const client = { get() { return 42; } };',
+            "b.ts": 'export const client = { other() {} };'
+        }), []);
+    });
+
+    it("treats unreadable, external and malformed star branches as unknown", async () => {
+        for (const branch of ['./missing', 'external-package', './broken', './commonjs']) {
+            assert.deepEqual(await collect({
+                "index.ts": 'import { guard } from "./barrel"; guard();',
+                "barrel.ts": `export * from "./helpers"; export * from "${branch}";`,
+                "helpers.ts": 'export function guard() {}',
+                "broken.ts": 'export function (',
+                "commonjs.js": 'exports.guard = function () {};'
+            }), []);
+        }
+    });
+
+    it("does not leak default exports or their local declaration names through stars", async () => {
+        for (const imported of ['guard', 'default as guard']) {
+            assert.deepEqual(await collect({
+                "index.ts": `import { ${imported} } from "./barrel"; guard();`,
+                "barrel.ts": 'export * from "./helpers";',
+                "helpers.ts": 'export default function guard() { return 42; }'
+            }), []);
+        }
+    });
+
+    it("finds a definition through a cycle but stops a cycle with no definition", async () => {
+        const files = {
+            "index.ts": 'import { guard } from "./a"; guard();',
+            "a.ts": 'export * from "./b";',
+            "b.ts": 'export * from "./a"; export * from "./helpers";',
+            "helpers.ts": 'export function guard() { return 42; }'
+        };
+        assert.equal((await collect(files))[0].from, './helpers.ts');
+        assert.deepEqual(await collect({ ...files, 'helpers.ts': 'export const other = 1;' }), []);
+    });
+
+    it("does not guess when another star branch exceeds the four-file depth limit", async () => {
+        assert.deepEqual(await collect({
+            "index.ts": 'import { guard } from "./barrel"; guard();',
+            "barrel.ts": 'export * from "./helpers"; export * from "./a";',
+            "helpers.ts": 'export function guard() {}',
+            "a.ts": 'export * from "./b";',
+            "b.ts": 'export * from "./c";',
+            "c.ts": 'export * from "./d";',
+            "d.ts": 'export const other = 1;'
+        }), []);
+    });
+
+    it("honors explicit bindings that cannot be excerpted instead of falling through to stars", async () => {
+        for (const explicit of ['export const { guard } = factory();', 'export * as guard from "./helpers";']) {
+            assert.deepEqual(await collect({
+                "index.ts": 'import { guard } from "./barrel"; guard();',
+                "barrel.ts": `${explicit} export * from "./helpers";`,
+                "helpers.ts": 'export function guard() { return 42; }'
+            }), []);
+        }
+    });
+
+    it("follows imported named and default bindings re-exported under aliases", async () => {
+        for (const declaration of [
+            'import { helper as local } from "./helpers"; export { local as guard };',
+            'import local from "./helpers"; export { local as guard };',
+            'import { helper as local } from "./helpers"; export default local;'
+        ]) {
+            const specifier = declaration.includes('export default') ? 'guard' : '{ guard }';
+            const [context] = await collect({
+                "index.ts": `import ${specifier} from "./barrel"; guard();`,
+                "barrel.ts": declaration,
+                "helpers.ts": 'export function helper() { return 42; } export default helper;'
+            });
+            assert.equal(context.from, './helpers.ts');
+            assert.match(context.source, /return 42/);
+        }
+    });
+
+    it("preserves distinct default value snapshots when checking star ambiguity", async () => {
+        assert.deepEqual(await collect({
+            "index.ts": 'import { guard } from "./barrel"; guard();',
+            "barrel.ts": 'export * from "./a"; export * from "./b";',
+            "a.ts": 'export { default as guard } from "./snapshot";',
+            "b.ts": 'export { helper as guard } from "./helpers";',
+            "snapshot.ts": 'import { helper } from "./helpers"; export default helper;',
+            "helpers.ts": 'export function helper() {}'
+        }), []);
+    });
+
+    it("preserves member selection through imported binding re-exports", async () => {
+        const [context] = await collect({
+            "index.ts": 'import { client } from "./barrel"; client.get();',
+            "barrel.ts": 'import { client } from "./helpers"; export { client };',
+            "helpers.ts": `export const client = { noisy() { ${'console.log(1);'.repeat(300)} }, get() { return 42; } };`
+        });
+        assert.match(context.source, /get\(\) \{ return 42; \}/);
+        assert.equal(context.excerpted, true);
+        assert.ok(context.source.length <= 1000);
+    });
+
+    it("collects imported constructors and respects shadowing", async () => {
+        const contexts = await collect({
+            "index.ts": 'import { Client } from "./helpers"; import * as ns from "./helpers"; new Client(); new ns.Client(); function f(Client) { new Client(); }',
+            "helpers.ts": 'export class Client { constructor() { this.ready = true; } }'
+        });
+        assert.deepEqual(contexts.map(context => context.name), ['Client', 'ns.Client']);
+        assert.match(contexts[0].source, /constructor\(\)/);
+        assert.deepEqual(await collect({
+            "index.ts": 'import { Client } from "./helpers"; function f(Client) { new Client(); }',
+            "helpers.ts": 'export class Client {}'
+        }), []);
+    });
+
+    it("bounds star expansion at the shared dependency parse limit", async () => {
+        const files: Record<string, string> = {
+            "index.ts": 'import { guard } from "./barrel"; guard();',
+            "barrel.ts": Array.from({ length: 25 }, (_, i) => `export * from "./helper${i}";`).join('\n')
+        };
+        for (let i = 0; i < 25; i++) files[`helper${i}.ts`] = i === 0
+            ? 'export function guard() {}' : `export const other${i} = 1;`;
+        assert.deepEqual(await collect(files), []);
+    });
+
+    it("bounds repeated diamond traversal even when the files are already cached", async () => {
+        for (const width of [6, 10]) {
+            const files: Record<string, string> = {
+                "index.ts": 'import { guard } from "./barrel"; guard();',
+                "barrel.ts": Array.from({ length: width }, (_, i) => `export * from "./a${i}";`).join('\n'),
+                "helpers.ts": 'export function guard() { return 42; }'
+            };
+            for (let i = 0; i < width; i++) {
+                files[`a${i}.ts`] = Array.from({ length: width }, (_, j) => `export * from "./b${j}";`).join('\n');
+                files[`b${i}.ts`] = 'export * from "./helpers";';
+            }
+            const contexts = await collect(files);
+            assert.equal(contexts.length, width === 6 ? 1 : 0);
+        }
+    });
+
+    it("follows an imported default constructor through a renamed re-export", async () => {
+        const [context] = await collect({
+            "index.ts": 'import { Client } from "./barrel"; new Client();',
+            "barrel.ts": 'import Implementation from "./client"; export { Implementation as Client };',
+            "client.ts": 'export default class Client { constructor() { this.ready = true; } }'
+        });
+        assert.match(context.source, /constructor\(\)/);
+        assert.equal(context.from, './client.ts');
+    });
+});

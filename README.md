@@ -99,8 +99,8 @@ To try the unfinished editor extension, see
 ```
 src/
   core/            analysis engine — no VS Code, no MCP, no I/O beyond files
-    analysis/      AST metrics (ast.ts), heuristic risk (risk.ts), one-hop
-                   import resolution for prompt context (callees.ts)
+    analysis/      AST metrics (ast.ts), heuristic risk (risk.ts), dependency
+                   context (callees.ts), file relationships (dependencies.ts)
     logs/          wrapper around tools/log-analyzer
     prediction/    model-backed prediction: one file, or a whole project
     sourceFiles.ts shared source-tree walker
@@ -141,7 +141,7 @@ Read this before relying on it.
   can see whether a callee already handles the
   case it is about to flag; pass `calleeContext: false` to send only the file.
   Third-party packages are never read. The deterministic tools (`analyze_file`,
-  `scan_project`, `analyze_logs`) run entirely locally and send nothing
+  `scan_project`, `map_dependencies`, `analyze_logs`) run entirely locally and send nothing
   anywhere. If you point the MCP server at a private codebase, know which tools
   your agent is calling.
 - **Very large files are analysed only in part.** Up to 120,000 characters
@@ -307,7 +307,7 @@ copilot mcp add predictive-debugger -- node /absolute/path/to/dist/mcp-server.js
 
 ### Tools
 
-The first three are **deterministic**: no model call, no credentials, results in
+The first four are **deterministic**: no model call, no credentials, results in
 milliseconds. These are what a reviewing agent should reach for — the agent is
 already a model, so it needs facts, not a second opinion.
 
@@ -315,6 +315,7 @@ already a model, so it needs facts, not a second opinion.
 | --- | --- |
 | `analyze_file` | Complexity metrics + risk score and risk density for one file, with the signals that drove it |
 | `scan_project` | Rank a directory's source files by risk density — risk per line, not per file. Test files are excluded by default (`includeTests` to rank them) |
+| `map_dependencies` | Imports, reverse imports and tests connected by imports, with source-line evidence and bounded depth. File relationships, not runtime callers or test coverage |
 | `analyze_logs` | Score log lines by severity and unusual wording, return the anomalies |
 | `predict_failures` | Full pipeline including a second-opinion model verdict, an `actionable` precision gate, a `checked` list of the categories the model says it weighed, and an optional ranked `findings` list (`multi: true`) — spawns a CLI, 5–15s. Takes `files: [...]` to review a change set in one call, concurrently |
 | `list_providers` | Which CLIs are installed and signed in (for diagnosing failures) |
@@ -327,6 +328,32 @@ exactly that, so it reaches for `analyze_file` first.
 A typical agent review looks like: `scan_project` to find the risky files →
 read those files directly → optionally `predict_failures` on the one or two that
 look worst.
+
+Use `map_dependencies` when deciding which other files belong in a review. Pass
+`directory` and a `file` inside it; `file` may be absolute or relative to that
+directory. `depth` defaults to 1 and supports up to 3 import hops in each direction.
+Each dependency or dependent includes a `via` chain with paths, import kinds and
+source lines. Entries marked `test: true` match test-path conventions; this does
+not establish that they execute the changed code.
+
+The map includes tests and follows ESM imports/re-exports, type import expressions
+and literal dynamic imports. CommonJS requires/import assignments and nonliteral
+dynamic imports are reported as unresolved. `unresolved` lists outgoing imports
+from the requested file; `coverage.unresolved` counts unresolved references across
+the scanned project. Build, vendor and hidden directories are excluded. Source
+outside `directory` and undiscovered targets remain unresolved.
+
+`maxFiles` defaults to 1,000 and supports up to 2,000. Additional bounds are 20,000
+directory entries, 64 directory levels, 4 MB per source file, 32 MB of source reads
+per request and 10,000 import references. `limit` defaults to 50 across both
+neighbor lists, with a maximum of 200; the serialized reply is capped at 32,000
+characters. Read/parse failures appear in `issues`, scan limits in
+`coverage.scanLimited`, and reply omissions in `truncated`. The index refreshes
+on every request. A missing relationship in a partial scan is not proof of absence.
+
+This tool makes no provider call, but its metadata and returned map occupy the
+calling agent's context. See the measured response sizes and local timings in
+[bench/DEPENDENCY-MAP-CHECKPOINT.md](bench/DEPENDENCY-MAP-CHECKPOINT.md).
 
 Reviewing several files at once, pass them as `files` rather than calling the
 tool once each. The verdicts are independent, so they run concurrently: a batch
@@ -345,6 +372,30 @@ five of the top six slots when they are included, and none when they are not.
 `includeTests: true` brings them back, for auditing a suite's own complexity.
 The VS Code project-wide command still covers tests: a human who asked for the
 whole workspace is not spending a per-file reading budget.
+
+### Dependency context
+
+Dependency context supports direct ESM imports, calls on declared imported objects,
+referenced types, imported constructors, named/default binding re-exports and
+unambiguous `export *` barrels through at most four files. Local `tsconfig.json`
+path mappings support relative config inheritance. CommonJS exports, namespace
+re-exports, package-based config inheritance and injected instance methods remain
+unresolved. Conflicting or unreadable wildcard branches remain unknown rather
+than selecting the first matching definition. At most 24 dependency files are
+parsed per collection; each must be no larger than 4 MB. Each requested export
+has a 128-step traversal limit, including cached paths.
+
+The dependency text budget is the source length with a 1,000-character minimum and
+16,000-character maximum, with at most 12 definitions of 3,000 characters each.
+There is no automatic second model pass. Very small files can still cost more to ask
+about than to read; callers should read those directly when saving context is the goal.
+
+Oversized imported objects and static class members prioritize the called member, referenced
+fields and helpers within that same budget. Retained members stay in source order;
+omitted members and state are marked. Small definitions stay intact. Dynamic
+definitions, duplicate overrides, inheritance and decorators retain prefix
+truncation. This is bounded supporting evidence, not complete state-flow analysis.
+Benchmark results and measurement methods are in [bench/RESULTS.md](bench/RESULTS.md).
 
 ### Verifying new code
 
@@ -458,23 +509,9 @@ rather than throwing, and a project scan that fails on one file keeps the
 results for the rest and lists the failures separately. Both behaviours are
 covered by tests — they were originally bugs the test suite caught.
 
-## Measured results
+## Benchmarks
 
-[bench/RESULTS.md](bench/RESULTS.md) compares direct Sonnet reading, the previous
-prompt version of the tool and the current tool across the same 28 development cases.
-The graphs show verified defect detections, false alarms, total reported tokens and
-CLI-estimated cost, including the model calls inside the tool.
-
-```bash
-npm run bench           # rebuild both versions, resume sessions, generate report and graphs
-node bench/markdown.mjs  # regenerate report and validated plot data without model calls
-python bench/plot-workflows.py
-```
-
-Install the plotting dependency from `bench/requirements.txt` first. The Windows
-runner checkpoints each complete agent session and stops on incomplete results.
-Changed source, builds or settings require a new output filename.
-See [method and reproduction](bench/METHOD.md).
+See [benchmark results](bench/RESULTS.md) and [method and reproduction](bench/METHOD.md).
 
 ## Development
 
@@ -515,23 +552,3 @@ privately rather than opening an issue.
 ## License
 
 MIT — see [LICENSE](LICENSE).
-
-
-### Accuracy experiments and cost
-
-Dependency context supports direct ESM imports, calls on declared imported objects,
-referenced types, explicit named re-exports through at most four files, and local
-`tsconfig.json` path mappings with relative config inheritance. It does not resolve
-CommonJS exports, `export *` barrels, package-based config inheritance, or injected
-instance methods. Unresolved dependencies remain unknown. At most 24 dependency
-files are parsed per collection; each must be no larger than 4 MB.
-
-The dependency text budget is the source length with a 1,000-character minimum and
-16,000-character maximum, with at most 12 definitions of 3,000 characters each.
-There is no automatic second model pass. Very small files can still cost more to ask
-about than to read; callers should read those directly when saving context is the goal.
-
-The full workflow comparison uses the original JavaScript and TypeScript cases plus
-four dependency cases. See [bench/METHOD.md](bench/METHOD.md) for build reconstruction,
-usage accounting, adjudication and reproduction. The corpus informed prompt tuning,
-so these are development results rather than held-out accuracy estimates.

@@ -14,6 +14,7 @@ const EXPECTED_TOOLS = [
     "analyze_file",
     "analyze_logs",
     "list_providers",
+    "map_dependencies",
     "predict_failures",
     "scan_project"
 ];
@@ -58,6 +59,7 @@ assert.ok(
 // sub-agent, which is the half that decides whether the rule is affordable.
 const instructions = client.getInstructions();
 assert.ok(instructions, "server should advertise instructions");
+assert.match(instructions, /Use map_dependencies for imports, reverse imports/);
 assert.match(
     instructions,
     /checked from outside the context that wrote it/,
@@ -96,6 +98,15 @@ const scan = await client.callTool({
 });
 assert.ok(!scan.isError, "scan_project returned an error");
 assert.equal(JSON.parse(scan.content[0].text).scanned, 4);
+
+const dependencies = await client.callTool({ name: "map_dependencies", arguments: {
+    directory: path.resolve("bench/corpus"), file: "src/accuracy/late-member.ts", depth: 1
+} });
+assert.ok(!dependencies.isError, "map_dependencies returned an error");
+const neighborhood = JSON.parse(dependencies.content[0].text);
+assert.ok(neighborhood.dependencies.some(entry => entry.file === "src/accuracy/large-directory.ts"));
+assert.ok(neighborhood.dependencies.every(entry => entry.via.every(edge => edge.line > 0)));
+assert.equal(neighborhood.coverage.scanLimited, false);
 
 await client.close();
 console.log(`MCP server OK — ${names.length} tools, deterministic calls verified`);
