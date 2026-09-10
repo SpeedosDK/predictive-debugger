@@ -18,7 +18,7 @@ test('report checks the original cases against the previous results and explains
         prior: { detected: 38, bugs: 39, falseAlarms: 0, controls: 45 }
     });
     assert.match(report, /v0\.7\.1 found 38\/39, the same as v0\.7/);
-    assert.match(report, /found\s+3\/12; v0\.7\.2 includes it and found 12\/12/);
+    assert.match(report, /found\s+3\/12; v0\.8\.0 includes it and found 12\/12/);
     assert.match(report, /3% more tokens than v0\.7\.1 and 50% fewer than direct reading/);
     assert.doesNotMatch(report, /CLI-estimated cost|\$\d|subscription invoices/);
     assert.match(report, /including cache reads and writes/);

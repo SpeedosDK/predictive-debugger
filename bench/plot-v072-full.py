@@ -1,4 +1,4 @@
-"""Figures for the fresh v0.7.1-vs-v0.7.2-candidate comparison on the 37-case corpus.
+"""Figures for the fresh v0.7.1-vs-v0.8.0-candidate comparison on the 37-case corpus.
 
 The main report charts live in plot-workflows.py. These figures support the full
 analysis, including new dependency cases and repeated clean-control scores.
@@ -22,7 +22,7 @@ plt.rcParams.update({'font.family': 'DejaVu Sans', 'font.size': 11,
                      'text.color': '#172b3a', 'axes.labelcolor': '#172b3a',
                      'xtick.color': '#526473', 'ytick.color': '#172b3a',
                      'svg.fonttype': 'none', 'savefig.facecolor': 'white'})
-labels = ['Direct reading', 'v0.7.1 (released)', 'v0.7.2 candidate']
+labels = ['Direct reading', 'v0.7.1 (released)', 'v0.8.0 candidate']
 colors = ['#8593a3', '#bd8745', '#178974']
 ARMS = ['read', 'previous', 'current']
 

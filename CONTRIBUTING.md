@@ -69,9 +69,9 @@ The package name is `predictive-debugger`; its executable is
 `predictive-debugger-mcp`. npm can infer that executable because it is the only
 `bin` entry, so users run `npx -y predictive-debugger@latest`.
 
-For the first publication, update the README's pending-publication wording
-as part of the release work. Publish from the clean, tagged release checkout
-using an npm account that can publish this package:
+Merge the release from `develop` into `master` by pull request and wait for every
+master CI job to pass. Tag that tested commit, then publish from a clean checkout
+of the tag using an npm account that can publish this package:
 
 ```bash
 npm ci

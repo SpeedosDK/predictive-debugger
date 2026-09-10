@@ -22,15 +22,16 @@ export function renderReport({ arms, groups, sessions, prior, trials }) {
     const sameScore = o.previous.detected === prior.detected && o.previous.bugs === prior.bugs;
     return `# Benchmark results
 
-**v0.7.2 identified ${current.detected}/${current.bugs} planted bug trials with ${current.falseAlarms} false alarms.**
+**v0.8.0 identified ${current.detected}/${current.bugs} planted bug trials with ${current.falseAlarms} false alarms.**
 
 Sonnet reviewed ${cases(o) + cases(a)} JavaScript and TypeScript cases ${trials} times per workflow, every session fresh:
 the ${cases(o)} cases from the [previous results](results-v07-balanced.json) and ${cases(a)} new dependency cases.
-The baseline is tagged v0.7.1; v0.7.2 labels the unreleased candidate build.
+The baseline is tagged v0.7.1; v0.8.0 labels the measured candidate build.
+The saved records retain its original v0.7.2 label and exact bundle hash.
 
 ![Detection and false alarms](charts/detection.svg)
 
-| Across three trials | Agent reads files | v0.7.1 | v0.7.2 |
+| Across three trials | Agent reads files | v0.7.1 | v0.8.0 |
 |---|---:|---:|---:|
 | Original ${cases(o)} cases: defects found | ${found(o)} |
 | New ${cases(a)} cases: defects found | ${found(a)} |
@@ -46,17 +47,17 @@ ${sameScore
         : `On the original cases v0.7.1 found ${o.previous.detected}/${o.previous.bugs}; v0.7 found ${prior.detected}/${prior.bugs} in the previous results.`}
 The test grew from ${cases(o)} to ${cases(o) + cases(a)} cases to exercise dependency resolution that the old cases barely covered.
 Each new bug case needs a definition from another file. v0.7.1 leaves it out of its prompt and found
-${a.previous.detected}/${a.previous.bugs}; v0.7.2 includes it and found ${a.current.detected}/${a.current.bugs}.
+${a.previous.detected}/${a.previous.bugs}; v0.8.0 includes it and found ${a.current.detected}/${a.current.bugs}.
 Direct reading can inspect those dependencies and found ${a.read.detected}/${a.read.bugs} new bug trials,
 which explains its stronger showing against v0.7.1 on the expanded test.
 ${previous.falseAlarms ? `
 v0.7.1's ${previous.falseAlarms} false ${previous.falseAlarms === 1 ? 'alarm is' : 'alarms are'} on clean files whose tool prompt has not changed since the previous
-results, where v0.7 raised ${prior.falseAlarms || 'none'}. The model now scores them just above the reporting cut. v0.7.2
+results, where v0.7 raised ${prior.falseAlarms || 'none'}. The model now scores them just above the reporting cut. v0.8.0
 sends the same prompt; these results do not establish a precision improvement ([analysis](RESULTS-v072-full.md#the-false-alarms-come-from-the-model-not-the-build)).
 ` : ''}
 ![Caller and internal model usage](charts/usage.svg)
 
-v0.7.2 used ${more(change(current.total.total, previous.total.total))} tokens than v0.7.1 and ${more(change(current.total.total, read.total.total))} than direct reading.
+v0.8.0 used ${more(change(current.total.total, previous.total.total))} tokens than v0.7.1 and ${more(change(current.total.total, read.total.total))} than direct reading.
 
 All ${3 * trials} sessions completed with a verdict for every file; no results are unavailable.
 Tokens include caller and internal model usage, including cache reads and writes.

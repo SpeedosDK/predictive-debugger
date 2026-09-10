@@ -1,4 +1,4 @@
-# v0.7.2 candidate vs v0.7.1: full comparison
+# v0.8.0 candidate vs v0.7.1: full comparison
 
 **51/51 planted bug trials matched, plus 0 verified alternative findings. 0 false alarms.**
 
@@ -6,22 +6,28 @@ The detailed analysis behind [RESULTS.md](RESULTS.md). Every arm here was run fr
 the same 37 cases: no reused sessions, no promoted baseline, no proxy build. The baseline is the
 real v0.7.1 release (tag `v0.7.1`, bundle `4149dc74126d`); the candidate is
 `feat/dependency-context` (bundle `7ecd7bd6667d`). All arms saw identical
-source under CLI 2.1.267 (Claude Code).
+source under CLI 2.1.267 (Claude Code). The candidate is labeled v0.8.0 for
+release; raw records retain the original v0.7.2 label. Its rebuilt bundle matches
+the recorded hash exactly. Subsequent npx packaging and help/version handling
+leave the prediction code, MCP tool schemas and instructions unchanged.
 
 ![Detection and false alarms](charts/detection-v072-full.svg)
 
-| All 37 cases, three trials | Agent reads files | v0.7.1 (released) | v0.7.2 candidate |
+| All 37 cases, three trials | Agent reads files | v0.7.1 (released) | v0.8.0 candidate |
 |---|---:|---:|---:|
 | Planted defects identified | 47/51 | 41/51 | 51/51 |
 | Other verified findings | 1 | 0 | 0 |
 | False alarms on clean files | 0/60 | 3/60 | 0/60 |
 | Total reported tokens | 2,120,442 | 1,433,632 | 1,481,267 |
+| CLI-estimated cost, USD | $1.6792 | $2.4045 | $1.2795 |
 
 ![Caller and internal model usage](charts/usage-v072-full.svg)
 
 The candidate used 3% more total tokens than v0.7.1 and 30% fewer than direct
 reading. Tokens include fresh input, output, cache writes and cache reads across the
-caller and internal models. Each category is counted once.
+caller and internal models. Each category is counted once. CLI dollar estimates
+include both models, but cache conditions and usage-limit interruptions differed
+between sessions. They do not establish monetary savings.
 
 ## The 9 new dependency cases
 
@@ -33,13 +39,13 @@ can be attributed to either build.
 
 ![New dependency cases](charts/newcases-v072-full.svg)
 
-| Original 28 cases | Agent reads files | v0.7.1 (released) | v0.7.2 candidate |
+| Original 28 cases | Agent reads files | v0.7.1 (released) | v0.8.0 candidate |
 |---|---:|---:|---:|
 | Planted defects identified | 35/39 | 38/39 | 39/39 |
 | Other verified findings | 1 | 0 | 0 |
 | False alarms on clean files | 0/45 | 3/45 | 0/45 |
 
-| **New 9 dependency cases** | Agent reads files | v0.7.1 (released) | v0.7.2 candidate |
+| **New 9 dependency cases** | Agent reads files | v0.7.1 (released) | v0.8.0 candidate |
 |---|---:|---:|---:|
 | Planted defects identified | 12/12 | 3/12 | 12/12 |
 | Other verified findings | 0 | 0 | 0 |
@@ -70,7 +76,7 @@ looked like a regression. On all 28 original cases the tool's internal prompt is
 
 ![Clean-control scores across runs](charts/falsepositives-v072-full.svg)
 
-| Clean control | v0.7.0-equivalent · Sept 5 | Candidate · Sept 9 | v0.7.1 · this run | Candidate · this run |
+| Clean control | v0.7.0-equivalent · Sept 5 | Candidate · Sept 9 | v0.7.1 · this run | v0.8.0 · this run |
 |---|---:|---:|---:|---:|
 | `orderService.js` | 0.10, 0.05, 0.10 | 0.10, **0.75**, **0.75** | 0.55, **0.72**, **0.75** | 0.10, 0.15, 0.10 |
 | `adminController.js` | 0.00, 0.10, 0.10 | 0.10, 0.30, 0.10 | 0.00, 0.55, 0.10 | 0.10, 0.55, 0.00 |
@@ -84,6 +90,8 @@ question for both builds, not a change this branch introduced.
 
 ## Provenance
 
+- Saved result SHA-256: `6b402e711676317829f0621edeeca8372af4f39002f705ec4fc6cda1cc476fac`.
+- Measured candidate commit: `f139cfdf366317cf1cea070889803cbc1474e565`.
 - Baseline tag: `v0.7.1`, commit `9de9017ca4a78dcdc65484398d180bb1b461dfac`.
 - Baseline bundle SHA-256: `4149dc74126d405075b985424c6c640612a379edaa5c9e89f71c72b6cc817a91`.
 - Candidate bundle SHA-256: `7ecd7bd6667df1b1c398513da7c009ea6e7049436d99be92a9be6f6019da0887`.

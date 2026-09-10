@@ -59,12 +59,7 @@ point an MCP-capable assistant at it, which the sections below walk through.
 The MCP server supports `npx`, which downloads and runs the package without a
 global install or a source build. The VS Code extension still uses a local build.
 
-**npm publication is pending.** The commands below will work after the first
-`predictive-debugger` package is published to npm. Until then, use
-[Build from source](#build-from-source) and the
-[local MCP setup](#using-a-local-build).
-
-After publication, download the current npm release and print its version:
+Download the current npm release and print its version:
 
 ```bash
 npx -y predictive-debugger@latest --version
@@ -76,9 +71,9 @@ starts a stdio server that waits for MCP messages.
 
 ### Build from source
 
-Use this for development, the VS Code preview, or before npm publication:
+Use this for development or the VS Code preview:
 
-1. Open the [v0.7.1 release](https://github.com/SpeedosDK/predictive-debugger/releases/tag/v0.7.1).
+1. Open the [v0.8.0 release](https://github.com/SpeedosDK/predictive-debugger/releases/tag/v0.8.0).
 2. Under **Assets**, select **Source code (zip)**.
 3. Extract the ZIP to a permanent location. Your MCP configuration will point
    to a file inside this folder, so moving it later will break that path.
@@ -241,7 +236,7 @@ open in another window, so the dev host needs a different folder.
 
 ### Ask your agent to add it
 
-Once the npm package is published, open the project where you want to use
+Open the project where you want to use
 Predictive Debugger and give your agent this instruction:
 
 > Add Predictive Debugger as a project-scoped MCP server for this project. The

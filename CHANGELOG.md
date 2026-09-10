@@ -8,7 +8,7 @@ All notable changes to this project are documented here. The format follows
 
 ### Added
 
-- Prepared npm distribution for `npx -y predictive-debugger@latest`, with agent
+- Added npm distribution for `npx -y predictive-debugger@latest`, with agent
   setup and update instructions for Claude Code, Codex and Copilot CLI.
   Added `--version` and `--help`, and a CI check that installs the tarball through
   `npx` in an isolated cache and exercises the installed MCP server.
@@ -34,6 +34,8 @@ All notable changes to this project are documented here. The format follows
 
 ### Changed
 
+- Benchmark reports and graphs label this release v0.8.0. Raw experiment names
+  and measured build hashes remain unchanged.
 - npm packages include only the MCP bundle, Python helper and package docs.
   JavaScript dependencies are bundled at build time, so `npx` does not need to
   install them separately. Publishing runs the tests and packaged-server check.

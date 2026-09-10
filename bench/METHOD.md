@@ -1,6 +1,6 @@
 # Workflow comparison
 
-## Current report: v0.7.2 candidate against v0.7.1
+## Current report: v0.8.0 candidate against v0.7.1
 
 [RESULTS.md](RESULTS.md) summarizes the completed 37-case experiment in
 `results-v072-full.json`, recorded September 10, 2026. All three workflows ran
@@ -25,9 +25,9 @@ python bench/plot-v072-full.py
 ```
 
 Tokens include the caller, internal model calls, auxiliary model usage, fresh input,
-output, cache writes and cache reads. The current reports compare tokens only.
-Dollar estimates remain in the raw records, but differing cache conditions and
-usage-limit interruptions prevent a controlled monetary comparison.
+output, cache writes and cache reads. Token totals are the primary comparison.
+The full report also lists CLI dollar estimates, but differing cache conditions
+and usage-limit interruptions prevent a controlled monetary comparison.
 
 ## Retained files
 
@@ -45,8 +45,13 @@ usage-limit interruptions prevent a controlled monetary comparison.
   runners and raw measurements. Earlier intermediate experiments are superseded.
 - Both corpora, manifests and fixture generators remain necessary for reproduction.
 
-The filenames retain the candidate label used when the experiment ran. They do
-not set the next release version; the package remains unchanged at 0.7.1.
+The filenames and raw records retain the v0.7.2 candidate label used when the
+experiment ran. The release is v0.8.0; report and graph labels use that version.
+Relabeling does not change the measurements or the recorded build hashes.
+[Release validation](release-v080.json) records the final v0.8.0 bundle hash,
+reproduced baseline and candidate bundle hashes, and the reused result file hash.
+All 83 recorded corpus files match, and the final MCP schemas and instructions
+match the measured candidate. Core and provider sources are unchanged.
 
 ## Running a new comparison
 

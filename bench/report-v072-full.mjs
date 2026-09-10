@@ -1,5 +1,5 @@
 /**
- * Full analysis behind the concise RESULTS.md: the v0.7.1-vs-v0.7.2 comparison on the
+ * Full analysis behind the concise RESULTS.md: the v0.7.1-vs-v0.8.0 comparison on the
  * 37-case corpus, with the evidence for each claim that page makes briefly -- which
  * definitions reached the model on the new cases, why the false alarms are the model
  * rather than either build, alongside the complete workflow token totals.
@@ -101,7 +101,7 @@ function falsePositiveEvidence(sources, originalFiles, kinds) {
 
 function table(rows, header) {
     return [
-        `| ${header} | Agent reads files | v0.7.1 (released) | v0.7.2 candidate |`,
+        `| ${header} | Agent reads files | v0.7.1 (released) | v0.8.0 candidate |`,
         '|---|---:|---:|---:|',
         `| Planted defects identified | ${rows.map(a => `${a.detected}/${a.bugs}`).join(' | ')} |`,
         `| Other verified findings | ${rows.map(a => a.otherVerified ?? 0).join(' | ')} |`,
@@ -170,7 +170,7 @@ export function renderReport(arms, groups, data, evidence, fp, sessions) {
     const tokenDelta = Math.round(100 * (current.total.total / previous.total.total - 1));
     const b = data.config.bundles;
     const trials = data.config.trials;
-    return `# v0.7.2 candidate vs v0.7.1: full comparison
+    return `# v0.8.0 candidate vs v0.7.1: full comparison
 
 **${current.detected}/${current.bugs} planted bug trials matched, plus ${current.otherVerified ?? 0} verified alternative ${(current.otherVerified ?? 0) === 1 ? 'finding' : 'findings'}. ${current.falseAlarms} false alarms.**
 
@@ -178,18 +178,24 @@ The detailed analysis behind [RESULTS.md](RESULTS.md). Every arm here was run fr
 the same 37 cases: no reused sessions, no promoted baseline, no proxy build. The baseline is the
 real v0.7.1 release (tag \`v0.7.1\`, bundle \`${b.previous.slice(0, 12)}\`); the candidate is
 \`feat/dependency-context\` (bundle \`${b.current.slice(0, 12)}\`). All arms saw identical
-source under CLI ${data.config.cliVersion}.
+source under CLI ${data.config.cliVersion}. The candidate is labeled v0.8.0 for
+release; raw records retain the original v0.7.2 label. Its rebuilt bundle matches
+the recorded hash exactly. Subsequent npx packaging and help/version handling
+leave the prediction code, MCP tool schemas and instructions unchanged.
 
 ![Detection and false alarms](charts/detection-v072-full.svg)
 
 ${table(arms, 'All 37 cases, three trials')}
 | Total reported tokens | ${arms.map(a => fmt(a.total.total)).join(' | ')} |
+| CLI-estimated cost, USD | ${arms.map(a => '$' + a.total.cost.toFixed(4)).join(' | ')} |
 
 ![Caller and internal model usage](charts/usage-v072-full.svg)
 
 The candidate used ${Math.abs(tokenDelta)}% ${tokenDelta >= 0 ? 'more' : 'fewer'} total tokens than v0.7.1 and ${Math.abs(fewerTokens)}% ${fewerTokens >= 0 ? 'fewer' : 'more'} than direct
 reading. Tokens include fresh input, output, cache writes and cache reads across the
-caller and internal models. Each category is counted once.
+caller and internal models. Each category is counted once. CLI dollar estimates
+include both models, but cache conditions and usage-limit interruptions differed
+between sessions. They do not establish monetary savings.
 
 ## The 9 new dependency cases
 
@@ -220,6 +226,8 @@ ${falsePositiveSection(fp, previous, current)}
 
 ## Provenance
 
+- Saved result SHA-256: \`${data.resultSha256}\`.
+- Measured candidate commit: \`f139cfdf366317cf1cea070889803cbc1474e565\`.
 - Baseline tag: \`v0.7.1\`, commit \`${data.config.baseline.revision}\`.
 - Baseline bundle SHA-256: \`${data.config.bundles.previous}\`.
 - Candidate bundle SHA-256: \`${data.config.bundles.current}\`.
@@ -246,13 +254,15 @@ async function readJson(name) {
 }
 
 async function main() {
-    const data = await readJson('results-v072-full.json');
+    const resultBytes = await fs.readFile(path.join(here, 'results-v072-full.json'));
+    const data = JSON.parse(resultBytes);
+    data.resultSha256 = createHash('sha256').update(resultBytes).digest('hex');
     const judgments = await readJson('judgments-v072-full.json');
     const prior = await readJson('results-v07-balanced.json');
     const originalFiles = new Set(prior.config.targets.map(t => t.file));
     const addedFiles = new Set(data.config.targets.map(t => t.file).filter(f => !originalFiles.has(f)));
     const arms = summarize(data, judgments);
-    const labels = { read: 'Agent reads files', previous: 'v0.7.1 (released)', current: 'v0.7.2 candidate' };
+    const labels = { read: 'Agent reads files', previous: 'v0.7.1 (released)', current: 'v0.8.0 candidate' };
     for (const arm of arms) arm.label = labels[arm.arm];
     const groups = { original: {}, added: {} };
     for (const arm of ARMS) {
@@ -264,7 +274,7 @@ async function main() {
     const sources = [
         { key: 'sept5', label: 'v0.7.0-equivalent · Sept 5', build: 'v0.7.0-equivalent', data: prior, arm: 'current' },
         { key: 'previous', label: 'v0.7.1 · this run', build: 'v0.7.1', data, arm: 'previous' },
-        { key: 'current', label: 'Candidate · this run', build: 'candidate', data, arm: 'current' }
+        { key: 'current', label: 'v0.8.0 · this run', build: 'candidate', data, arm: 'current' }
     ];
     try {
         sources.splice(1, 0, { key: 'sept9', label: 'Candidate · Sept 9', build: 'candidate',

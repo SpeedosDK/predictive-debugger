@@ -18,7 +18,7 @@ plt.rcParams.update({'font.family': 'DejaVu Sans', 'font.size': 11,
                      'text.color': '#172b3a', 'axes.labelcolor': '#172b3a',
                      'xtick.color': '#526473', 'ytick.color': '#172b3a',
                      'svg.fonttype': 'none', 'savefig.facecolor': 'white'})
-labels = ['Direct reading', 'v0.7.1', 'v0.7.2']
+labels = ['Direct reading', 'v0.7.1', 'v0.8.0']
 colors = ['#8593a3', '#bd8745', '#178974']
 arms = ['read', 'previous', 'current']
 original = [data['groups']['original'][a] for a in arms]

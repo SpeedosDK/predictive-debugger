@@ -86,7 +86,7 @@
     },
     {
       "arm": "current",
-      "label": "v0.7.2 candidate",
+      "label": "v0.8.0 candidate",
       "bugs": 51,
       "detected": 51,
       "otherVerified": 0,
@@ -410,7 +410,7 @@
       },
       {
         "key": "current",
-        "label": "Candidate · this run",
+        "label": "v0.8.0 · this run",
         "build": "candidate"
       }
     ],
