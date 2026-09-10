@@ -53,12 +53,30 @@ point an MCP-capable assistant at it, which the sections below walk through.
    GitHub Copilot CLI. This project has no AI model of its own — it borrows
    whichever one of these you're signed into. Install one first if you don't
    have one; there's nothing for this project to borrow otherwise.
-3. Predictive Debugger downloaded and built using the instructions below.
 
 ## Download and install
 
-Predictive Debugger is not published to npm or the VS Code Marketplace. Download
-the project from GitHub and build it locally:
+The MCP server supports `npx`, which downloads and runs the package without a
+global install or a source build. The VS Code extension still uses a local build.
+
+**npm publication is pending.** The commands below will work after the first
+`predictive-debugger` package is published to npm. Until then, use
+[Build from source](#build-from-source) and the
+[local MCP setup](#using-a-local-build).
+
+After publication, download the current npm release and print its version:
+
+```bash
+npx -y predictive-debugger@latest --version
+```
+
+Then follow [Using it from an agent](#using-it-from-an-agent-mcp). Your agent
+starts the server when it needs it. Running the command without `--version`
+starts a stdio server that waits for MCP messages.
+
+### Build from source
+
+Use this for development, the VS Code preview, or before npm publication:
 
 1. Open the [v0.7.1 release](https://github.com/SpeedosDK/predictive-debugger/releases/tag/v0.7.1).
 2. Under **Assets**, select **Source code (zip)**.
@@ -134,8 +152,7 @@ Read this before relying on it.
   sign-in.
 - **The VS Code extension is unfinished.** It is not published to the VS Code
   Marketplace or distributed as an installable VSIX. You can try it from the
-  source folder using the development workflow below. The MCP server is built
-  and configured directly from the downloaded source.
+  source folder using the development workflow below.
 - **`predict_failures` sends file contents to a model provider.** It also sends
   bounded imported definitions and referenced type contracts, so the model
   can see whether a callee already handles the
@@ -193,16 +210,17 @@ Read this before relying on it.
 - **The MCP tools accept absolute paths from the calling agent** and will read
   any file the process can read — by design, since the point is to analyse a
   codebase. Files above 4 MB are skipped rather than loaded.
-- `npm audit` reported 0 vulnerabilities across 111 production dependencies as
-  of 2026-09-05. Re-run it rather than trusting this line.
+- JavaScript dependencies are bundled into the shipped server. Run `npm audit`
+  in a source checkout to check the dependencies used to build it. Auditing the
+  installed npm package does not inspect code inside the bundle.
 
 ## Using it in VS Code
 
 The VS Code extension is still an unfinished preview. It is not available from
 the Marketplace and there is no prebuilt VSIX to install. To try it:
 
-1. Complete [Download and install](#download-and-install).
-2. Open the extracted `predictive-debugger-0.5.2` folder in VS Code.
+1. Complete [Build from source](#build-from-source).
+2. Open the extracted Predictive Debugger folder in VS Code.
 3. Press <kbd>F5</kbd> to launch an Extension Development Host.
 4. Run one of these commands in the new VS Code window:
 
@@ -223,24 +241,16 @@ open in another window, so the dev host needs a different folder.
 
 ### Ask your agent to add it
 
-Your coding agent can usually configure the MCP server for you. After running
-`npm run build`, copy the full path to `dist/mcp-server.js`. Open the project
-where you want to use Predictive Debugger and give the agent one of these
-instructions:
+Once the npm package is published, open the project where you want to use
+Predictive Debugger and give your agent this instruction:
 
 > Add Predictive Debugger as a project-scoped MCP server for this project. The
-> server command is `node` and its entry point is
-> `/absolute/path/to/predictive-debugger-0.5.2/dist/mcp-server.js`. Verify that
-> the server starts and lists its tools.
+> server command is `npx` with arguments `-y predictive-debugger@latest`.
+> On native Windows, use `cmd` with arguments
+> `/d /c npx -y predictive-debugger@latest`. Verify that it starts and lists
+> its tools.
 
-Or, to make it available in every project:
-
-> Add Predictive Debugger as a user-level MCP server so it is available in all
-> my projects. The server command is `node` and its entry point is
-> `/absolute/path/to/predictive-debugger-0.5.2/dist/mcp-server.js`. Verify that
-> the server starts and lists its tools.
-
-Replace the example with the real path on your machine. Project scope makes the
+For every project, replace "project-scoped" with "user-level". Project scope makes the
 server available only when you work in that project. User or global scope makes
 it available across projects. This setting controls where the MCP registration
 is loaded; it does not restrict which paths the server process can read.
@@ -250,39 +260,54 @@ instructions below.
 
 ### Claude Code
 
-A project-scoped `.mcp.json` is included in the download. It points at
-`dist/mcp-server.js`, so after building you can start Claude Code from the
-downloaded folder:
+Run this in the project where you want to use the server. On macOS, Linux or WSL:
 
 ```bash
-claude
+claude mcp add --scope project predictive-debugger -- npx -y predictive-debugger@latest
 ```
 
-To add it to another project, run this from that project's folder:
+On native Windows, from PowerShell:
 
-```bash
-claude mcp add --scope project predictive-debugger -- node /absolute/path/to/dist/mcp-server.js
+```powershell
+claude mcp add --scope project predictive-debugger -- cmd /d /c npx -y predictive-debugger@latest
 ```
 
-To make it available in every project, use user scope:
-
-```bash
-claude mcp add --scope user predictive-debugger -- node /absolute/path/to/dist/mcp-server.js
-```
+Use `--scope user` for every project. Restart Claude Code and check `/mcp`.
+See [Claude Code's MCP setup](https://code.claude.com/docs/en/mcp) for scope details.
 
 ### Codex
 
-Add the following block to `.codex/config.toml` inside a trusted project for a
+For a user-level setup on macOS, Linux or WSL:
+
+```bash
+codex mcp add predictive-debugger -- npx -y predictive-debugger@latest
+```
+
+On native Windows, from PowerShell:
+
+```powershell
+codex mcp add predictive-debugger -- cmd /d /c npx -y predictive-debugger@latest
+```
+
+Alternatively, add this block to `.codex/config.toml` inside a trusted project for a
 project-only setup. Add it to `~/.codex/config.toml` instead to make the server
 available in every project:
 
 ```toml
 [mcp_servers.predictive-debugger]
-command = "node"
-args = ["/absolute/path/to/dist/mcp-server.js"]
+command = "npx"
+args = ["-y", "predictive-debugger@latest"]
+startup_timeout_sec = 60
 ```
 
-### GitHub Copilot
+On native Windows, use `command = "cmd"` and
+`args = ["/d", "/c", "npx", "-y", "predictive-debugger@latest"]`.
+The startup timeout allows time for the first download. You can also add
+`startup_timeout_sec = 60` to the entry created by the CLI.
+Restart Codex and check `/mcp`. See
+[Codex MCP configuration](https://developers.openai.com/codex/mcp/).
+
+### GitHub Copilot CLI
 
 For a project-only setup, add this to `.mcp.json` in the project where you want
 to use the server:
@@ -291,19 +316,63 @@ to use the server:
 {
   "mcpServers": {
     "predictive-debugger": {
-      "command": "node",
-      "args": ["/absolute/path/to/dist/mcp-server.js"]
+      "command": "npx",
+      "args": ["-y", "predictive-debugger@latest"],
+      "tools": ["*"]
     }
   }
 }
 ```
 
-To add it to your Copilot user configuration and make it available across
-projects, run:
+On native Windows, use `"command": "cmd"` and
+`"args": ["/d", "/c", "npx", "-y", "predictive-debugger@latest"]`.
+
+For a user-level setup on macOS, Linux or WSL:
 
 ```bash
-copilot mcp add predictive-debugger -- node /absolute/path/to/dist/mcp-server.js
+copilot mcp add predictive-debugger -- npx -y predictive-debugger@latest
 ```
+
+On native Windows, from PowerShell:
+
+```powershell
+copilot mcp add predictive-debugger -- cmd /d /c npx -y predictive-debugger@latest
+```
+
+Restart Copilot and check `/mcp`. See
+[Copilot CLI MCP configuration](https://docs.github.com/en/copilot/reference/copilot-cli-reference/cli-command-reference#mcp-server-configuration).
+
+### Updating
+
+The configurations above use `@latest`, so npm resolves the current release when
+your agent starts the server. Restart the agent or reconnect its MCP server to
+use an update. A running server keeps its current version.
+
+To force an update check and print the downloaded version:
+
+```bash
+npx --prefer-online -y predictive-debugger@latest --version
+```
+
+Then restart your agent. `--prefer-online` forces npm to recheck cached package
+metadata. See [npm's cache options](https://docs.npmjs.com/cli/v11/commands/npm-exec/#a-note-on-caching).
+For controlled updates, replace `@latest` in your MCP configuration with a
+published version such as `@X.Y.Z`, then change it when you want to upgrade.
+
+### Using a local build
+
+After [building from source](#build-from-source), configure the server command as
+`node` and pass the absolute path to `dist/mcp-server.js` as its only argument.
+This works with the same agent configurations above. For example:
+
+```bash
+claude mcp add --scope project predictive-debugger -- node "/absolute/path/to/predictive-debugger/dist/mcp-server.js"
+```
+
+The repository's `.mcp.json` already uses `node ./dist/mcp-server.js`, so starting
+Claude Code or Copilot in this repository uses the local build. When switching an
+existing registration to `npx`, edit its command and arguments in place. A
+project entry can override a user-level entry with the same name.
 
 ### Tools
 
@@ -519,6 +588,7 @@ See [benchmark results](bench/RESULTS.md) and [method and reproduction](bench/ME
 npm run watch     # esbuild in watch mode (unminified, with sourcemaps)
 npm run check     # type-check only — esbuild does not type-check
 npm test          # Node's built-in runner, no test dependencies
+npm run test:package # pack, install through npx, and verify the installed MCP server
 npm run package   # build and produce a .vsix
 ```
 
