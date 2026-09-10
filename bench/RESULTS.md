@@ -1,36 +1,44 @@
 # Benchmark results
 
-**38/39 planted bug trials matched, plus 1 verified alternative finding. 0 false alarms.**
+**v0.7.2 identified 51/51 planted bug trials with 0 false alarms.**
 
-Sonnet reviewed the same 28 JavaScript and TypeScript cases three times per workflow.
-The baseline is the pinned master commit, not an intermediate development prompt.
-v0.7 is an unreleased candidate. The candidate has 84 fresh predictions; master and reading baselines reuse matching saved sessions.
+Sonnet reviewed 37 JavaScript and TypeScript cases 3 times per workflow, every session fresh:
+the 28 cases from the [previous results](results-v07-balanced.json) and 9 new dependency cases.
+The baseline is tagged v0.7.1; v0.7.2 labels the unreleased candidate build.
 
 ![Detection and false alarms](charts/detection.svg)
 
-| Across three trials | Agent reads files | v0.6 master | v0.7 candidate |
+| Across three trials | Agent reads files | v0.7.1 | v0.7.2 |
 |---|---:|---:|---:|
-| Planted defects identified | 34/39 | 35/39 | 38/39 |
-| Other verified findings in buggy files | 2 | 1 | 1 |
-| False alarms on clean files | 0/45 | 0/45 | 0/45 |
-| Total reported tokens | 2,166,359 | 1,136,211 | 1,105,371 |
-| CLI-estimated cost | $1.553 | $1.490 | $1.294 |
+| Original 28 cases: defects found | 35/39 | 38/39 | 39/39 |
+| New 9 cases: defects found | 12/12 | 3/12 | 12/12 |
+| Total planted bug trials found | 47/51 | 41/51 | 51/51 |
+| Other verified findings | 1 | 0 | 0 |
+| False alarms on clean files | 0/60 | 3/60 | 0/60 |
+| Total reported tokens | 2,120,442 | 1,433,632 | 1,481,267 |
+
+## Why v0.7.1 scores lower than before
+
+On the original cases v0.7.1 found 38/39, the same as v0.7 in the previous results.
+The test grew from 28 to 37 cases to exercise dependency resolution that the old cases barely covered.
+Each new bug case needs a definition from another file. v0.7.1 leaves it out of its prompt and found
+3/12; v0.7.2 includes it and found 12/12.
+Direct reading can inspect those dependencies and found 12/12 new bug trials,
+which explains its stronger showing against v0.7.1 on the expanded test.
+
+v0.7.1's 3 false alarms are on clean files whose tool prompt has not changed since the previous
+results, where v0.7 raised none. The model now scores them just above the reporting cut. v0.7.2
+sends the same prompt; these results do not establish a precision improvement ([analysis](RESULTS-v072-full.md#the-false-alarms-come-from-the-model-not-the-build)).
 
 ![Caller and internal model usage](charts/usage.svg)
 
-The candidate workflow cost **13% less than the v0.6 master workflow** in this run.
-It cost **17% less than direct reading**.
-It used 49% fewer total tokens than direct reading.
-The v0.6 baseline detected 35/39; the v0.7 candidate detected 38/39.
+v0.7.2 used 3% more tokens than v0.7.1 and 30% fewer than direct reading.
 
-Tokens include fresh input, output, cache writes and cache reads across the caller
-and internal models. Cache state was not reset; baseline sessions were recorded earlier. These are observed
-CLI cost estimates, not subscription invoices or a guarantee of future savings.
+All 9 sessions completed with a verdict for every file; no results are unavailable.
+Tokens include caller and internal model usage, including cache reads and writes.
 
-There are 13 distinct buggy files and 15 clean controls. Repeated trials are not
-additional bugs. These development cases informed the tool's prompt, so this is
-not a held-out accuracy estimate. Findings were reviewed for defect identity,
-not just a matching line number.
+There are 17 buggy files and 20 clean controls; repeated trials are not additional bugs.
+These development cases informed the tool, so this is not a held-out accuracy estimate.
 
-[Method and reproduction](METHOD.md) | [Raw runs](results-v07-balanced.json) |
-[Defect judgments](judgments-v07-balanced.json) | [Token breakdown](workflow-summary.json)
+[Method and reproduction](METHOD.md) | [Full analysis](RESULTS-v072-full.md) | [Raw runs](results-v072-full.json) |
+[Defect judgments](judgments-v072-full.json) | [Token breakdown](workflow-summary.json)

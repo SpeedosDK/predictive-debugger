@@ -3,6 +3,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
 import { analyzeFile } from "../core/analysis/risk";
+import { mapDependencies } from "../core/analysis/dependencies";
 import { analyzeLogs } from "../core/logs/analyzeLogs";
 import {
     actionableFindings,
@@ -41,7 +42,8 @@ const registry = new ProviderRegistry();
  */
 const INSTRUCTIONS = [
     "Deterministic tools first: scan_project and analyze_file cost nothing and answer most " +
-        "questions about where the risk sits. predict_failures spawns a second model, so call " +
+        "questions about where the risk sits. Use map_dependencies for imports, reverse imports " +
+        "and tests connected by imports. predict_failures spawns a second model, so call " +
         "it when you want a verdict independent of your own.",
     "When you point these tools at code you wrote in this session -- a fix for something they " +
         "flagged, or a feature you just finished -- have it checked from outside the context " +
@@ -100,6 +102,31 @@ function failure(message: string) {
 }
 
 /* ---- Deterministic tools: no model call, no credentials, milliseconds. ---- */
+
+server.registerTool(
+    "map_dependencies",
+    {
+        title: "Map a file's dependency neighborhood",
+        description: "Find a file's local imports, reverse imports and tests connected by imports. " +
+            "Each relationship includes a source path and line as evidence. Static file relationships, " +
+            "not runtime callers or test coverage. Scans JavaScript/TypeScript including tests, with " +
+            "bounded work and explicit unresolved imports and scan limits. Deterministic; no provider call.",
+        inputSchema: {
+            directory: z.string().describe("Project directory; source outside this directory is excluded"),
+            file: z.string().describe("Source file, absolute or relative to directory"),
+            depth: z.number().int().min(1).max(3).optional().describe("Import hops in each direction, default 1"),
+            limit: z.number().int().min(1).max(200).optional().describe("Total neighboring files to return, default 50"),
+            maxFiles: z.number().int().min(1).max(2000).optional().describe("Maximum source files to discover, default 1000")
+        }
+    },
+    async (options) => {
+        try {
+            return json(await mapDependencies(options));
+        } catch (error) {
+            return failure(`Could not map dependencies: ${message(error)}`);
+        }
+    }
+);
 
 server.registerTool(
     "analyze_file",

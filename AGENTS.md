@@ -39,6 +39,20 @@ next person who changes it has to remember to change both, and usually doesn't.
 
 ## Benchmarking
 
+- When evaluating release readiness or preparing a new version, always compare the candidate
+  against the latest official release. Verify the release at that time and pin its tag and commit;
+  a previous development checkpoint or the current `master` tip is not a release baseline.
+- Prefer reusing the latest official release's saved benchmark results and running only the
+  candidate. Verify that the saved build matches that release and that cases/source, trial count,
+  resolved models, CLI and workflow settings are compatible. Follow `bench/METHOD.md` when
+  selecting saved sessions; an older experiment's baseline arm may represent an older release.
+  If results are missing or incompatible, explain the mismatch before proposing a baseline rerun.
+- Record each version/build hash and the reused result file/hash. Report accuracy, false alarms,
+  unavailable results, token usage and CLI-estimated cost, with matching case/prediction counts
+  and cache accounting. Release claims use this comparison; incremental checkpoints stay separate.
+- Keep benchmark measurements in `bench/`; keep README focused on setup and tool behavior.
+  Release notes should briefly state what improved and explain any measured token/cost increase,
+  linking to the results rather than repeating the report.
 - Reuse `bench/corpus` and `bench/manifest.json` for a new benchmark. A new fixture corpus makes
   a new result incomparable to every existing one in `bench/RESULTS.md`; extend the answer key
   instead of building a parallel corpus.

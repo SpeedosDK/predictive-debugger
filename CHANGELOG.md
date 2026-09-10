@@ -6,6 +6,48 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- Added the deterministic `map_dependencies` MCP tool for bounded imports,
+  reverse imports and connected test files, with source-line evidence and explicit
+  coverage limits. It shares module-path resolution with prediction context and
+  makes no provider call. MCP instructions route relationship questions to it.
+- Dependency context resolves unambiguous wildcard barrels, imported named/default
+  bindings that are re-exported, and calls to imported constructors. Conflicts are
+  checked by originating binding; unknown branches and traversal limits produce
+  less context instead of a guessed definition. Namespace re-exports and CommonJS
+  remain unsupported.
+
+### Fixed
+
+- Dependency maps now mark coverage as limited when directory discovery reaches
+  its depth cap, alongside the existing issue detail.
+- Oversized imported object and static class context prioritizes the called
+  member and referenced state/helpers within the existing character limits.
+  An unrelated earlier method could previously consume the budget and hide the
+  called method. Omissions are explicit; small definitions remain unchanged.
+  Dynamic definitions retain the previous truncation behavior.
+
+### Changed
+
+- Clarified member-selection rules, export resolution states and map traversal
+  without changing the 37 benchmark prediction prompts.
+- Broader dependency evidence enabled more detections in targeted tests and used
+  3% more total tokens than v0.7.1 in the complete comparison. The report separates
+  the original cases from new dependency cases and compares tokens, with no monetary
+  savings claim. See [benchmark results](bench/RESULTS.md).
+- Shared batch caching is deferred after [profiling](bench/BATCH-PARSING-CHECKPOINT.md)
+  found little repeated indexing time worth saving.
+- Release comparisons reuse compatible saved results for the latest official
+  release and test only the candidate. Detailed results belong in `bench/`, with
+  a brief explanation of behavior and token usage in release notes.
+
+### Removed
+
+- Superseded development checkpoint runs, proxy-baseline experiments and duplicate
+  benchmark reports. Retained the complete comparison, its supporting historical
+  inputs, and the final dependency-map and batch-parsing measurements.
+
 ## [0.7.1] — 2026-09-07
 
 ### Fixed

@@ -1,0 +1,1286 @@
+{
+  "read#1/corpus/src/services/pricingService.js": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: Tier loop reads tiers[i + 1] without bounding i, so the last tier dereferences undefined.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "c8b67a8be15f8a09c3c3d5a902fc33999f902f46b7b23cbcfef8aa1e7cff1614",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "a29b4c7a42f3eba098df9e9763557452e2991f21953cfa3ac5d5c40cd19122c6"
+  },
+  "read#1/corpus/src/services/inventoryService.js": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: await inside forEach is not awaited, so reserve() returns before any stock is decremented.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "d38ac20410e079ba47c3eef0b10eeda28129bd39b3579f3be7b3a8ebb53d6245",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "a29b4c7a42f3eba098df9e9763557452e2991f21953cfa3ac5d5c40cd19122c6"
+  },
+  "read#1/corpus/src/lib/dateWindow.js": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: Loop bound is <= days, so every window contains one extra day.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "0a8530dd6c81bda7560c42e74c6bfbc3b064e82d90cfe16a9e0bfe3f22953351",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "a29b4c7a42f3eba098df9e9763557452e2991f21953cfa3ac5d5c40cd19122c6"
+  },
+  "read#1/corpus/src/models/cartTotals.js": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: discount is optional on the row but dereferenced unguarded, throwing for carts with no coupon.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "6eaa471ab94bf8ba1218f229e8822656e21a0ffa6e615fcec47033cadd6d6747",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "a29b4c7a42f3eba098df9e9763557452e2991f21953cfa3ac5d5c40cd19122c6"
+  },
+  "read#1/corpus/src/lib/retry.js": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: The final attempt's rejection is swallowed, so retry resolves undefined instead of throwing.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "4c54b5e486ee9f5ba09a38fc6bfb55285d00ebe53c3c83d8894f1eb51463d698",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "a29b4c7a42f3eba098df9e9763557452e2991f21953cfa3ac5d5c40cd19122c6"
+  },
+  "read#1/corpus-ts/src/models/invoice.entity.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: settledAt is a nullable TypeORM column, so an unsettled row loads as null rather than undefined, and isSettled() returns true for every unsettled invoice.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "6b487221075627c66b376ca3a81c853c2eb5538416f14e0f8b7d539fd0af2601",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "a29b4c7a42f3eba098df9e9763557452e2991f21953cfa3ac5d5c40cd19122c6"
+  },
+  "read#1/corpus-ts/src/services/cache.service.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: The sweep interval started in the constructor is never cleared on destroy, so the timer keeps the process alive after shutdown.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "b8bc7008d22e2c43d03ba04aa3d60bec764295eeaab1eb8e3f08c673eab35ab5",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "a29b4c7a42f3eba098df9e9763557452e2991f21953cfa3ac5d5c40cd19122c6"
+  },
+  "read#1/corpus-ts/src/services/supplier.service.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: eligible() returns the inactive suppliers, the exact opposite of what its documentation and name promise. No exception is thrown; the caller sends purchase orders to suspended suppliers.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "47b4fbf4dcb69a3ddd79a0b20105aa6dc68ff06c72684307622cb366ad4f62b4",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "a29b4c7a42f3eba098df9e9763557452e2991f21953cfa3ac5d5c40cd19122c6"
+  },
+  "read#1/corpus-ts/src/models/cart.model.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: discount is declared optional on CartRow and dereferenced without a guard, while the equally optional lines is guarded one line above.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "fe46d6c7b29ed71cd33dd37f9f9eb7a11004312c8d9f16e677ed97f544dafaaf",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "a29b4c7a42f3eba098df9e9763557452e2991f21953cfa3ac5d5c40cd19122c6"
+  },
+  "read#1/corpus-ts/src/lib/paginate.mts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: The loop bound is <= lastPage, so pageBounds returns one more page than the documented ceil(total / pageSize), and the extra page is empty.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "ffc281da0bab5cfcf9f5d2c6592c2bb6f5c184b2d151b901cc45bc502bda0ef4",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "a29b4c7a42f3eba098df9e9763557452e2991f21953cfa3ac5d5c40cd19122c6"
+  },
+  "read#1/corpus-ts/src/services/sync.service.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: modifiedSince filters on createdAt instead of updatedAt, so an incremental sync silently skips every record that was edited after it was created.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "bc3d7907f200e11d7e0da9778eb941fb388eb7f5ced1c03e8af55605563f97b2",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "a29b4c7a42f3eba098df9e9763557452e2991f21953cfa3ac5d5c40cd19122c6"
+  },
+  "read#1/corpus/src/accuracy/discount.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: Row permits an absent discount, which is dereferenced without a guard.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "06c2ffaf47268ba297773e4951e85c3c3b64cd15a2b8520a584435ef77fc4a65",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "a29b4c7a42f3eba098df9e9763557452e2991f21953cfa3ac5d5c40cd19122c6"
+  },
+  "read#1/corpus/src/accuracy/late-member.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: The directory Map starts empty; get returns undefined for a missing id, then displayName dereferences name.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "e1c168da3505c5abc0d8a5dd5c68cea048aa94e0679492438c899dbb1506d25c",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "a29b4c7a42f3eba098df9e9763557452e2991f21953cfa3ac5d5c40cd19122c6"
+  },
+  "read#1/corpus/src/accuracy/wildcard-discount.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: The wildcard-exported Row contract permits an absent discount, dereferenced without a guard.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "9dbcff59e710be827be727cb75e5f6bd7c7cf40d2a3a237bcb3d4730e1e2bd66",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "a29b4c7a42f3eba098df9e9763557452e2991f21953cfa3ac5d5c40cd19122c6"
+  },
+  "read#1/corpus/src/accuracy/forwarded-coupon.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: couponFor forwards resolveCoupon, which returns undefined; discount dereferences amount.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "bac2a9673d197bdff07ca8127d2f3c2fca6c0486c332b309545330a9ebeb128a",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "a29b4c7a42f3eba098df9e9763557452e2991f21953cfa3ac5d5c40cd19122c6"
+  },
+  "read#1/corpus/src/accuracy/constructed-reading.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: Reading converts its input to a string; display calls the numeric toFixed method on that string.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "468050c90c52a0959c209527182c81e0b589ffa338e975cefe248bac78df7633",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "a29b4c7a42f3eba098df9e9763557452e2991f21953cfa3ac5d5c40cd19122c6"
+  },
+  "previous#1/corpus/src/services/pricingService.js": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: Tier loop reads tiers[i + 1] without bounding i, so the last tier dereferences undefined.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "c8b67a8be15f8a09c3c3d5a902fc33999f902f46b7b23cbcfef8aa1e7cff1614",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "f2d2d5b448ad7cd412f151b832d358893ae6102bcb5617d008b4aafce8c0366b"
+  },
+  "previous#1/corpus/src/workers/reconciliationWorker.js": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: Balance is read before the awaits and written back after, so concurrent ticks lose updates.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "898eb9ee68e1b07d1b167d88d03a5ff395db82c0727442058d53a100e06929af",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "f2d2d5b448ad7cd412f151b832d358893ae6102bcb5617d008b4aafce8c0366b"
+  },
+  "previous#1/corpus/src/services/inventoryService.js": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: await inside forEach is not awaited, so reserve() returns before any stock is decremented.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "d38ac20410e079ba47c3eef0b10eeda28129bd39b3579f3be7b3a8ebb53d6245",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "f2d2d5b448ad7cd412f151b832d358893ae6102bcb5617d008b4aafce8c0366b"
+  },
+  "previous#1/corpus/src/lib/dateWindow.js": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: Loop bound is <= days, so every window contains one extra day.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "0a8530dd6c81bda7560c42e74c6bfbc3b064e82d90cfe16a9e0bfe3f22953351",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "f2d2d5b448ad7cd412f151b832d358893ae6102bcb5617d008b4aafce8c0366b"
+  },
+  "previous#1/corpus/src/models/cartTotals.js": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: discount is optional on the row but dereferenced unguarded, throwing for carts with no coupon.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "6eaa471ab94bf8ba1218f229e8822656e21a0ffa6e615fcec47033cadd6d6747",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "f2d2d5b448ad7cd412f151b832d358893ae6102bcb5617d008b4aafce8c0366b"
+  },
+  "previous#1/corpus/src/lib/retry.js": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: The final attempt's rejection is swallowed, so retry resolves undefined instead of throwing.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "4c54b5e486ee9f5ba09a38fc6bfb55285d00ebe53c3c83d8894f1eb51463d698",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "f2d2d5b448ad7cd412f151b832d358893ae6102bcb5617d008b4aafce8c0366b"
+  },
+  "previous#1/corpus-ts/src/models/invoice.entity.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: settledAt is a nullable TypeORM column, so an unsettled row loads as null rather than undefined, and isSettled() returns true for every unsettled invoice.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "6b487221075627c66b376ca3a81c853c2eb5538416f14e0f8b7d539fd0af2601",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "f2d2d5b448ad7cd412f151b832d358893ae6102bcb5617d008b4aafce8c0366b"
+  },
+  "previous#1/corpus-ts/src/services/cache.service.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: The sweep interval started in the constructor is never cleared on destroy, so the timer keeps the process alive after shutdown.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "b8bc7008d22e2c43d03ba04aa3d60bec764295eeaab1eb8e3f08c673eab35ab5",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "f2d2d5b448ad7cd412f151b832d358893ae6102bcb5617d008b4aafce8c0366b"
+  },
+  "previous#1/corpus-ts/src/services/supplier.service.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: eligible() returns the inactive suppliers, the exact opposite of what its documentation and name promise. No exception is thrown; the caller sends purchase orders to suspended suppliers.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "47b4fbf4dcb69a3ddd79a0b20105aa6dc68ff06c72684307622cb366ad4f62b4",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "f2d2d5b448ad7cd412f151b832d358893ae6102bcb5617d008b4aafce8c0366b"
+  },
+  "previous#1/corpus-ts/src/models/cart.model.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: discount is declared optional on CartRow and dereferenced without a guard, while the equally optional lines is guarded one line above.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "fe46d6c7b29ed71cd33dd37f9f9eb7a11004312c8d9f16e677ed97f544dafaaf",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "f2d2d5b448ad7cd412f151b832d358893ae6102bcb5617d008b4aafce8c0366b"
+  },
+  "previous#1/corpus-ts/src/lib/paginate.mts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: The loop bound is <= lastPage, so pageBounds returns one more page than the documented ceil(total / pageSize), and the extra page is empty.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "ffc281da0bab5cfcf9f5d2c6592c2bb6f5c184b2d151b901cc45bc502bda0ef4",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "f2d2d5b448ad7cd412f151b832d358893ae6102bcb5617d008b4aafce8c0366b"
+  },
+  "previous#1/corpus-ts/src/services/sync.service.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: modifiedSince filters on createdAt instead of updatedAt, so an incremental sync silently skips every record that was edited after it was created.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "bc3d7907f200e11d7e0da9778eb941fb388eb7f5ced1c03e8af55605563f97b2",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "f2d2d5b448ad7cd412f151b832d358893ae6102bcb5617d008b4aafce8c0366b"
+  },
+  "previous#1/corpus/src/accuracy/discount.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: Row permits an absent discount, which is dereferenced without a guard.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "06c2ffaf47268ba297773e4951e85c3c3b64cd15a2b8520a584435ef77fc4a65",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "f2d2d5b448ad7cd412f151b832d358893ae6102bcb5617d008b4aafce8c0366b"
+  },
+  "previous#1/corpus/src/accuracy/late-member.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: The directory Map starts empty; get returns undefined for a missing id, then displayName dereferences name.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "e1c168da3505c5abc0d8a5dd5c68cea048aa94e0679492438c899dbb1506d25c",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "f2d2d5b448ad7cd412f151b832d358893ae6102bcb5617d008b4aafce8c0366b"
+  },
+  "current#1/corpus/src/services/pricingService.js": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: Tier loop reads tiers[i + 1] without bounding i, so the last tier dereferences undefined.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "c8b67a8be15f8a09c3c3d5a902fc33999f902f46b7b23cbcfef8aa1e7cff1614",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "32e6bfe9c84f07a7687ef930401ad38354974ffe040fd4a5344c5c3c993ef549"
+  },
+  "current#1/corpus/src/workers/reconciliationWorker.js": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: Balance is read before the awaits and written back after, so concurrent ticks lose updates.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "898eb9ee68e1b07d1b167d88d03a5ff395db82c0727442058d53a100e06929af",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "32e6bfe9c84f07a7687ef930401ad38354974ffe040fd4a5344c5c3c993ef549"
+  },
+  "current#1/corpus/src/services/inventoryService.js": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: await inside forEach is not awaited, so reserve() returns before any stock is decremented.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "d38ac20410e079ba47c3eef0b10eeda28129bd39b3579f3be7b3a8ebb53d6245",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "32e6bfe9c84f07a7687ef930401ad38354974ffe040fd4a5344c5c3c993ef549"
+  },
+  "current#1/corpus/src/lib/dateWindow.js": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: Loop bound is <= days, so every window contains one extra day.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "0a8530dd6c81bda7560c42e74c6bfbc3b064e82d90cfe16a9e0bfe3f22953351",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "32e6bfe9c84f07a7687ef930401ad38354974ffe040fd4a5344c5c3c993ef549"
+  },
+  "current#1/corpus/src/models/cartTotals.js": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: discount is optional on the row but dereferenced unguarded, throwing for carts with no coupon.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "6eaa471ab94bf8ba1218f229e8822656e21a0ffa6e615fcec47033cadd6d6747",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "32e6bfe9c84f07a7687ef930401ad38354974ffe040fd4a5344c5c3c993ef549"
+  },
+  "current#1/corpus/src/lib/retry.js": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: The final attempt's rejection is swallowed, so retry resolves undefined instead of throwing.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "4c54b5e486ee9f5ba09a38fc6bfb55285d00ebe53c3c83d8894f1eb51463d698",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "32e6bfe9c84f07a7687ef930401ad38354974ffe040fd4a5344c5c3c993ef549"
+  },
+  "current#1/corpus-ts/src/models/invoice.entity.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: settledAt is a nullable TypeORM column, so an unsettled row loads as null rather than undefined, and isSettled() returns true for every unsettled invoice.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "6b487221075627c66b376ca3a81c853c2eb5538416f14e0f8b7d539fd0af2601",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "32e6bfe9c84f07a7687ef930401ad38354974ffe040fd4a5344c5c3c993ef549"
+  },
+  "current#1/corpus-ts/src/services/cache.service.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: The sweep interval started in the constructor is never cleared on destroy, so the timer keeps the process alive after shutdown.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "b8bc7008d22e2c43d03ba04aa3d60bec764295eeaab1eb8e3f08c673eab35ab5",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "32e6bfe9c84f07a7687ef930401ad38354974ffe040fd4a5344c5c3c993ef549"
+  },
+  "current#1/corpus-ts/src/services/supplier.service.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: eligible() returns the inactive suppliers, the exact opposite of what its documentation and name promise. No exception is thrown; the caller sends purchase orders to suspended suppliers.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "47b4fbf4dcb69a3ddd79a0b20105aa6dc68ff06c72684307622cb366ad4f62b4",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "32e6bfe9c84f07a7687ef930401ad38354974ffe040fd4a5344c5c3c993ef549"
+  },
+  "current#1/corpus-ts/src/models/cart.model.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: discount is declared optional on CartRow and dereferenced without a guard, while the equally optional lines is guarded one line above.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "fe46d6c7b29ed71cd33dd37f9f9eb7a11004312c8d9f16e677ed97f544dafaaf",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "32e6bfe9c84f07a7687ef930401ad38354974ffe040fd4a5344c5c3c993ef549"
+  },
+  "current#1/corpus-ts/src/lib/paginate.mts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: The loop bound is <= lastPage, so pageBounds returns one more page than the documented ceil(total / pageSize), and the extra page is empty.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "ffc281da0bab5cfcf9f5d2c6592c2bb6f5c184b2d151b901cc45bc502bda0ef4",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "32e6bfe9c84f07a7687ef930401ad38354974ffe040fd4a5344c5c3c993ef549"
+  },
+  "current#1/corpus-ts/src/services/sync.service.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: modifiedSince filters on createdAt instead of updatedAt, so an incremental sync silently skips every record that was edited after it was created.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "bc3d7907f200e11d7e0da9778eb941fb388eb7f5ced1c03e8af55605563f97b2",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "32e6bfe9c84f07a7687ef930401ad38354974ffe040fd4a5344c5c3c993ef549"
+  },
+  "current#1/corpus/src/accuracy/discount.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: Row permits an absent discount, which is dereferenced without a guard.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "06c2ffaf47268ba297773e4951e85c3c3b64cd15a2b8520a584435ef77fc4a65",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "32e6bfe9c84f07a7687ef930401ad38354974ffe040fd4a5344c5c3c993ef549"
+  },
+  "current#1/corpus/src/accuracy/late-member.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: The directory Map starts empty; get returns undefined for a missing id, then displayName dereferences name.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "e1c168da3505c5abc0d8a5dd5c68cea048aa94e0679492438c899dbb1506d25c",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "32e6bfe9c84f07a7687ef930401ad38354974ffe040fd4a5344c5c3c993ef549"
+  },
+  "current#1/corpus/src/accuracy/wildcard-discount.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: The wildcard-exported Row contract permits an absent discount, dereferenced without a guard.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "9dbcff59e710be827be727cb75e5f6bd7c7cf40d2a3a237bcb3d4730e1e2bd66",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "32e6bfe9c84f07a7687ef930401ad38354974ffe040fd4a5344c5c3c993ef549"
+  },
+  "current#1/corpus/src/accuracy/forwarded-coupon.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: couponFor forwards resolveCoupon, which returns undefined; discount dereferences amount.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "bac2a9673d197bdff07ca8127d2f3c2fca6c0486c332b309545330a9ebeb128a",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "32e6bfe9c84f07a7687ef930401ad38354974ffe040fd4a5344c5c3c993ef549"
+  },
+  "current#1/corpus/src/accuracy/constructed-reading.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: Reading converts its input to a string; display calls the numeric toFixed method on that string.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "468050c90c52a0959c209527182c81e0b589ffa338e975cefe248bac78df7633",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "32e6bfe9c84f07a7687ef930401ad38354974ffe040fd4a5344c5c3c993ef549"
+  },
+  "previous#2/corpus/src/services/pricingService.js": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: Tier loop reads tiers[i + 1] without bounding i, so the last tier dereferences undefined.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "c8b67a8be15f8a09c3c3d5a902fc33999f902f46b7b23cbcfef8aa1e7cff1614",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "141b1b3e0cbf29d80fdf062f1d193ae1bc1e1d11138c11f74ca549b57ee2453a"
+  },
+  "previous#2/corpus/src/workers/reconciliationWorker.js": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: Balance is read before the awaits and written back after, so concurrent ticks lose updates.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "898eb9ee68e1b07d1b167d88d03a5ff395db82c0727442058d53a100e06929af",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "141b1b3e0cbf29d80fdf062f1d193ae1bc1e1d11138c11f74ca549b57ee2453a"
+  },
+  "previous#2/corpus/src/services/inventoryService.js": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: await inside forEach is not awaited, so reserve() returns before any stock is decremented.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "d38ac20410e079ba47c3eef0b10eeda28129bd39b3579f3be7b3a8ebb53d6245",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "141b1b3e0cbf29d80fdf062f1d193ae1bc1e1d11138c11f74ca549b57ee2453a"
+  },
+  "previous#2/corpus/src/lib/dateWindow.js": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: Loop bound is <= days, so every window contains one extra day.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "0a8530dd6c81bda7560c42e74c6bfbc3b064e82d90cfe16a9e0bfe3f22953351",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "141b1b3e0cbf29d80fdf062f1d193ae1bc1e1d11138c11f74ca549b57ee2453a"
+  },
+  "previous#2/corpus/src/models/cartTotals.js": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: discount is optional on the row but dereferenced unguarded, throwing for carts with no coupon.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "6eaa471ab94bf8ba1218f229e8822656e21a0ffa6e615fcec47033cadd6d6747",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "141b1b3e0cbf29d80fdf062f1d193ae1bc1e1d11138c11f74ca549b57ee2453a"
+  },
+  "previous#2/corpus/src/lib/retry.js": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: The final attempt's rejection is swallowed, so retry resolves undefined instead of throwing.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "4c54b5e486ee9f5ba09a38fc6bfb55285d00ebe53c3c83d8894f1eb51463d698",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "141b1b3e0cbf29d80fdf062f1d193ae1bc1e1d11138c11f74ca549b57ee2453a"
+  },
+  "previous#2/corpus/src/services/orderService.js": {
+    "matchesDefect": false,
+    "reason": "False alarm on a clean control. Claims the resolve block re-applies rounding after fetch; the two options are applied sequentially by design across all eleven near-identical methods, and no documented contract makes the combination wrong. Not a demonstrated runtime defect.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "a6375c377f66193b1f93ef32f339e9acd754b44b7ac7b6971cd2b75560a999f0",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "141b1b3e0cbf29d80fdf062f1d193ae1bc1e1d11138c11f74ca549b57ee2453a"
+  },
+  "previous#2/corpus-ts/src/models/invoice.entity.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: settledAt is a nullable TypeORM column, so an unsettled row loads as null rather than undefined, and isSettled() returns true for every unsettled invoice.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "6b487221075627c66b376ca3a81c853c2eb5538416f14e0f8b7d539fd0af2601",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "141b1b3e0cbf29d80fdf062f1d193ae1bc1e1d11138c11f74ca549b57ee2453a"
+  },
+  "previous#2/corpus-ts/src/services/cache.service.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: The sweep interval started in the constructor is never cleared on destroy, so the timer keeps the process alive after shutdown.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "b8bc7008d22e2c43d03ba04aa3d60bec764295eeaab1eb8e3f08c673eab35ab5",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "141b1b3e0cbf29d80fdf062f1d193ae1bc1e1d11138c11f74ca549b57ee2453a"
+  },
+  "previous#2/corpus-ts/src/services/supplier.service.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: eligible() returns the inactive suppliers, the exact opposite of what its documentation and name promise. No exception is thrown; the caller sends purchase orders to suspended suppliers.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "47b4fbf4dcb69a3ddd79a0b20105aa6dc68ff06c72684307622cb366ad4f62b4",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "141b1b3e0cbf29d80fdf062f1d193ae1bc1e1d11138c11f74ca549b57ee2453a"
+  },
+  "previous#2/corpus-ts/src/models/cart.model.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: discount is declared optional on CartRow and dereferenced without a guard, while the equally optional lines is guarded one line above.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "fe46d6c7b29ed71cd33dd37f9f9eb7a11004312c8d9f16e677ed97f544dafaaf",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "141b1b3e0cbf29d80fdf062f1d193ae1bc1e1d11138c11f74ca549b57ee2453a"
+  },
+  "previous#2/corpus-ts/src/lib/paginate.mts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: The loop bound is <= lastPage, so pageBounds returns one more page than the documented ceil(total / pageSize), and the extra page is empty.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "ffc281da0bab5cfcf9f5d2c6592c2bb6f5c184b2d151b901cc45bc502bda0ef4",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "141b1b3e0cbf29d80fdf062f1d193ae1bc1e1d11138c11f74ca549b57ee2453a"
+  },
+  "previous#2/corpus-ts/src/services/sync.service.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: modifiedSince filters on createdAt instead of updatedAt, so an incremental sync silently skips every record that was edited after it was created.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "bc3d7907f200e11d7e0da9778eb941fb388eb7f5ced1c03e8af55605563f97b2",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "141b1b3e0cbf29d80fdf062f1d193ae1bc1e1d11138c11f74ca549b57ee2453a"
+  },
+  "previous#2/corpus-ts/src/api/order.controller.ts": {
+    "matchesDefect": false,
+    "reason": "False alarm on a clean control. Infers order.lines may be undefined from the optional chaining in lines(), but OrderDto is imported from ../lib/types, which is not in the corpus, so the premise is unverifiable from available source.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "dacdad98d455b682c2277814f280c55f093345f54e4e4202fbc8dbdf61a6e8ef",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "141b1b3e0cbf29d80fdf062f1d193ae1bc1e1d11138c11f74ca549b57ee2453a"
+  },
+  "previous#2/corpus/src/accuracy/discount.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: Row permits an absent discount, which is dereferenced without a guard.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "06c2ffaf47268ba297773e4951e85c3c3b64cd15a2b8520a584435ef77fc4a65",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "141b1b3e0cbf29d80fdf062f1d193ae1bc1e1d11138c11f74ca549b57ee2453a"
+  },
+  "previous#2/corpus/src/accuracy/late-member.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: The directory Map starts empty; get returns undefined for a missing id, then displayName dereferences name.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "e1c168da3505c5abc0d8a5dd5c68cea048aa94e0679492438c899dbb1506d25c",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "141b1b3e0cbf29d80fdf062f1d193ae1bc1e1d11138c11f74ca549b57ee2453a"
+  },
+  "current#2/corpus/src/services/pricingService.js": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: Tier loop reads tiers[i + 1] without bounding i, so the last tier dereferences undefined.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "c8b67a8be15f8a09c3c3d5a902fc33999f902f46b7b23cbcfef8aa1e7cff1614",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "9b780c79b9cd52b31938b4d71bd0d883d22abe4bb3b34bde3b3929eaa1b7457c"
+  },
+  "current#2/corpus/src/workers/reconciliationWorker.js": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: Balance is read before the awaits and written back after, so concurrent ticks lose updates.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "898eb9ee68e1b07d1b167d88d03a5ff395db82c0727442058d53a100e06929af",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "9b780c79b9cd52b31938b4d71bd0d883d22abe4bb3b34bde3b3929eaa1b7457c"
+  },
+  "current#2/corpus/src/services/inventoryService.js": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: await inside forEach is not awaited, so reserve() returns before any stock is decremented.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "d38ac20410e079ba47c3eef0b10eeda28129bd39b3579f3be7b3a8ebb53d6245",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "9b780c79b9cd52b31938b4d71bd0d883d22abe4bb3b34bde3b3929eaa1b7457c"
+  },
+  "current#2/corpus/src/lib/dateWindow.js": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: Loop bound is <= days, so every window contains one extra day.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "0a8530dd6c81bda7560c42e74c6bfbc3b064e82d90cfe16a9e0bfe3f22953351",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "9b780c79b9cd52b31938b4d71bd0d883d22abe4bb3b34bde3b3929eaa1b7457c"
+  },
+  "current#2/corpus/src/models/cartTotals.js": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: discount is optional on the row but dereferenced unguarded, throwing for carts with no coupon.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "6eaa471ab94bf8ba1218f229e8822656e21a0ffa6e615fcec47033cadd6d6747",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "9b780c79b9cd52b31938b4d71bd0d883d22abe4bb3b34bde3b3929eaa1b7457c"
+  },
+  "current#2/corpus/src/lib/retry.js": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: The final attempt's rejection is swallowed, so retry resolves undefined instead of throwing.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "4c54b5e486ee9f5ba09a38fc6bfb55285d00ebe53c3c83d8894f1eb51463d698",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "9b780c79b9cd52b31938b4d71bd0d883d22abe4bb3b34bde3b3929eaa1b7457c"
+  },
+  "current#2/corpus-ts/src/models/invoice.entity.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: settledAt is a nullable TypeORM column, so an unsettled row loads as null rather than undefined, and isSettled() returns true for every unsettled invoice.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "6b487221075627c66b376ca3a81c853c2eb5538416f14e0f8b7d539fd0af2601",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "9b780c79b9cd52b31938b4d71bd0d883d22abe4bb3b34bde3b3929eaa1b7457c"
+  },
+  "current#2/corpus-ts/src/services/cache.service.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: The sweep interval started in the constructor is never cleared on destroy, so the timer keeps the process alive after shutdown.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "b8bc7008d22e2c43d03ba04aa3d60bec764295eeaab1eb8e3f08c673eab35ab5",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "9b780c79b9cd52b31938b4d71bd0d883d22abe4bb3b34bde3b3929eaa1b7457c"
+  },
+  "current#2/corpus-ts/src/services/supplier.service.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: eligible() returns the inactive suppliers, the exact opposite of what its documentation and name promise. No exception is thrown; the caller sends purchase orders to suspended suppliers.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "47b4fbf4dcb69a3ddd79a0b20105aa6dc68ff06c72684307622cb366ad4f62b4",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "9b780c79b9cd52b31938b4d71bd0d883d22abe4bb3b34bde3b3929eaa1b7457c"
+  },
+  "current#2/corpus-ts/src/models/cart.model.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: discount is declared optional on CartRow and dereferenced without a guard, while the equally optional lines is guarded one line above.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "fe46d6c7b29ed71cd33dd37f9f9eb7a11004312c8d9f16e677ed97f544dafaaf",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "9b780c79b9cd52b31938b4d71bd0d883d22abe4bb3b34bde3b3929eaa1b7457c"
+  },
+  "current#2/corpus-ts/src/lib/paginate.mts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: The loop bound is <= lastPage, so pageBounds returns one more page than the documented ceil(total / pageSize), and the extra page is empty.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "ffc281da0bab5cfcf9f5d2c6592c2bb6f5c184b2d151b901cc45bc502bda0ef4",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "9b780c79b9cd52b31938b4d71bd0d883d22abe4bb3b34bde3b3929eaa1b7457c"
+  },
+  "current#2/corpus-ts/src/services/sync.service.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: modifiedSince filters on createdAt instead of updatedAt, so an incremental sync silently skips every record that was edited after it was created.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "bc3d7907f200e11d7e0da9778eb941fb388eb7f5ced1c03e8af55605563f97b2",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "9b780c79b9cd52b31938b4d71bd0d883d22abe4bb3b34bde3b3929eaa1b7457c"
+  },
+  "current#2/corpus/src/accuracy/discount.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: Row permits an absent discount, which is dereferenced without a guard.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "06c2ffaf47268ba297773e4951e85c3c3b64cd15a2b8520a584435ef77fc4a65",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "9b780c79b9cd52b31938b4d71bd0d883d22abe4bb3b34bde3b3929eaa1b7457c"
+  },
+  "current#2/corpus/src/accuracy/late-member.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: The directory Map starts empty; get returns undefined for a missing id, then displayName dereferences name.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "e1c168da3505c5abc0d8a5dd5c68cea048aa94e0679492438c899dbb1506d25c",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "9b780c79b9cd52b31938b4d71bd0d883d22abe4bb3b34bde3b3929eaa1b7457c"
+  },
+  "current#2/corpus/src/accuracy/wildcard-discount.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: The wildcard-exported Row contract permits an absent discount, dereferenced without a guard.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "9dbcff59e710be827be727cb75e5f6bd7c7cf40d2a3a237bcb3d4730e1e2bd66",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "9b780c79b9cd52b31938b4d71bd0d883d22abe4bb3b34bde3b3929eaa1b7457c"
+  },
+  "current#2/corpus/src/accuracy/forwarded-coupon.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: couponFor forwards resolveCoupon, which returns undefined; discount dereferences amount.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "bac2a9673d197bdff07ca8127d2f3c2fca6c0486c332b309545330a9ebeb128a",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "9b780c79b9cd52b31938b4d71bd0d883d22abe4bb3b34bde3b3929eaa1b7457c"
+  },
+  "current#2/corpus/src/accuracy/constructed-reading.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: Reading converts its input to a string; display calls the numeric toFixed method on that string.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "468050c90c52a0959c209527182c81e0b589ffa338e975cefe248bac78df7633",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "9b780c79b9cd52b31938b4d71bd0d883d22abe4bb3b34bde3b3929eaa1b7457c"
+  },
+  "read#2/corpus/src/services/pricingService.js": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: Tier loop reads tiers[i + 1] without bounding i, so the last tier dereferences undefined.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "c8b67a8be15f8a09c3c3d5a902fc33999f902f46b7b23cbcfef8aa1e7cff1614",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "3d224f00c39204bccf48dacb71acc6a9b3738ca3ac54014c51099f44080c4cc5"
+  },
+  "read#2/corpus/src/services/inventoryService.js": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: await inside forEach is not awaited, so reserve() returns before any stock is decremented.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "d38ac20410e079ba47c3eef0b10eeda28129bd39b3579f3be7b3a8ebb53d6245",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "3d224f00c39204bccf48dacb71acc6a9b3738ca3ac54014c51099f44080c4cc5"
+  },
+  "read#2/corpus/src/lib/dateWindow.js": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: Loop bound is <= days, so every window contains one extra day.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "0a8530dd6c81bda7560c42e74c6bfbc3b064e82d90cfe16a9e0bfe3f22953351",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "3d224f00c39204bccf48dacb71acc6a9b3738ca3ac54014c51099f44080c4cc5"
+  },
+  "read#2/corpus/src/models/cartTotals.js": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: discount is optional on the row but dereferenced unguarded, throwing for carts with no coupon.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "6eaa471ab94bf8ba1218f229e8822656e21a0ffa6e615fcec47033cadd6d6747",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "3d224f00c39204bccf48dacb71acc6a9b3738ca3ac54014c51099f44080c4cc5"
+  },
+  "read#2/corpus/src/lib/retry.js": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: The final attempt's rejection is swallowed, so retry resolves undefined instead of throwing.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "4c54b5e486ee9f5ba09a38fc6bfb55285d00ebe53c3c83d8894f1eb51463d698",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "3d224f00c39204bccf48dacb71acc6a9b3738ca3ac54014c51099f44080c4cc5"
+  },
+  "read#2/corpus-ts/src/models/invoice.entity.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: settledAt is a nullable TypeORM column, so an unsettled row loads as null rather than undefined, and isSettled() returns true for every unsettled invoice.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "6b487221075627c66b376ca3a81c853c2eb5538416f14e0f8b7d539fd0af2601",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "3d224f00c39204bccf48dacb71acc6a9b3738ca3ac54014c51099f44080c4cc5"
+  },
+  "read#2/corpus-ts/src/services/cache.service.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: The sweep interval started in the constructor is never cleared on destroy, so the timer keeps the process alive after shutdown.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "b8bc7008d22e2c43d03ba04aa3d60bec764295eeaab1eb8e3f08c673eab35ab5",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "3d224f00c39204bccf48dacb71acc6a9b3738ca3ac54014c51099f44080c4cc5"
+  },
+  "read#2/corpus-ts/src/services/supplier.service.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: eligible() returns the inactive suppliers, the exact opposite of what its documentation and name promise. No exception is thrown; the caller sends purchase orders to suspended suppliers.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "47b4fbf4dcb69a3ddd79a0b20105aa6dc68ff06c72684307622cb366ad4f62b4",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "3d224f00c39204bccf48dacb71acc6a9b3738ca3ac54014c51099f44080c4cc5"
+  },
+  "read#2/corpus-ts/src/models/cart.model.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: discount is declared optional on CartRow and dereferenced without a guard, while the equally optional lines is guarded one line above.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "fe46d6c7b29ed71cd33dd37f9f9eb7a11004312c8d9f16e677ed97f544dafaaf",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "3d224f00c39204bccf48dacb71acc6a9b3738ca3ac54014c51099f44080c4cc5"
+  },
+  "read#2/corpus-ts/src/lib/paginate.mts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: The loop bound is <= lastPage, so pageBounds returns one more page than the documented ceil(total / pageSize), and the extra page is empty.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "ffc281da0bab5cfcf9f5d2c6592c2bb6f5c184b2d151b901cc45bc502bda0ef4",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "3d224f00c39204bccf48dacb71acc6a9b3738ca3ac54014c51099f44080c4cc5"
+  },
+  "read#2/corpus-ts/src/services/sync.service.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: modifiedSince filters on createdAt instead of updatedAt, so an incremental sync silently skips every record that was edited after it was created.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "bc3d7907f200e11d7e0da9778eb941fb388eb7f5ced1c03e8af55605563f97b2",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "3d224f00c39204bccf48dacb71acc6a9b3738ca3ac54014c51099f44080c4cc5"
+  },
+  "read#2/corpus/src/accuracy/discount.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: Row permits an absent discount, which is dereferenced without a guard.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "06c2ffaf47268ba297773e4951e85c3c3b64cd15a2b8520a584435ef77fc4a65",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "3d224f00c39204bccf48dacb71acc6a9b3738ca3ac54014c51099f44080c4cc5"
+  },
+  "read#2/corpus/src/accuracy/late-member.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: The directory Map starts empty; get returns undefined for a missing id, then displayName dereferences name.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "e1c168da3505c5abc0d8a5dd5c68cea048aa94e0679492438c899dbb1506d25c",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "3d224f00c39204bccf48dacb71acc6a9b3738ca3ac54014c51099f44080c4cc5"
+  },
+  "read#2/corpus/src/accuracy/wildcard-discount.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: The wildcard-exported Row contract permits an absent discount, dereferenced without a guard.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "9dbcff59e710be827be727cb75e5f6bd7c7cf40d2a3a237bcb3d4730e1e2bd66",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "3d224f00c39204bccf48dacb71acc6a9b3738ca3ac54014c51099f44080c4cc5"
+  },
+  "read#2/corpus/src/accuracy/forwarded-coupon.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: couponFor forwards resolveCoupon, which returns undefined; discount dereferences amount.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "bac2a9673d197bdff07ca8127d2f3c2fca6c0486c332b309545330a9ebeb128a",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "3d224f00c39204bccf48dacb71acc6a9b3738ca3ac54014c51099f44080c4cc5"
+  },
+  "read#2/corpus/src/accuracy/constructed-reading.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: Reading converts its input to a string; display calls the numeric toFixed method on that string.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "468050c90c52a0959c209527182c81e0b589ffa338e975cefe248bac78df7633",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "3d224f00c39204bccf48dacb71acc6a9b3738ca3ac54014c51099f44080c4cc5"
+  },
+  "current#3/corpus/src/services/pricingService.js": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: Tier loop reads tiers[i + 1] without bounding i, so the last tier dereferences undefined.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "c8b67a8be15f8a09c3c3d5a902fc33999f902f46b7b23cbcfef8aa1e7cff1614",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "d5ef08af560b6eba619d59533f0882ffe5e5b3a8c750406a9c31a6f166c5b3e9"
+  },
+  "current#3/corpus/src/workers/reconciliationWorker.js": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: Balance is read before the awaits and written back after, so concurrent ticks lose updates.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "898eb9ee68e1b07d1b167d88d03a5ff395db82c0727442058d53a100e06929af",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "d5ef08af560b6eba619d59533f0882ffe5e5b3a8c750406a9c31a6f166c5b3e9"
+  },
+  "current#3/corpus/src/services/inventoryService.js": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: await inside forEach is not awaited, so reserve() returns before any stock is decremented.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "d38ac20410e079ba47c3eef0b10eeda28129bd39b3579f3be7b3a8ebb53d6245",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "d5ef08af560b6eba619d59533f0882ffe5e5b3a8c750406a9c31a6f166c5b3e9"
+  },
+  "current#3/corpus/src/lib/dateWindow.js": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: Loop bound is <= days, so every window contains one extra day.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "0a8530dd6c81bda7560c42e74c6bfbc3b064e82d90cfe16a9e0bfe3f22953351",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "d5ef08af560b6eba619d59533f0882ffe5e5b3a8c750406a9c31a6f166c5b3e9"
+  },
+  "current#3/corpus/src/models/cartTotals.js": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: discount is optional on the row but dereferenced unguarded, throwing for carts with no coupon.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "6eaa471ab94bf8ba1218f229e8822656e21a0ffa6e615fcec47033cadd6d6747",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "d5ef08af560b6eba619d59533f0882ffe5e5b3a8c750406a9c31a6f166c5b3e9"
+  },
+  "current#3/corpus/src/lib/retry.js": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: The final attempt's rejection is swallowed, so retry resolves undefined instead of throwing.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "4c54b5e486ee9f5ba09a38fc6bfb55285d00ebe53c3c83d8894f1eb51463d698",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "d5ef08af560b6eba619d59533f0882ffe5e5b3a8c750406a9c31a6f166c5b3e9"
+  },
+  "current#3/corpus-ts/src/models/invoice.entity.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: settledAt is a nullable TypeORM column, so an unsettled row loads as null rather than undefined, and isSettled() returns true for every unsettled invoice.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "6b487221075627c66b376ca3a81c853c2eb5538416f14e0f8b7d539fd0af2601",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "d5ef08af560b6eba619d59533f0882ffe5e5b3a8c750406a9c31a6f166c5b3e9"
+  },
+  "current#3/corpus-ts/src/services/cache.service.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: The sweep interval started in the constructor is never cleared on destroy, so the timer keeps the process alive after shutdown.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "b8bc7008d22e2c43d03ba04aa3d60bec764295eeaab1eb8e3f08c673eab35ab5",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "d5ef08af560b6eba619d59533f0882ffe5e5b3a8c750406a9c31a6f166c5b3e9"
+  },
+  "current#3/corpus-ts/src/services/supplier.service.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: eligible() returns the inactive suppliers, the exact opposite of what its documentation and name promise. No exception is thrown; the caller sends purchase orders to suspended suppliers.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "47b4fbf4dcb69a3ddd79a0b20105aa6dc68ff06c72684307622cb366ad4f62b4",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "d5ef08af560b6eba619d59533f0882ffe5e5b3a8c750406a9c31a6f166c5b3e9"
+  },
+  "current#3/corpus-ts/src/models/cart.model.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: discount is declared optional on CartRow and dereferenced without a guard, while the equally optional lines is guarded one line above.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "fe46d6c7b29ed71cd33dd37f9f9eb7a11004312c8d9f16e677ed97f544dafaaf",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "d5ef08af560b6eba619d59533f0882ffe5e5b3a8c750406a9c31a6f166c5b3e9"
+  },
+  "current#3/corpus-ts/src/lib/paginate.mts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: The loop bound is <= lastPage, so pageBounds returns one more page than the documented ceil(total / pageSize), and the extra page is empty.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "ffc281da0bab5cfcf9f5d2c6592c2bb6f5c184b2d151b901cc45bc502bda0ef4",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "d5ef08af560b6eba619d59533f0882ffe5e5b3a8c750406a9c31a6f166c5b3e9"
+  },
+  "current#3/corpus-ts/src/services/sync.service.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: modifiedSince filters on createdAt instead of updatedAt, so an incremental sync silently skips every record that was edited after it was created.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "bc3d7907f200e11d7e0da9778eb941fb388eb7f5ced1c03e8af55605563f97b2",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "d5ef08af560b6eba619d59533f0882ffe5e5b3a8c750406a9c31a6f166c5b3e9"
+  },
+  "current#3/corpus/src/accuracy/discount.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: Row permits an absent discount, which is dereferenced without a guard.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "06c2ffaf47268ba297773e4951e85c3c3b64cd15a2b8520a584435ef77fc4a65",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "d5ef08af560b6eba619d59533f0882ffe5e5b3a8c750406a9c31a6f166c5b3e9"
+  },
+  "current#3/corpus/src/accuracy/late-member.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: The directory Map starts empty; get returns undefined for a missing id, then displayName dereferences name.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "e1c168da3505c5abc0d8a5dd5c68cea048aa94e0679492438c899dbb1506d25c",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "d5ef08af560b6eba619d59533f0882ffe5e5b3a8c750406a9c31a6f166c5b3e9"
+  },
+  "current#3/corpus/src/accuracy/wildcard-discount.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: The wildcard-exported Row contract permits an absent discount, dereferenced without a guard.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "9dbcff59e710be827be727cb75e5f6bd7c7cf40d2a3a237bcb3d4730e1e2bd66",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "d5ef08af560b6eba619d59533f0882ffe5e5b3a8c750406a9c31a6f166c5b3e9"
+  },
+  "current#3/corpus/src/accuracy/forwarded-coupon.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: couponFor forwards resolveCoupon, which returns undefined; discount dereferences amount.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "bac2a9673d197bdff07ca8127d2f3c2fca6c0486c332b309545330a9ebeb128a",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "d5ef08af560b6eba619d59533f0882ffe5e5b3a8c750406a9c31a6f166c5b3e9"
+  },
+  "current#3/corpus/src/accuracy/constructed-reading.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: Reading converts its input to a string; display calls the numeric toFixed method on that string.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "468050c90c52a0959c209527182c81e0b589ffa338e975cefe248bac78df7633",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "d5ef08af560b6eba619d59533f0882ffe5e5b3a8c750406a9c31a6f166c5b3e9"
+  },
+  "read#3/corpus/src/services/pricingService.js": {
+    "matchesDefect": false,
+    "validDefect": true,
+    "reason": "Verified alternative defect, not the planted off-by-one: currency.js exports only fetchCurrency0..mergeCurrency7, so the destructured roundMoney at line 1 is undefined and roundMoney(total) at line 26 throws on every quote() call. Credited separately from the planted tiers[i + 1] dereference.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "c8b67a8be15f8a09c3c3d5a902fc33999f902f46b7b23cbcfef8aa1e7cff1614",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "08ac58b4c6d8da2ee912183c827f0d809205d0f10e6b6ef6efe716508917a08c"
+  },
+  "read#3/corpus/src/services/inventoryService.js": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: await inside forEach is not awaited, so reserve() returns before any stock is decremented.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "d38ac20410e079ba47c3eef0b10eeda28129bd39b3579f3be7b3a8ebb53d6245",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "08ac58b4c6d8da2ee912183c827f0d809205d0f10e6b6ef6efe716508917a08c"
+  },
+  "read#3/corpus/src/lib/dateWindow.js": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: Loop bound is <= days, so every window contains one extra day.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "0a8530dd6c81bda7560c42e74c6bfbc3b064e82d90cfe16a9e0bfe3f22953351",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "08ac58b4c6d8da2ee912183c827f0d809205d0f10e6b6ef6efe716508917a08c"
+  },
+  "read#3/corpus/src/models/cartTotals.js": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: discount is optional on the row but dereferenced unguarded, throwing for carts with no coupon.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "6eaa471ab94bf8ba1218f229e8822656e21a0ffa6e615fcec47033cadd6d6747",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "08ac58b4c6d8da2ee912183c827f0d809205d0f10e6b6ef6efe716508917a08c"
+  },
+  "read#3/corpus/src/lib/retry.js": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: The final attempt's rejection is swallowed, so retry resolves undefined instead of throwing.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "4c54b5e486ee9f5ba09a38fc6bfb55285d00ebe53c3c83d8894f1eb51463d698",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "08ac58b4c6d8da2ee912183c827f0d809205d0f10e6b6ef6efe716508917a08c"
+  },
+  "read#3/corpus-ts/src/models/invoice.entity.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: settledAt is a nullable TypeORM column, so an unsettled row loads as null rather than undefined, and isSettled() returns true for every unsettled invoice.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "6b487221075627c66b376ca3a81c853c2eb5538416f14e0f8b7d539fd0af2601",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "08ac58b4c6d8da2ee912183c827f0d809205d0f10e6b6ef6efe716508917a08c"
+  },
+  "read#3/corpus-ts/src/services/cache.service.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: The sweep interval started in the constructor is never cleared on destroy, so the timer keeps the process alive after shutdown.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "b8bc7008d22e2c43d03ba04aa3d60bec764295eeaab1eb8e3f08c673eab35ab5",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "08ac58b4c6d8da2ee912183c827f0d809205d0f10e6b6ef6efe716508917a08c"
+  },
+  "read#3/corpus-ts/src/services/supplier.service.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: eligible() returns the inactive suppliers, the exact opposite of what its documentation and name promise. No exception is thrown; the caller sends purchase orders to suspended suppliers.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "47b4fbf4dcb69a3ddd79a0b20105aa6dc68ff06c72684307622cb366ad4f62b4",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "08ac58b4c6d8da2ee912183c827f0d809205d0f10e6b6ef6efe716508917a08c"
+  },
+  "read#3/corpus-ts/src/models/cart.model.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: discount is declared optional on CartRow and dereferenced without a guard, while the equally optional lines is guarded one line above.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "fe46d6c7b29ed71cd33dd37f9f9eb7a11004312c8d9f16e677ed97f544dafaaf",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "08ac58b4c6d8da2ee912183c827f0d809205d0f10e6b6ef6efe716508917a08c"
+  },
+  "read#3/corpus-ts/src/lib/paginate.mts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: The loop bound is <= lastPage, so pageBounds returns one more page than the documented ceil(total / pageSize), and the extra page is empty.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "ffc281da0bab5cfcf9f5d2c6592c2bb6f5c184b2d151b901cc45bc502bda0ef4",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "08ac58b4c6d8da2ee912183c827f0d809205d0f10e6b6ef6efe716508917a08c"
+  },
+  "read#3/corpus-ts/src/services/sync.service.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: modifiedSince filters on createdAt instead of updatedAt, so an incremental sync silently skips every record that was edited after it was created.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "bc3d7907f200e11d7e0da9778eb941fb388eb7f5ced1c03e8af55605563f97b2",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "08ac58b4c6d8da2ee912183c827f0d809205d0f10e6b6ef6efe716508917a08c"
+  },
+  "read#3/corpus/src/accuracy/discount.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: Row permits an absent discount, which is dereferenced without a guard.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "06c2ffaf47268ba297773e4951e85c3c3b64cd15a2b8520a584435ef77fc4a65",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "08ac58b4c6d8da2ee912183c827f0d809205d0f10e6b6ef6efe716508917a08c"
+  },
+  "read#3/corpus/src/accuracy/late-member.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: The directory Map starts empty; get returns undefined for a missing id, then displayName dereferences name.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "e1c168da3505c5abc0d8a5dd5c68cea048aa94e0679492438c899dbb1506d25c",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "08ac58b4c6d8da2ee912183c827f0d809205d0f10e6b6ef6efe716508917a08c"
+  },
+  "read#3/corpus/src/accuracy/wildcard-discount.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: The wildcard-exported Row contract permits an absent discount, dereferenced without a guard.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "9dbcff59e710be827be727cb75e5f6bd7c7cf40d2a3a237bcb3d4730e1e2bd66",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "08ac58b4c6d8da2ee912183c827f0d809205d0f10e6b6ef6efe716508917a08c"
+  },
+  "read#3/corpus/src/accuracy/forwarded-coupon.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: couponFor forwards resolveCoupon, which returns undefined; discount dereferences amount.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "bac2a9673d197bdff07ca8127d2f3c2fca6c0486c332b309545330a9ebeb128a",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "08ac58b4c6d8da2ee912183c827f0d809205d0f10e6b6ef6efe716508917a08c"
+  },
+  "read#3/corpus/src/accuracy/constructed-reading.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: Reading converts its input to a string; display calls the numeric toFixed method on that string.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "468050c90c52a0959c209527182c81e0b589ffa338e975cefe248bac78df7633",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "08ac58b4c6d8da2ee912183c827f0d809205d0f10e6b6ef6efe716508917a08c"
+  },
+  "previous#3/corpus/src/services/pricingService.js": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: Tier loop reads tiers[i + 1] without bounding i, so the last tier dereferences undefined.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "c8b67a8be15f8a09c3c3d5a902fc33999f902f46b7b23cbcfef8aa1e7cff1614",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "5d85e9f78fb67289e3a2de4dcd2c127feb96b2d6bb39e0b85675101548444dcb"
+  },
+  "previous#3/corpus/src/services/inventoryService.js": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: await inside forEach is not awaited, so reserve() returns before any stock is decremented.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "d38ac20410e079ba47c3eef0b10eeda28129bd39b3579f3be7b3a8ebb53d6245",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "5d85e9f78fb67289e3a2de4dcd2c127feb96b2d6bb39e0b85675101548444dcb"
+  },
+  "previous#3/corpus/src/lib/dateWindow.js": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: Loop bound is <= days, so every window contains one extra day.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "0a8530dd6c81bda7560c42e74c6bfbc3b064e82d90cfe16a9e0bfe3f22953351",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "5d85e9f78fb67289e3a2de4dcd2c127feb96b2d6bb39e0b85675101548444dcb"
+  },
+  "previous#3/corpus/src/models/cartTotals.js": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: discount is optional on the row but dereferenced unguarded, throwing for carts with no coupon.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "6eaa471ab94bf8ba1218f229e8822656e21a0ffa6e615fcec47033cadd6d6747",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "5d85e9f78fb67289e3a2de4dcd2c127feb96b2d6bb39e0b85675101548444dcb"
+  },
+  "previous#3/corpus/src/lib/retry.js": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: The final attempt's rejection is swallowed, so retry resolves undefined instead of throwing.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "4c54b5e486ee9f5ba09a38fc6bfb55285d00ebe53c3c83d8894f1eb51463d698",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "5d85e9f78fb67289e3a2de4dcd2c127feb96b2d6bb39e0b85675101548444dcb"
+  },
+  "previous#3/corpus/src/services/orderService.js": {
+    "matchesDefect": false,
+    "reason": "False alarm on a clean control. Claims the resolve block re-rounds after a strict fetch floor; the two options are applied sequentially by design across all eleven near-identical methods, and no documented contract makes the combination wrong. Not a demonstrated runtime defect.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "a6375c377f66193b1f93ef32f339e9acd754b44b7ac7b6971cd2b75560a999f0",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "5d85e9f78fb67289e3a2de4dcd2c127feb96b2d6bb39e0b85675101548444dcb"
+  },
+  "previous#3/corpus-ts/src/models/invoice.entity.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: settledAt is a nullable TypeORM column, so an unsettled row loads as null rather than undefined, and isSettled() returns true for every unsettled invoice.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "6b487221075627c66b376ca3a81c853c2eb5538416f14e0f8b7d539fd0af2601",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "5d85e9f78fb67289e3a2de4dcd2c127feb96b2d6bb39e0b85675101548444dcb"
+  },
+  "previous#3/corpus-ts/src/services/cache.service.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: The sweep interval started in the constructor is never cleared on destroy, so the timer keeps the process alive after shutdown.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "b8bc7008d22e2c43d03ba04aa3d60bec764295eeaab1eb8e3f08c673eab35ab5",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "5d85e9f78fb67289e3a2de4dcd2c127feb96b2d6bb39e0b85675101548444dcb"
+  },
+  "previous#3/corpus-ts/src/services/supplier.service.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: eligible() returns the inactive suppliers, the exact opposite of what its documentation and name promise. No exception is thrown; the caller sends purchase orders to suspended suppliers.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "47b4fbf4dcb69a3ddd79a0b20105aa6dc68ff06c72684307622cb366ad4f62b4",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "5d85e9f78fb67289e3a2de4dcd2c127feb96b2d6bb39e0b85675101548444dcb"
+  },
+  "previous#3/corpus-ts/src/models/cart.model.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: discount is declared optional on CartRow and dereferenced without a guard, while the equally optional lines is guarded one line above.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "fe46d6c7b29ed71cd33dd37f9f9eb7a11004312c8d9f16e677ed97f544dafaaf",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "5d85e9f78fb67289e3a2de4dcd2c127feb96b2d6bb39e0b85675101548444dcb"
+  },
+  "previous#3/corpus-ts/src/lib/paginate.mts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: The loop bound is <= lastPage, so pageBounds returns one more page than the documented ceil(total / pageSize), and the extra page is empty.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "ffc281da0bab5cfcf9f5d2c6592c2bb6f5c184b2d151b901cc45bc502bda0ef4",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "5d85e9f78fb67289e3a2de4dcd2c127feb96b2d6bb39e0b85675101548444dcb"
+  },
+  "previous#3/corpus-ts/src/services/sync.service.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: modifiedSince filters on createdAt instead of updatedAt, so an incremental sync silently skips every record that was edited after it was created.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "bc3d7907f200e11d7e0da9778eb941fb388eb7f5ced1c03e8af55605563f97b2",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "5d85e9f78fb67289e3a2de4dcd2c127feb96b2d6bb39e0b85675101548444dcb"
+  },
+  "previous#3/corpus/src/accuracy/discount.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: Row permits an absent discount, which is dereferenced without a guard.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "06c2ffaf47268ba297773e4951e85c3c3b64cd15a2b8520a584435ef77fc4a65",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "5d85e9f78fb67289e3a2de4dcd2c127feb96b2d6bb39e0b85675101548444dcb"
+  },
+  "previous#3/corpus/src/accuracy/late-member.ts": {
+    "matchesDefect": true,
+    "validDefect": true,
+    "reason": "Reported cause matches the planted defect: The directory Map starts empty; get returns undefined for a missing id, then displayName dereferences name.",
+    "reviewer": "Claude manual review against source and answer key",
+    "sourceHash": "e1c168da3505c5abc0d8a5dd5c68cea048aa94e0679492438c899dbb1506d25c",
+    "promptHash": "8a3a8a2640a0ced5c1b5f270f780a7ce0308a7ab8929c095b342456bde64be5d",
+    "responseHash": "5d85e9f78fb67289e3a2de4dcd2c127feb96b2d6bb39e0b85675101548444dcb"
+  }
+}
