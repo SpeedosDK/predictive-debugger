@@ -75,3 +75,6 @@ pids
 *.seed
 *.pid.lock
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Plumbing check for the Jev replay; answers come from a fixture, not the service.
+bench/results-jev-dryrun.json

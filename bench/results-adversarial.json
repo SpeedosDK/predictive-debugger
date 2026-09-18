@@ -1,0 +1,554 @@
+{
+  "config": {
+    "model": "sonnet",
+    "provider": "claude",
+    "concurrency": 4,
+    "jev": true,
+    "manifestHash": "aa4033b4a0962a1b7f58fcf2363d62cd40c6bec8eb8d8192136ead81aec986b8",
+    "casesHash": "25c0e6f2b7f419abbfdb42da5e84a5bee5d5e5107a3acf5a9b7ff597120a6e8b",
+    "runnerHash": "c9ab3ee5012d0bd7cd976283bc440bc8b900789f5e916c1ebd3db9b9ec698489"
+  },
+  "startedAt": "2026-09-18T16:40:50.153Z",
+  "wallMs": 19896,
+  "failures": [],
+  "rows": [
+    {
+      "file": "src/adversarial/shallow-overrides.js",
+      "kind": "buggy",
+      "sourceHash": "a289cde7740c6ba4b4839643d80a5a2d99fe89dd89af8d92603496dcae027c6c",
+      "expected": {
+        "pattern": "other",
+        "line": 6,
+        "acceptableLines": [
+          6
+        ],
+        "acceptableRanges": [
+          [
+            3,
+            9
+          ]
+        ],
+        "summary": "Spread copies only the top level, so writing copy.retry.attempts mutates the caller's shared retry object."
+      },
+      "detected": {
+        "pattern": "other",
+        "score": 0.85,
+        "line": 5,
+        "reason": "When config.retry already exists, copy.retry is the same object reference as config.retry (shallow spread), so mutating copy.retry.attempts/backoffMs also mutates the caller's original config object."
+      },
+      "combinedScore": 0.7793835616438356,
+      "riskScore": 0.14383561643835618,
+      "jev": {
+        "status": "scored",
+        "model": "jev-1.13.0",
+        "rubric": "evidence-impact-v1",
+        "findings": [
+          {
+            "findingIndex": 0,
+            "evidence": {
+              "score": 0.7725,
+              "confidence": 0.24
+            },
+            "impact": {
+              "score": 0.3,
+              "confidence": 0.72
+            },
+            "priority": 0.23174999999999998
+          }
+        ],
+        "usage": {
+          "inputTokens": 802,
+          "outputTokens": 36
+        }
+      }
+    },
+    {
+      "file": "src/adversarial/float-cents.js",
+      "kind": "buggy",
+      "sourceHash": "22bc2d15d5bdd2bde5b4d6d6d5c5e5854d01873a8fa41ce15fdc1be6bb4c8603",
+      "expected": {
+        "pattern": "other",
+        "line": 6,
+        "acceptableLines": [
+          6
+        ],
+        "acceptableRanges": [
+          [
+            3,
+            9
+          ]
+        ],
+        "summary": "Amounts are floating-point currency, so accumulated representation error makes the strict equality fail for values that are equal."
+      },
+      "detected": {
+        "pattern": "other",
+        "score": 0.85,
+        "line": 6,
+        "reason": "Comparing summed floating-point currency amounts with === fails to account for binary floating-point rounding error, so equal amounts (e.g. 0.1+0.2 style sums) can be falsely reported as unsettled."
+      },
+      "combinedScore": 0.7695801526717557,
+      "riskScore": 0.04580152671755725,
+      "jev": {
+        "status": "scored",
+        "model": "jev-1.13.0",
+        "rubric": "evidence-impact-v1",
+        "findings": [
+          {
+            "findingIndex": 0,
+            "evidence": {
+              "score": 0.6875,
+              "confidence": 0.2
+            },
+            "impact": {
+              "score": 0.245,
+              "confidence": 0.95
+            },
+            "priority": 0.1684375
+          }
+        ],
+        "usage": {
+          "inputTokens": 772,
+          "outputTokens": 36
+        }
+      }
+    },
+    {
+      "file": "src/adversarial/in-place-sort.js",
+      "kind": "buggy",
+      "sourceHash": "e377ea0d3f73e36bcbbec92c66eef52ddd57d1911107ba7056a4a3991d77fb6e",
+      "expected": {
+        "pattern": "other",
+        "line": 5,
+        "acceptableLines": [
+          5
+        ],
+        "acceptableRanges": [
+          [
+            2,
+            8
+          ]
+        ],
+        "summary": "sort mutates the caller's array, so suppliers is reordered as a side effect of asking for a ranking."
+      },
+      "detected": {
+        "pattern": "other",
+        "score": 0.85,
+        "line": 5,
+        "reason": "Array.prototype.sort mutates the input array in place, so calling topSuppliers reorders the caller's original suppliers array as a side effect, contradicting a pure ranking function's expected behaviour."
+      },
+      "combinedScore": 0.7695801526717557,
+      "riskScore": 0.04580152671755725,
+      "jev": {
+        "status": "scored",
+        "model": "jev-1.13.0",
+        "rubric": "evidence-impact-v1",
+        "findings": [
+          {
+            "findingIndex": 0,
+            "evidence": {
+              "score": 0.735,
+              "confidence": 0.12
+            },
+            "impact": {
+              "score": 0.345,
+              "confidence": 0.6
+            },
+            "priority": 0.253575
+          }
+        ],
+        "usage": {
+          "inputTokens": 752,
+          "outputTokens": 36
+        }
+      }
+    },
+    {
+      "file": "src/adversarial/unawaited-close.js",
+      "kind": "buggy",
+      "sourceHash": "19b34c7c9a018bd4377197845fa5804987fc1a0bce795c2280ad550989789dba",
+      "expected": {
+        "pattern": "async-misuse",
+        "line": 18,
+        "acceptableLines": [
+          18
+        ],
+        "acceptableRanges": [
+          [
+            15,
+            21
+          ]
+        ],
+        "summary": "close() returns a promise that is never awaited, so write resolves before the handle is flushed and closed."
+      },
+      "detected": {
+        "pattern": "async_misuse",
+        "score": 0.85,
+        "line": 18,
+        "reason": "handle.close() is called without await in the finally block, so write() can resolve before the handle is actually released, and any rejection from close() becomes an unhandled promise rejection."
+      },
+      "combinedScore": 0.7840938511326861,
+      "riskScore": 0.19093851132686088,
+      "jev": {
+        "status": "scored",
+        "model": "jev-1.13.0",
+        "rubric": "evidence-impact-v1",
+        "findings": [
+          {
+            "findingIndex": 0,
+            "evidence": {
+              "score": 0.4925,
+              "confidence": 0.18
+            },
+            "impact": {
+              "score": 0.3525,
+              "confidence": 0.33
+            },
+            "priority": 0.17360625
+          }
+        ],
+        "usage": {
+          "inputTokens": 842,
+          "outputTokens": 36
+        }
+      }
+    },
+    {
+      "file": "src/adversarial/var-capture.js",
+      "kind": "buggy",
+      "sourceHash": "69fa196dfc84f516b506b3a74a03f50848b12c4141f15a613a2b233a75d82d2a",
+      "expected": {
+        "pattern": "other",
+        "line": 5,
+        "acceptableLines": [
+          5
+        ],
+        "acceptableRanges": [
+          [
+            2,
+            8
+          ]
+        ],
+        "summary": "var is function-scoped, so every scheduled callback reads the same i and notifies pending[pending.length] repeatedly."
+      },
+      "detected": {
+        "pattern": "race_condition",
+        "score": 0.9,
+        "line": 5,
+        "reason": "var-scoped i is shared across all scheduled callbacks, so by the time each deferred callback runs after the loop completes, i equals pending.length and notify reads pending[pending.length] (undefined) for every call."
+      },
+      "combinedScore": 0.8187591240875913,
+      "riskScore": 0.08759124087591241,
+      "jev": {
+        "status": "scored",
+        "model": "jev-1.13.0",
+        "rubric": "evidence-impact-v1",
+        "findings": [
+          {
+            "findingIndex": 0,
+            "evidence": {
+              "score": 0.715,
+              "confidence": 0.05
+            },
+            "impact": {
+              "score": 0.4575,
+              "confidence": 0.64
+            },
+            "priority": 0.3271125
+          }
+        ],
+        "usage": {
+          "inputTokens": 774,
+          "outputTokens": 36
+        }
+      }
+    },
+    {
+      "file": "src/adversarial/filtered-average.js",
+      "kind": "buggy",
+      "sourceHash": "79c636898d00b90c7b5c859d9526bf825cfc7649f60d805a89bcb15e7172134e",
+      "expected": {
+        "pattern": "other",
+        "line": 10,
+        "acceptableLines": [
+          10
+        ],
+        "acceptableRanges": [
+          [
+            7,
+            13
+          ]
+        ],
+        "summary": "The total sums only settled orders but the divisor counts every order, so the average is understated whenever any order is unsettled."
+      },
+      "detected": {
+        "pattern": "other",
+        "score": 0.9,
+        "line": 10,
+        "reason": "Denominator uses orders.length (all orders) instead of the settled-order count used for total, so the average is diluted whenever any order is unsettled."
+      },
+      "combinedScore": 0.8170631970260224,
+      "riskScore": 0.07063197026022307,
+      "jev": {
+        "status": "scored",
+        "model": "jev-1.13.0",
+        "rubric": "evidence-impact-v1",
+        "findings": [
+          {
+            "findingIndex": 0,
+            "evidence": {
+              "score": 0.73,
+              "confidence": 0.1
+            },
+            "impact": {
+              "score": 0.2475,
+              "confidence": 0.99
+            },
+            "priority": 0.180675
+          }
+        ],
+        "usage": {
+          "inputTokens": 792,
+          "outputTokens": 36
+        }
+      }
+    },
+    {
+      "file": "src/adversarial/bounded-lookahead.js",
+      "kind": "clean",
+      "sourceHash": "a67597345d0ee99d56505bf45e7e505b84a6bba05ec1cc4dfa62b46e1f043960",
+      "expected": null,
+      "detected": {
+        "pattern": "none",
+        "score": 0,
+        "reason": "Loop correctly checks bounds against tiers.length - 1 and falls through to the last tier's rate for quantities at or above the final threshold."
+      },
+      "combinedScore": 0.013194444444444448,
+      "riskScore": 0.13194444444444448,
+      "jev": {
+        "status": "skipped",
+        "reason": "no-findings"
+      }
+    },
+    {
+      "file": "src/adversarial/sequential-reserve.js",
+      "kind": "clean",
+      "sourceHash": "74ce57bbb78acb1775b3b6ad3e86f373b2d84e9ab6ab9f5a09215cf74be91402",
+      "expected": null,
+      "detected": {
+        "pattern": "none",
+        "score": 0,
+        "reason": "Each line is awaited sequentially and stock is decremented atomically via a conditional store operation, so no double-take or lost-update window exists in this source."
+      },
+      "combinedScore": 0.016943521594684388,
+      "riskScore": 0.16943521594684388,
+      "jev": {
+        "status": "skipped",
+        "reason": "no-findings"
+      }
+    },
+    {
+      "file": "src/adversarial/locked-balance.js",
+      "kind": "clean",
+      "sourceHash": "eb3c91800383370e17df40e184fdc87b071253eab0d10aa3ad2d7e1310930a9f",
+      "expected": null,
+      "detected": {
+        "pattern": "none",
+        "score": 0,
+        "reason": "Per-account lock is acquired before read and released in a finally after write, so balance read-modify-write is properly serialised; no defect shown."
+      },
+      "combinedScore": 0.02401215805471125,
+      "riskScore": 0.2401215805471125,
+      "jev": {
+        "status": "skipped",
+        "reason": "no-findings"
+      }
+    },
+    {
+      "file": "src/adversarial/guarded-profile.js",
+      "kind": "clean",
+      "sourceHash": "d946c9cf58408dcbfe900ebfed048fed5c441f08c12f3b3b3b8652383498bb23",
+      "expected": null,
+      "detected": {
+        "pattern": "none",
+        "score": 0,
+        "reason": "Guard fully validates session.user.displayName before use, and joinedAt/locale are handled with safe defaults; no defect found."
+      },
+      "combinedScore": 0.011660777385159011,
+      "riskScore": 0.1166077738515901,
+      "jev": {
+        "status": "skipped",
+        "reason": "no-findings"
+      }
+    },
+    {
+      "file": "src/adversarial/checked-divisor.js",
+      "kind": "clean",
+      "sourceHash": "82a0e2f5ba34220e37fd5d4b10c1508dfda43511f05f8d8b05a9606eed75ae1f",
+      "expected": null,
+      "detected": {
+        "pattern": "none",
+        "score": 0,
+        "reason": "Zero-length settled array returns early before division, and reduce/round behave correctly for normal numeric inputs."
+      },
+      "combinedScore": 0.007063197026022307,
+      "riskScore": 0.07063197026022307,
+      "jev": {
+        "status": "skipped",
+        "reason": "no-findings"
+      }
+    },
+    {
+      "file": "src/adversarial/closed-handle.js",
+      "kind": "clean",
+      "sourceHash": "a0c668ab4c51df7a7e6970a1b584bf5919a5c6ed571c75325a00e6fe907f79f3",
+      "expected": null,
+      "detected": {
+        "pattern": "none",
+        "score": 0,
+        "reason": "handle.close() runs in finally regardless of loop or flush outcome, and no other defect is evident in normal execution."
+      },
+      "combinedScore": 0.02401215805471125,
+      "riskScore": 0.2401215805471125,
+      "jev": {
+        "status": "skipped",
+        "reason": "no-findings"
+      }
+    },
+    {
+      "file": "src/adversarial/preset-index.js",
+      "kind": "clean",
+      "sourceHash": "222ee1820f119212bba60f60470fa93fc8eaf955d9ffed7a4e8c80ba001f077e",
+      "expected": null,
+      "detected": {
+        "pattern": "none",
+        "score": 0,
+        "reason": "Index is built from the same records slice immediately before use, so every id inserted in the first loop is guaranteed present when read in the second loop."
+      },
+      "combinedScore": 0.009420289855072466,
+      "riskScore": 0.09420289855072465,
+      "jev": {
+        "status": "skipped",
+        "reason": "no-findings"
+      }
+    },
+    {
+      "file": "src/adversarial/validated-index.js",
+      "kind": "clean",
+      "sourceHash": "d02794f01b9294ecc2562c0c0daeeb7b50beb2fbc9234e842552f0be1eef08b6",
+      "expected": null,
+      "detected": {
+        "pattern": "none",
+        "score": 0,
+        "reason": "Index is validated as an integer within bounds before use, so pages[requested] is always a valid element."
+      },
+      "combinedScore": 0.007063197026022307,
+      "riskScore": 0.07063197026022307,
+      "jev": {
+        "status": "skipped",
+        "reason": "no-findings"
+      }
+    },
+    {
+      "file": "src/adversarial/empty-rows.js",
+      "kind": "clean",
+      "sourceHash": "2a86fb61b051aa87a845f37df70af186c274fe1b459e05ced3dbae7a5e9ae651",
+      "expected": null,
+      "detected": {
+        "pattern": "none",
+        "score": 0,
+        "reason": "headerFor correctly guards the empty-rows case and derives columns/generatedAt from rows[0] otherwise, with no crash or wrong value shown."
+      },
+      "combinedScore": 0.007063197026022307,
+      "riskScore": 0.07063197026022307,
+      "jev": {
+        "status": "skipped",
+        "reason": "no-findings"
+      }
+    },
+    {
+      "file": "src/adversarial/deep-clone-config.js",
+      "kind": "clean",
+      "sourceHash": "9191bdc1d4e393aaf02d69ef57feb1ffc9567827b5a54ce2dde84623608dc3f8",
+      "expected": null,
+      "detected": {
+        "pattern": "none",
+        "score": 0,
+        "reason": "structuredClone deep-copies config and retry defaults/overrides are applied to the copy only, so the caller's config is left untouched as documented."
+      },
+      "combinedScore": 0.01438356164383562,
+      "riskScore": 0.14383561643835618,
+      "jev": {
+        "status": "skipped",
+        "reason": "no-findings"
+      }
+    },
+    {
+      "file": "src/adversarial/optional-chain.js",
+      "kind": "clean",
+      "sourceHash": "accd4beae3aa4987834a2d5fe0f3d0ed0990d3963914e22746e1010d23edb002",
+      "expected": null,
+      "detected": {
+        "pattern": "none",
+        "score": 0,
+        "reason": "Optional chaining and type/length guard correctly handle any missing segment of the chain, returning \"unknown\" as documented."
+      },
+      "combinedScore": 0.007063197026022307,
+      "riskScore": 0.07063197026022307,
+      "jev": {
+        "status": "skipped",
+        "reason": "no-findings"
+      }
+    },
+    {
+      "file": "src/adversarial/awaited-later.js",
+      "kind": "clean",
+      "sourceHash": "482cdfcdf3c46c86aa8e151eda95af30575f8cdf2ebf92079adf974120bdf562",
+      "expected": null,
+      "detected": {
+        "pattern": "none",
+        "score": 0,
+        "reason": "The render promise is created eagerly but is awaited within the try block, so its rejection is still caught by the catch handler; behavior is correct."
+      },
+      "combinedScore": 0.015824915824915825,
+      "riskScore": 0.15824915824915825,
+      "jev": {
+        "status": "skipped",
+        "reason": "no-findings"
+      }
+    },
+    {
+      "file": "src/adversarial/copied-sort.js",
+      "kind": "clean",
+      "sourceHash": "1b22f0b576a882290a4630ea76bc07c262c90af983fc673c161d860829887688",
+      "expected": null,
+      "detected": {
+        "pattern": "none",
+        "score": 0,
+        "reason": "Function copies the array before sorting and slices safely; no defect demonstrated."
+      },
+      "combinedScore": 0.004580152671755725,
+      "riskScore": 0.04580152671755725,
+      "jev": {
+        "status": "skipped",
+        "reason": "no-findings"
+      }
+    },
+    {
+      "file": "src/adversarial/integer-cents.js",
+      "kind": "clean",
+      "sourceHash": "363460c968e3110d437b13c15a81bd374cfea191b74cafb8820f0ade18f2bdc4",
+      "expected": null,
+      "detected": {
+        "pattern": "none",
+        "score": 0,
+        "reason": "Integer-cents summation and exact equality comparison are correct as documented; no defect shown for any valid invoice input."
+      },
+      "combinedScore": 0.004580152671755725,
+      "riskScore": 0.04580152671755725,
+      "jev": {
+        "status": "skipped",
+        "reason": "no-findings"
+      }
+    }
+  ]
+}

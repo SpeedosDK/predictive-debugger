@@ -1,0 +1,3151 @@
+{
+  "config": {
+    "source": "results-v072-full.json",
+    "sourceHash": "6b402e711676317829f0621edeeca8372af4f39002f705ec4fc6cda1cc476fac",
+    "judgments": "judgments-v072-full.json",
+    "judgmentsHash": "99539eaed15c48659ababe4abe84f3690cdef5cb16777923e033905dbda57640",
+    "scorer": "openrouter",
+    "mode": "Jev via OpenRouter (typesafe/jev-1.13)",
+    "records": 101,
+    "limit": null,
+    "runnerHash": "0a7f059710e8181ece76fd19a8ee4b2813c0496b25758d187cb898f13539aa23",
+    "jevHash": "83c1383772ae3b054bc519e4ec44150297d5edda3fd05d11934ff3d97972c8f0"
+  },
+  "configHash": "3e327206ac9ad6b03302c0446605ec55b33373ea7456a330f5d9090fc2ac02a2",
+  "startedAt": "2026-09-18T15:40:39.608Z",
+  "status": "complete",
+  "scored": [
+    {
+      "id": "current#1/corpus-ts/src/lib/paginate.mts",
+      "arm": "current",
+      "trial": 1,
+      "file": "corpus-ts/src/lib/paginate.mts",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: The loop bound is <= lastPage, so pageBounds returns one more page than the documented ceil(total / pageSize), and the extra page is empty.",
+      "pattern": "off_by_one",
+      "line": 23,
+      "cliScore": 0.93,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 340,
+      "evidence": {
+        "score": 0.8975,
+        "confidence": 0.66
+      },
+      "impact": {
+        "score": 0.2475,
+        "confidence": 0.97
+      },
+      "priority": 0.22213125,
+      "usage": {
+        "inputTokens": 1006,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "current#1/corpus-ts/src/models/cart.model.ts",
+      "arm": "current",
+      "trial": 1,
+      "file": "corpus-ts/src/models/cart.model.ts",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: discount is declared optional on CartRow and dereferenced without a guard, while the equally optional lines is guarded one line above.",
+      "pattern": "null_reference",
+      "line": 28,
+      "cliScore": 0.9,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 501,
+      "evidence": {
+        "score": 0.875,
+        "confidence": 0.59
+      },
+      "impact": {
+        "score": 0.4775,
+        "confidence": 0.89
+      },
+      "priority": 0.4178125,
+      "usage": {
+        "inputTokens": 930,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "current#1/corpus-ts/src/models/invoice.entity.ts",
+      "arm": "current",
+      "trial": 1,
+      "file": "corpus-ts/src/models/invoice.entity.ts",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: settledAt is a nullable TypeORM column, so an unsettled row loads as null rather than undefined, and isSettled() returns true for every unsettled invoice.",
+      "pattern": "other",
+      "line": 28,
+      "cliScore": 0.75,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 362,
+      "evidence": {
+        "score": 0.69,
+        "confidence": 0
+      },
+      "impact": {
+        "score": 0.25,
+        "confidence": 0.96
+      },
+      "priority": 0.1725,
+      "usage": {
+        "inputTokens": 1022,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "current#1/corpus-ts/src/services/cache.service.ts",
+      "arm": "current",
+      "trial": 1,
+      "file": "corpus-ts/src/services/cache.service.ts",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: The sweep interval started in the constructor is never cleared on destroy, so the timer keeps the process alive after shutdown.",
+      "pattern": "resource_leak",
+      "line": 24,
+      "cliScore": 0.82,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 302,
+      "evidence": {
+        "score": 0.855,
+        "confidence": 0.52
+      },
+      "impact": {
+        "score": 0.315,
+        "confidence": 0
+      },
+      "priority": 0.269325,
+      "usage": {
+        "inputTokens": 1207,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "current#1/corpus-ts/src/services/supplier.service.ts",
+      "arm": "current",
+      "trial": 1,
+      "file": "corpus-ts/src/services/supplier.service.ts",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: eligible() returns the inactive suppliers, the exact opposite of what its documentation and name promise. No exception is thrown; the caller sends purchase orders to suspended suppliers.",
+      "pattern": "other",
+      "line": 15,
+      "cliScore": 0.95,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 282,
+      "evidence": {
+        "score": 0.7375,
+        "confidence": 0.13
+      },
+      "impact": {
+        "score": 0.3425,
+        "confidence": 0.64
+      },
+      "priority": 0.25259375000000006,
+      "usage": {
+        "inputTokens": 972,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "current#1/corpus-ts/src/services/sync.service.ts",
+      "arm": "current",
+      "trial": 1,
+      "file": "corpus-ts/src/services/sync.service.ts",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: modifiedSince filters on createdAt instead of updatedAt, so an incremental sync silently skips every record that was edited after it was created.",
+      "pattern": "other",
+      "line": 16,
+      "cliScore": 0.82,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 324,
+      "evidence": {
+        "score": 0.635,
+        "confidence": 0.18
+      },
+      "impact": {
+        "score": 0.4425,
+        "confidence": 0.32
+      },
+      "priority": 0.2809875,
+      "usage": {
+        "inputTokens": 984,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "current#1/corpus/src/accuracy/constructed-reading.ts",
+      "arm": "current",
+      "trial": 1,
+      "file": "corpus/src/accuracy/constructed-reading.ts",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: Reading converts its input to a string; display calls the numeric toFixed method on that string.",
+      "pattern": "other",
+      "line": 3,
+      "cliScore": 0.9,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 278,
+      "evidence": {
+        "score": 0.925,
+        "confidence": 0.75
+      },
+      "impact": {
+        "score": 0.4875,
+        "confidence": 0.86
+      },
+      "priority": 0.4509375,
+      "usage": {
+        "inputTokens": 737,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 1
+    },
+    {
+      "id": "current#1/corpus/src/accuracy/discount.ts",
+      "arm": "current",
+      "trial": 1,
+      "file": "corpus/src/accuracy/discount.ts",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: Row permits an absent discount, which is dereferenced without a guard.",
+      "pattern": "null_reference",
+      "line": 3,
+      "cliScore": 0.88,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 414,
+      "evidence": {
+        "score": 0.7525,
+        "confidence": 0.17
+      },
+      "impact": {
+        "score": 0.475,
+        "confidence": 0.89
+      },
+      "priority": 0.35743749999999996,
+      "usage": {
+        "inputTokens": 713,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 1
+    },
+    {
+      "id": "current#1/corpus/src/accuracy/forwarded-coupon.ts",
+      "arm": "current",
+      "trial": 1,
+      "file": "corpus/src/accuracy/forwarded-coupon.ts",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: couponFor forwards resolveCoupon, which returns undefined; discount dereferences amount.",
+      "pattern": "null_reference",
+      "line": 3,
+      "cliScore": 0.8,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 347,
+      "evidence": {
+        "score": 0.46,
+        "confidence": 0.2
+      },
+      "impact": {
+        "score": 0.4875,
+        "confidence": 0.93
+      },
+      "priority": 0.22425,
+      "usage": {
+        "inputTokens": 743,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 1
+    },
+    {
+      "id": "current#1/corpus/src/accuracy/late-member.ts",
+      "arm": "current",
+      "trial": 1,
+      "file": "corpus/src/accuracy/late-member.ts",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: The directory Map starts empty; get returns undefined for a missing id, then displayName dereferences name.",
+      "pattern": "null_reference",
+      "line": 3,
+      "cliScore": 0.85,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 281,
+      "evidence": {
+        "score": 0.795,
+        "confidence": 0.32
+      },
+      "impact": {
+        "score": 0.495,
+        "confidence": 0.97
+      },
+      "priority": 0.393525,
+      "usage": {
+        "inputTokens": 772,
+        "outputTokens": 36
+      },
+      "truncated": "Imported definitions are excerpted.",
+      "calleeCount": 1
+    },
+    {
+      "id": "current#1/corpus/src/accuracy/wildcard-discount.ts",
+      "arm": "current",
+      "trial": 1,
+      "file": "corpus/src/accuracy/wildcard-discount.ts",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: The wildcard-exported Row contract permits an absent discount, dereferenced without a guard.",
+      "pattern": "null_reference",
+      "line": 3,
+      "cliScore": 0.9,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 598,
+      "evidence": {
+        "score": 0.7475,
+        "confidence": 0.15
+      },
+      "impact": {
+        "score": 0.475,
+        "confidence": 0.91
+      },
+      "priority": 0.3550625,
+      "usage": {
+        "inputTokens": 714,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 1
+    },
+    {
+      "id": "current#1/corpus/src/lib/dateWindow.js",
+      "arm": "current",
+      "trial": 1,
+      "file": "corpus/src/lib/dateWindow.js",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: Loop bound is <= days, so every window contains one extra day.",
+      "pattern": "off_by_one",
+      "line": 7,
+      "cliScore": 0.85,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 312,
+      "evidence": {
+        "score": 0.69,
+        "confidence": 0
+      },
+      "impact": {
+        "score": 0.245,
+        "confidence": 0.97
+      },
+      "priority": 0.16904999999999998,
+      "usage": {
+        "inputTokens": 857,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "current#1/corpus/src/lib/retry.js",
+      "arm": "current",
+      "trial": 1,
+      "file": "corpus/src/lib/retry.js",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: The final attempt's rejection is swallowed, so retry resolves undefined instead of throwing.",
+      "pattern": "other",
+      "line": 11,
+      "cliScore": 0.85,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 341,
+      "evidence": {
+        "score": 0.95,
+        "confidence": 0.83
+      },
+      "impact": {
+        "score": 0.33,
+        "confidence": 0.64
+      },
+      "priority": 0.3135,
+      "usage": {
+        "inputTokens": 784,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "current#1/corpus/src/models/cartTotals.js",
+      "arm": "current",
+      "trial": 1,
+      "file": "corpus/src/models/cartTotals.js",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: discount is optional on the row but dereferenced unguarded, throwing for carts with no coupon.",
+      "pattern": "null_reference",
+      "line": 6,
+      "cliScore": 0.82,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 367,
+      "evidence": {
+        "score": 0.8975,
+        "confidence": 0.66
+      },
+      "impact": {
+        "score": 0.49,
+        "confidence": 0.91
+      },
+      "priority": 0.43977499999999997,
+      "usage": {
+        "inputTokens": 781,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "current#1/corpus/src/services/inventoryService.js",
+      "arm": "current",
+      "trial": 1,
+      "file": "corpus/src/services/inventoryService.js",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: await inside forEach is not awaited, so reserve() returns before any stock is decremented.",
+      "pattern": "async_misuse",
+      "line": 28,
+      "cliScore": 0.9,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 779,
+      "evidence": {
+        "score": 0.9,
+        "confidence": 0.67
+      },
+      "impact": {
+        "score": 0.505,
+        "confidence": 0.74
+      },
+      "priority": 0.4545,
+      "usage": {
+        "inputTokens": 1952,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "current#1/corpus/src/services/pricingService.js",
+      "arm": "current",
+      "trial": 1,
+      "file": "corpus/src/services/pricingService.js",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: Tier loop reads tiers[i + 1] without bounding i, so the last tier dereferences undefined.",
+      "pattern": "off_by_one",
+      "line": 36,
+      "cliScore": 0.85,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 286,
+      "evidence": {
+        "score": 0.7375,
+        "confidence": 0.13
+      },
+      "impact": {
+        "score": 0.4925,
+        "confidence": 0.89
+      },
+      "priority": 0.36321875000000003,
+      "usage": {
+        "inputTokens": 2373,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "current#1/corpus/src/workers/reconciliationWorker.js",
+      "arm": "current",
+      "trial": 1,
+      "file": "corpus/src/workers/reconciliationWorker.js",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: Balance is read before the awaits and written back after, so concurrent ticks lose updates.",
+      "pattern": "race_condition",
+      "line": 40,
+      "cliScore": 0.72,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 274,
+      "evidence": {
+        "score": 0.38,
+        "confidence": 0.2
+      },
+      "impact": {
+        "score": 0.505,
+        "confidence": 0.41
+      },
+      "priority": 0.19190000000000002,
+      "usage": {
+        "inputTokens": 1916,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "current#2/corpus-ts/src/lib/paginate.mts",
+      "arm": "current",
+      "trial": 2,
+      "file": "corpus-ts/src/lib/paginate.mts",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: The loop bound is <= lastPage, so pageBounds returns one more page than the documented ceil(total / pageSize), and the extra page is empty.",
+      "pattern": "off_by_one",
+      "line": 23,
+      "cliScore": 0.92,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 391,
+      "evidence": {
+        "score": 0.8675,
+        "confidence": 0.56
+      },
+      "impact": {
+        "score": 0.245,
+        "confidence": 0.97
+      },
+      "priority": 0.21253750000000002,
+      "usage": {
+        "inputTokens": 996,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "current#2/corpus-ts/src/models/cart.model.ts",
+      "arm": "current",
+      "trial": 2,
+      "file": "corpus-ts/src/models/cart.model.ts",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: discount is declared optional on CartRow and dereferenced without a guard, while the equally optional lines is guarded one line above.",
+      "pattern": "null_reference",
+      "line": 28,
+      "cliScore": 0.9,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 362,
+      "evidence": {
+        "score": 0.9125,
+        "confidence": 0.71
+      },
+      "impact": {
+        "score": 0.4825,
+        "confidence": 0.91
+      },
+      "priority": 0.44028124999999996,
+      "usage": {
+        "inputTokens": 922,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "current#2/corpus-ts/src/models/invoice.entity.ts",
+      "arm": "current",
+      "trial": 2,
+      "file": "corpus-ts/src/models/invoice.entity.ts",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: settledAt is a nullable TypeORM column, so an unsettled row loads as null rather than undefined, and isSettled() returns true for every unsettled invoice.",
+      "pattern": "other",
+      "line": 28,
+      "cliScore": 0.85,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 277,
+      "evidence": {
+        "score": 0.4575,
+        "confidence": 0
+      },
+      "impact": {
+        "score": 0.22,
+        "confidence": 0.86
+      },
+      "priority": 0.10065,
+      "usage": {
+        "inputTokens": 1021,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "current#2/corpus-ts/src/services/cache.service.ts",
+      "arm": "current",
+      "trial": 2,
+      "file": "corpus-ts/src/services/cache.service.ts",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: The sweep interval started in the constructor is never cleared on destroy, so the timer keeps the process alive after shutdown.",
+      "pattern": "resource_leak",
+      "line": 23,
+      "cliScore": 0.8,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 352,
+      "evidence": {
+        "score": 0.8275,
+        "confidence": 0.43
+      },
+      "impact": {
+        "score": 0.365,
+        "confidence": 0.19
+      },
+      "priority": 0.3020375,
+      "usage": {
+        "inputTokens": 1207,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "current#2/corpus-ts/src/services/supplier.service.ts",
+      "arm": "current",
+      "trial": 2,
+      "file": "corpus-ts/src/services/supplier.service.ts",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: eligible() returns the inactive suppliers, the exact opposite of what its documentation and name promise. No exception is thrown; the caller sends purchase orders to suspended suppliers.",
+      "pattern": "other",
+      "line": 15,
+      "cliScore": 0.95,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 349,
+      "evidence": {
+        "score": 0.725,
+        "confidence": 0.08
+      },
+      "impact": {
+        "score": 0.345,
+        "confidence": 0.6
+      },
+      "priority": 0.250125,
+      "usage": {
+        "inputTokens": 971,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "current#2/corpus-ts/src/services/sync.service.ts",
+      "arm": "current",
+      "trial": 2,
+      "file": "corpus-ts/src/services/sync.service.ts",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: modifiedSince filters on createdAt instead of updatedAt, so an incremental sync silently skips every record that was edited after it was created.",
+      "pattern": "other",
+      "line": 16,
+      "cliScore": 0.72,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 313,
+      "evidence": {
+        "score": 0.6225,
+        "confidence": 0.19
+      },
+      "impact": {
+        "score": 0.4075,
+        "confidence": 0.43
+      },
+      "priority": 0.25366875,
+      "usage": {
+        "inputTokens": 982,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "current#2/corpus/src/accuracy/constructed-reading.ts",
+      "arm": "current",
+      "trial": 2,
+      "file": "corpus/src/accuracy/constructed-reading.ts",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: Reading converts its input to a string; display calls the numeric toFixed method on that string.",
+      "pattern": "other",
+      "line": 3,
+      "cliScore": 0.9,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 308,
+      "evidence": {
+        "score": 0.945,
+        "confidence": 0.82
+      },
+      "impact": {
+        "score": 0.4875,
+        "confidence": 0.9
+      },
+      "priority": 0.46068749999999997,
+      "usage": {
+        "inputTokens": 743,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 1
+    },
+    {
+      "id": "current#2/corpus/src/accuracy/discount.ts",
+      "arm": "current",
+      "trial": 2,
+      "file": "corpus/src/accuracy/discount.ts",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: Row permits an absent discount, which is dereferenced without a guard.",
+      "pattern": "null_reference",
+      "line": 3,
+      "cliScore": 0.85,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 307,
+      "evidence": {
+        "score": 0.62,
+        "confidence": 0
+      },
+      "impact": {
+        "score": 0.475,
+        "confidence": 0.9
+      },
+      "priority": 0.2945,
+      "usage": {
+        "inputTokens": 706,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 1
+    },
+    {
+      "id": "current#2/corpus/src/accuracy/forwarded-coupon.ts",
+      "arm": "current",
+      "trial": 2,
+      "file": "corpus/src/accuracy/forwarded-coupon.ts",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: couponFor forwards resolveCoupon, which returns undefined; discount dereferences amount.",
+      "pattern": "null_reference",
+      "line": 3,
+      "cliScore": 0.8,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 276,
+      "evidence": {
+        "score": 0.6025,
+        "confidence": 0
+      },
+      "impact": {
+        "score": 0.4875,
+        "confidence": 0.93
+      },
+      "priority": 0.29371875000000003,
+      "usage": {
+        "inputTokens": 738,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 1
+    },
+    {
+      "id": "current#2/corpus/src/accuracy/late-member.ts",
+      "arm": "current",
+      "trial": 2,
+      "file": "corpus/src/accuracy/late-member.ts",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: The directory Map starts empty; get returns undefined for a missing id, then displayName dereferences name.",
+      "pattern": "null_reference",
+      "line": 3,
+      "cliScore": 0.8,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 465,
+      "evidence": {
+        "score": 0.82,
+        "confidence": 0.4
+      },
+      "impact": {
+        "score": 0.4925,
+        "confidence": 0.97
+      },
+      "priority": 0.40385,
+      "usage": {
+        "inputTokens": 775,
+        "outputTokens": 36
+      },
+      "truncated": "Imported definitions are excerpted.",
+      "calleeCount": 1
+    },
+    {
+      "id": "current#2/corpus/src/accuracy/wildcard-discount.ts",
+      "arm": "current",
+      "trial": 2,
+      "file": "corpus/src/accuracy/wildcard-discount.ts",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: The wildcard-exported Row contract permits an absent discount, dereferenced without a guard.",
+      "pattern": "null_reference",
+      "line": 3,
+      "cliScore": 0.85,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 310,
+      "evidence": {
+        "score": 0.655,
+        "confidence": 0
+      },
+      "impact": {
+        "score": 0.4875,
+        "confidence": 0.92
+      },
+      "priority": 0.3193125,
+      "usage": {
+        "inputTokens": 712,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 1
+    },
+    {
+      "id": "current#2/corpus/src/api/adminController.js",
+      "arm": "current",
+      "trial": 2,
+      "file": "corpus/src/api/adminController.js",
+      "kind": "clean",
+      "stratum": "below-cut",
+      "correct": false,
+      "basis": "answer key only; finding did not reach the actionable cut",
+      "pattern": "other",
+      "line": 21,
+      "cliScore": 0.55,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 403,
+      "evidence": {
+        "score": 0.325,
+        "confidence": 0.7
+      },
+      "impact": {
+        "score": 0.25,
+        "confidence": 0.42
+      },
+      "priority": 0.08125,
+      "usage": {
+        "inputTokens": 4233,
+        "outputTokens": 36
+      },
+      "truncated": "verdict covers 248 of 373 lines in selected excerpts; omitted code was not reviewed",
+      "calleeCount": 0
+    },
+    {
+      "id": "current#2/corpus/src/lib/dateWindow.js",
+      "arm": "current",
+      "trial": 2,
+      "file": "corpus/src/lib/dateWindow.js",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: Loop bound is <= days, so every window contains one extra day.",
+      "pattern": "off_by_one",
+      "line": 7,
+      "cliScore": 0.85,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 314,
+      "evidence": {
+        "score": 0.6125,
+        "confidence": 0
+      },
+      "impact": {
+        "score": 0.24,
+        "confidence": 0.96
+      },
+      "priority": 0.147,
+      "usage": {
+        "inputTokens": 830,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "current#2/corpus/src/lib/retry.js",
+      "arm": "current",
+      "trial": 2,
+      "file": "corpus/src/lib/retry.js",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: The final attempt's rejection is swallowed, so retry resolves undefined instead of throwing.",
+      "pattern": "other",
+      "line": 11,
+      "cliScore": 0.85,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 377,
+      "evidence": {
+        "score": 0.94,
+        "confidence": 0.8
+      },
+      "impact": {
+        "score": 0.325,
+        "confidence": 0.68
+      },
+      "priority": 0.3055,
+      "usage": {
+        "inputTokens": 787,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "current#2/corpus/src/models/cartTotals.js",
+      "arm": "current",
+      "trial": 2,
+      "file": "corpus/src/models/cartTotals.js",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: discount is optional on the row but dereferenced unguarded, throwing for carts with no coupon.",
+      "pattern": "null_reference",
+      "line": 6,
+      "cliScore": 0.8,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 322,
+      "evidence": {
+        "score": 0.9125,
+        "confidence": 0.7
+      },
+      "impact": {
+        "score": 0.49,
+        "confidence": 0.92
+      },
+      "priority": 0.447125,
+      "usage": {
+        "inputTokens": 782,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "current#2/corpus/src/services/inventoryService.js",
+      "arm": "current",
+      "trial": 2,
+      "file": "corpus/src/services/inventoryService.js",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: await inside forEach is not awaited, so reserve() returns before any stock is decremented.",
+      "pattern": "async_misuse",
+      "line": 28,
+      "cliScore": 0.9,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 330,
+      "evidence": {
+        "score": 0.9,
+        "confidence": 0.66
+      },
+      "impact": {
+        "score": 0.4625,
+        "confidence": 0.75
+      },
+      "priority": 0.41625,
+      "usage": {
+        "inputTokens": 1952,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "current#2/corpus/src/services/pricingService.js",
+      "arm": "current",
+      "trial": 2,
+      "file": "corpus/src/services/pricingService.js",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: Tier loop reads tiers[i + 1] without bounding i, so the last tier dereferences undefined.",
+      "pattern": "null_reference",
+      "line": 36,
+      "cliScore": 0.88,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 284,
+      "evidence": {
+        "score": 0.8175,
+        "confidence": 0.39
+      },
+      "impact": {
+        "score": 0.4975,
+        "confidence": 0.93
+      },
+      "priority": 0.40670625,
+      "usage": {
+        "inputTokens": 2373,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "current#2/corpus/src/workers/reconciliationWorker.js",
+      "arm": "current",
+      "trial": 2,
+      "file": "corpus/src/workers/reconciliationWorker.js",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: Balance is read before the awaits and written back after, so concurrent ticks lose updates.",
+      "pattern": "race_condition",
+      "line": 40,
+      "cliScore": 0.72,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 341,
+      "evidence": {
+        "score": 0.3575,
+        "confidence": 0.24
+      },
+      "impact": {
+        "score": 0.54,
+        "confidence": 0.29
+      },
+      "priority": 0.19305,
+      "usage": {
+        "inputTokens": 1913,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "current#3/corpus-ts/src/lib/paginate.mts",
+      "arm": "current",
+      "trial": 3,
+      "file": "corpus-ts/src/lib/paginate.mts",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: The loop bound is <= lastPage, so pageBounds returns one more page than the documented ceil(total / pageSize), and the extra page is empty.",
+      "pattern": "off_by_one",
+      "line": 23,
+      "cliScore": 0.93,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 557,
+      "evidence": {
+        "score": 0.8625,
+        "confidence": 0.54
+      },
+      "impact": {
+        "score": 0.245,
+        "confidence": 0.97
+      },
+      "priority": 0.21131250000000001,
+      "usage": {
+        "inputTokens": 998,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "current#3/corpus-ts/src/models/cart.model.ts",
+      "arm": "current",
+      "trial": 3,
+      "file": "corpus-ts/src/models/cart.model.ts",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: discount is declared optional on CartRow and dereferenced without a guard, while the equally optional lines is guarded one line above.",
+      "pattern": "null_reference",
+      "line": 28,
+      "cliScore": 0.92,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 314,
+      "evidence": {
+        "score": 0.91,
+        "confidence": 0.7
+      },
+      "impact": {
+        "score": 0.4775,
+        "confidence": 0.89
+      },
+      "priority": 0.434525,
+      "usage": {
+        "inputTokens": 936,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "current#3/corpus-ts/src/models/invoice.entity.ts",
+      "arm": "current",
+      "trial": 3,
+      "file": "corpus-ts/src/models/invoice.entity.ts",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: settledAt is a nullable TypeORM column, so an unsettled row loads as null rather than undefined, and isSettled() returns true for every unsettled invoice.",
+      "pattern": "other",
+      "line": 28,
+      "cliScore": 0.8,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 375,
+      "evidence": {
+        "score": 0.415,
+        "confidence": 0.4
+      },
+      "impact": {
+        "score": 0.255,
+        "confidence": 0.92
+      },
+      "priority": 0.105825,
+      "usage": {
+        "inputTokens": 1021,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "current#3/corpus-ts/src/services/cache.service.ts",
+      "arm": "current",
+      "trial": 3,
+      "file": "corpus-ts/src/services/cache.service.ts",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: The sweep interval started in the constructor is never cleared on destroy, so the timer keeps the process alive after shutdown.",
+      "pattern": "resource_leak",
+      "line": 23,
+      "cliScore": 0.82,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 302,
+      "evidence": {
+        "score": 0.825,
+        "confidence": 0.41
+      },
+      "impact": {
+        "score": 0.33,
+        "confidence": 0.13
+      },
+      "priority": 0.27225,
+      "usage": {
+        "inputTokens": 1207,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "current#3/corpus-ts/src/services/supplier.service.ts",
+      "arm": "current",
+      "trial": 3,
+      "file": "corpus-ts/src/services/supplier.service.ts",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: eligible() returns the inactive suppliers, the exact opposite of what its documentation and name promise. No exception is thrown; the caller sends purchase orders to suspended suppliers.",
+      "pattern": "other",
+      "line": 15,
+      "cliScore": 0.95,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 403,
+      "evidence": {
+        "score": 0.73,
+        "confidence": 0.1
+      },
+      "impact": {
+        "score": 0.335,
+        "confidence": 0.65
+      },
+      "priority": 0.24455000000000002,
+      "usage": {
+        "inputTokens": 979,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "current#3/corpus-ts/src/services/sync.service.ts",
+      "arm": "current",
+      "trial": 3,
+      "file": "corpus-ts/src/services/sync.service.ts",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: modifiedSince filters on createdAt instead of updatedAt, so an incremental sync silently skips every record that was edited after it was created.",
+      "pattern": "other",
+      "line": 16,
+      "cliScore": 0.8,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 288,
+      "evidence": {
+        "score": 0.6525,
+        "confidence": 0.27
+      },
+      "impact": {
+        "score": 0.4275,
+        "confidence": 0.38
+      },
+      "priority": 0.27894375,
+      "usage": {
+        "inputTokens": 989,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "current#3/corpus/src/accuracy/constructed-reading.ts",
+      "arm": "current",
+      "trial": 3,
+      "file": "corpus/src/accuracy/constructed-reading.ts",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: Reading converts its input to a string; display calls the numeric toFixed method on that string.",
+      "pattern": "other",
+      "line": 3,
+      "cliScore": 0.9,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 457,
+      "evidence": {
+        "score": 0.9575,
+        "confidence": 0.86
+      },
+      "impact": {
+        "score": 0.495,
+        "confidence": 0.9
+      },
+      "priority": 0.4739625,
+      "usage": {
+        "inputTokens": 739,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 1
+    },
+    {
+      "id": "current#3/corpus/src/accuracy/discount.ts",
+      "arm": "current",
+      "trial": 3,
+      "file": "corpus/src/accuracy/discount.ts",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: Row permits an absent discount, which is dereferenced without a guard.",
+      "pattern": "null_reference",
+      "line": 3,
+      "cliScore": 0.85,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 308,
+      "evidence": {
+        "score": 0.78,
+        "confidence": 0.27
+      },
+      "impact": {
+        "score": 0.48,
+        "confidence": 0.9
+      },
+      "priority": 0.3744,
+      "usage": {
+        "inputTokens": 715,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 1
+    },
+    {
+      "id": "current#3/corpus/src/accuracy/forwarded-coupon.ts",
+      "arm": "current",
+      "trial": 3,
+      "file": "corpus/src/accuracy/forwarded-coupon.ts",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: couponFor forwards resolveCoupon, which returns undefined; discount dereferences amount.",
+      "pattern": "null_reference",
+      "line": 3,
+      "cliScore": 0.85,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 400,
+      "evidence": {
+        "score": 0.5075,
+        "confidence": 0.07
+      },
+      "impact": {
+        "score": 0.4875,
+        "confidence": 0.88
+      },
+      "priority": 0.24740624999999997,
+      "usage": {
+        "inputTokens": 737,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 1
+    },
+    {
+      "id": "current#3/corpus/src/accuracy/late-member.ts",
+      "arm": "current",
+      "trial": 3,
+      "file": "corpus/src/accuracy/late-member.ts",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: The directory Map starts empty; get returns undefined for a missing id, then displayName dereferences name.",
+      "pattern": "null_reference",
+      "line": 3,
+      "cliScore": 0.85,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 327,
+      "evidence": {
+        "score": 0.7425,
+        "confidence": 0.14
+      },
+      "impact": {
+        "score": 0.495,
+        "confidence": 0.97
+      },
+      "priority": 0.3675375,
+      "usage": {
+        "inputTokens": 776,
+        "outputTokens": 36
+      },
+      "truncated": "Imported definitions are excerpted.",
+      "calleeCount": 1
+    },
+    {
+      "id": "current#3/corpus/src/accuracy/wildcard-discount.ts",
+      "arm": "current",
+      "trial": 3,
+      "file": "corpus/src/accuracy/wildcard-discount.ts",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: The wildcard-exported Row contract permits an absent discount, dereferenced without a guard.",
+      "pattern": "null_reference",
+      "line": 3,
+      "cliScore": 0.9,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 406,
+      "evidence": {
+        "score": 0.6525,
+        "confidence": 0
+      },
+      "impact": {
+        "score": 0.47,
+        "confidence": 0.88
+      },
+      "priority": 0.306675,
+      "usage": {
+        "inputTokens": 709,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 1
+    },
+    {
+      "id": "current#3/corpus/src/lib/dateWindow.js",
+      "arm": "current",
+      "trial": 3,
+      "file": "corpus/src/lib/dateWindow.js",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: Loop bound is <= days, so every window contains one extra day.",
+      "pattern": "off_by_one",
+      "line": 7,
+      "cliScore": 0.85,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 262,
+      "evidence": {
+        "score": 0.515,
+        "confidence": 0.02
+      },
+      "impact": {
+        "score": 0.2375,
+        "confidence": 0.95
+      },
+      "priority": 0.12231249999999999,
+      "usage": {
+        "inputTokens": 836,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "current#3/corpus/src/lib/retry.js",
+      "arm": "current",
+      "trial": 3,
+      "file": "corpus/src/lib/retry.js",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: The final attempt's rejection is swallowed, so retry resolves undefined instead of throwing.",
+      "pattern": "other",
+      "line": 11,
+      "cliScore": 0.85,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 429,
+      "evidence": {
+        "score": 0.935,
+        "confidence": 0.78
+      },
+      "impact": {
+        "score": 0.35,
+        "confidence": 0.56
+      },
+      "priority": 0.32725,
+      "usage": {
+        "inputTokens": 785,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "current#3/corpus/src/models/cartTotals.js",
+      "arm": "current",
+      "trial": 3,
+      "file": "corpus/src/models/cartTotals.js",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: discount is optional on the row but dereferenced unguarded, throwing for carts with no coupon.",
+      "pattern": "null_reference",
+      "line": 6,
+      "cliScore": 0.82,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 362,
+      "evidence": {
+        "score": 0.815,
+        "confidence": 0.38
+      },
+      "impact": {
+        "score": 0.48,
+        "confidence": 0.89
+      },
+      "priority": 0.39119999999999994,
+      "usage": {
+        "inputTokens": 785,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "current#3/corpus/src/services/inventoryService.js",
+      "arm": "current",
+      "trial": 3,
+      "file": "corpus/src/services/inventoryService.js",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: await inside forEach is not awaited, so reserve() returns before any stock is decremented.",
+      "pattern": "async_misuse",
+      "line": 28,
+      "cliScore": 0.9,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 401,
+      "evidence": {
+        "score": 0.945,
+        "confidence": 0.81
+      },
+      "impact": {
+        "score": 0.4675,
+        "confidence": 0.74
+      },
+      "priority": 0.4417875,
+      "usage": {
+        "inputTokens": 1942,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "current#3/corpus/src/services/pricingService.js",
+      "arm": "current",
+      "trial": 3,
+      "file": "corpus/src/services/pricingService.js",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: Tier loop reads tiers[i + 1] without bounding i, so the last tier dereferences undefined.",
+      "pattern": "null_reference",
+      "line": 36,
+      "cliScore": 0.9,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 440,
+      "evidence": {
+        "score": 0.8275,
+        "confidence": 0.43
+      },
+      "impact": {
+        "score": 0.5,
+        "confidence": 0.95
+      },
+      "priority": 0.41375,
+      "usage": {
+        "inputTokens": 2360,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "current#3/corpus/src/workers/reconciliationWorker.js",
+      "arm": "current",
+      "trial": 3,
+      "file": "corpus/src/workers/reconciliationWorker.js",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: Balance is read before the awaits and written back after, so concurrent ticks lose updates.",
+      "pattern": "race_condition",
+      "line": 40,
+      "cliScore": 0.72,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 298,
+      "evidence": {
+        "score": 0.635,
+        "confidence": 0.23
+      },
+      "impact": {
+        "score": 0.6125,
+        "confidence": 0.54
+      },
+      "priority": 0.38893750000000005,
+      "usage": {
+        "inputTokens": 1927,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "previous#1/corpus-ts/src/lib/paginate.mts",
+      "arm": "previous",
+      "trial": 1,
+      "file": "corpus-ts/src/lib/paginate.mts",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: The loop bound is <= lastPage, so pageBounds returns one more page than the documented ceil(total / pageSize), and the extra page is empty.",
+      "pattern": "off_by_one",
+      "line": 23,
+      "cliScore": 0.9,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 250,
+      "evidence": {
+        "score": 0.9125,
+        "confidence": 0.71
+      },
+      "impact": {
+        "score": 0.2475,
+        "confidence": 0.97
+      },
+      "priority": 0.22584374999999998,
+      "usage": {
+        "inputTokens": 1017,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "previous#1/corpus-ts/src/models/cart.model.ts",
+      "arm": "previous",
+      "trial": 1,
+      "file": "corpus-ts/src/models/cart.model.ts",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: discount is declared optional on CartRow and dereferenced without a guard, while the equally optional lines is guarded one line above.",
+      "pattern": "null_reference",
+      "line": 28,
+      "cliScore": 0.9,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 304,
+      "evidence": {
+        "score": 0.915,
+        "confidence": 0.71
+      },
+      "impact": {
+        "score": 0.4875,
+        "confidence": 0.92
+      },
+      "priority": 0.44606250000000003,
+      "usage": {
+        "inputTokens": 921,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "previous#1/corpus-ts/src/models/invoice.entity.ts",
+      "arm": "previous",
+      "trial": 1,
+      "file": "corpus-ts/src/models/invoice.entity.ts",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: settledAt is a nullable TypeORM column, so an unsettled row loads as null rather than undefined, and isSettled() returns true for every unsettled invoice.",
+      "pattern": "other",
+      "line": 28,
+      "cliScore": 0.72,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 326,
+      "evidence": {
+        "score": 0.5325,
+        "confidence": 0.03
+      },
+      "impact": {
+        "score": 0.25,
+        "confidence": 0.95
+      },
+      "priority": 0.133125,
+      "usage": {
+        "inputTokens": 1023,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "previous#1/corpus-ts/src/services/cache.service.ts",
+      "arm": "previous",
+      "trial": 1,
+      "file": "corpus-ts/src/services/cache.service.ts",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: The sweep interval started in the constructor is never cleared on destroy, so the timer keeps the process alive after shutdown.",
+      "pattern": "resource_leak",
+      "line": 23,
+      "cliScore": 0.85,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 591,
+      "evidence": {
+        "score": 0.82,
+        "confidence": 0.4
+      },
+      "impact": {
+        "score": 0.365,
+        "confidence": 0.24
+      },
+      "priority": 0.29929999999999995,
+      "usage": {
+        "inputTokens": 1210,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "previous#1/corpus-ts/src/services/supplier.service.ts",
+      "arm": "previous",
+      "trial": 1,
+      "file": "corpus-ts/src/services/supplier.service.ts",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: eligible() returns the inactive suppliers, the exact opposite of what its documentation and name promise. No exception is thrown; the caller sends purchase orders to suspended suppliers.",
+      "pattern": "other",
+      "line": 15,
+      "cliScore": 0.95,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 334,
+      "evidence": {
+        "score": 0.755,
+        "confidence": 0.19
+      },
+      "impact": {
+        "score": 0.3275,
+        "confidence": 0.7
+      },
+      "priority": 0.24726250000000002,
+      "usage": {
+        "inputTokens": 979,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "previous#1/corpus-ts/src/services/sync.service.ts",
+      "arm": "previous",
+      "trial": 1,
+      "file": "corpus-ts/src/services/sync.service.ts",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: modifiedSince filters on createdAt instead of updatedAt, so an incremental sync silently skips every record that was edited after it was created.",
+      "pattern": "other",
+      "line": 16,
+      "cliScore": 0.85,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 331,
+      "evidence": {
+        "score": 0.6175,
+        "confidence": 0.19
+      },
+      "impact": {
+        "score": 0.3625,
+        "confidence": 0.58
+      },
+      "priority": 0.22384375,
+      "usage": {
+        "inputTokens": 985,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "previous#1/corpus/src/accuracy/discount.ts",
+      "arm": "previous",
+      "trial": 1,
+      "file": "corpus/src/accuracy/discount.ts",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: Row permits an absent discount, which is dereferenced without a guard.",
+      "pattern": "null_reference",
+      "line": 3,
+      "cliScore": 0.85,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 266,
+      "evidence": {
+        "score": 0.7675,
+        "confidence": 0.22
+      },
+      "impact": {
+        "score": 0.48,
+        "confidence": 0.92
+      },
+      "priority": 0.36839999999999995,
+      "usage": {
+        "inputTokens": 714,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 1
+    },
+    {
+      "id": "previous#1/corpus/src/accuracy/late-member.ts",
+      "arm": "previous",
+      "trial": 1,
+      "file": "corpus/src/accuracy/late-member.ts",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: The directory Map starts empty; get returns undefined for a missing id, then displayName dereferences name.",
+      "pattern": "null_reference",
+      "line": 3,
+      "cliScore": 0.8,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 445,
+      "evidence": {
+        "score": 0.805,
+        "confidence": 0.35
+      },
+      "impact": {
+        "score": 0.4975,
+        "confidence": 0.95
+      },
+      "priority": 0.4004875,
+      "usage": {
+        "inputTokens": 775,
+        "outputTokens": 36
+      },
+      "truncated": "Imported definitions are excerpted.",
+      "calleeCount": 1
+    },
+    {
+      "id": "previous#1/corpus/src/lib/dateWindow.js",
+      "arm": "previous",
+      "trial": 1,
+      "file": "corpus/src/lib/dateWindow.js",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: Loop bound is <= days, so every window contains one extra day.",
+      "pattern": "off_by_one",
+      "line": 7,
+      "cliScore": 0.85,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 293,
+      "evidence": {
+        "score": 0.5675,
+        "confidence": 0.16
+      },
+      "impact": {
+        "score": 0.24,
+        "confidence": 0.95
+      },
+      "priority": 0.1362,
+      "usage": {
+        "inputTokens": 841,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "previous#1/corpus/src/lib/retry.js",
+      "arm": "previous",
+      "trial": 1,
+      "file": "corpus/src/lib/retry.js",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: The final attempt's rejection is swallowed, so retry resolves undefined instead of throwing.",
+      "pattern": "other",
+      "line": 11,
+      "cliScore": 0.9,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 278,
+      "evidence": {
+        "score": 0.945,
+        "confidence": 0.82
+      },
+      "impact": {
+        "score": 0.3275,
+        "confidence": 0.65
+      },
+      "priority": 0.30948749999999997,
+      "usage": {
+        "inputTokens": 784,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "previous#1/corpus/src/models/cartTotals.js",
+      "arm": "previous",
+      "trial": 1,
+      "file": "corpus/src/models/cartTotals.js",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: discount is optional on the row but dereferenced unguarded, throwing for carts with no coupon.",
+      "pattern": "null_reference",
+      "line": 6,
+      "cliScore": 0.8,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 523,
+      "evidence": {
+        "score": 0.8775,
+        "confidence": 0.59
+      },
+      "impact": {
+        "score": 0.49,
+        "confidence": 0.91
+      },
+      "priority": 0.42997499999999994,
+      "usage": {
+        "inputTokens": 783,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "previous#1/corpus/src/services/inventoryService.js",
+      "arm": "previous",
+      "trial": 1,
+      "file": "corpus/src/services/inventoryService.js",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: await inside forEach is not awaited, so reserve() returns before any stock is decremented.",
+      "pattern": "async_misuse",
+      "line": 28,
+      "cliScore": 0.9,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 464,
+      "evidence": {
+        "score": 0.9225,
+        "confidence": 0.74
+      },
+      "impact": {
+        "score": 0.48,
+        "confidence": 0.75
+      },
+      "priority": 0.44279999999999997,
+      "usage": {
+        "inputTokens": 1949,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "previous#1/corpus/src/services/orderService.js",
+      "arm": "previous",
+      "trial": 1,
+      "file": "corpus/src/services/orderService.js",
+      "kind": "clean",
+      "stratum": "below-cut",
+      "correct": false,
+      "basis": "answer key only; finding did not reach the actionable cut",
+      "pattern": "other",
+      "line": 26,
+      "cliScore": 0.55,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 367,
+      "evidence": {
+        "score": 0.9275,
+        "confidence": 0.76
+      },
+      "impact": {
+        "score": 0.245,
+        "confidence": 0.95
+      },
+      "priority": 0.22723749999999998,
+      "usage": {
+        "inputTokens": 4169,
+        "outputTokens": 36
+      },
+      "truncated": "verdict covers 258 of 296 lines in selected excerpts; omitted code was not reviewed",
+      "calleeCount": 0
+    },
+    {
+      "id": "previous#1/corpus/src/services/pricingService.js",
+      "arm": "previous",
+      "trial": 1,
+      "file": "corpus/src/services/pricingService.js",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: Tier loop reads tiers[i + 1] without bounding i, so the last tier dereferences undefined.",
+      "pattern": "off_by_one",
+      "line": 36,
+      "cliScore": 0.9,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 445,
+      "evidence": {
+        "score": 0.825,
+        "confidence": 0.42
+      },
+      "impact": {
+        "score": 0.5,
+        "confidence": 0.92
+      },
+      "priority": 0.4125,
+      "usage": {
+        "inputTokens": 2373,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "previous#1/corpus/src/workers/reconciliationWorker.js",
+      "arm": "previous",
+      "trial": 1,
+      "file": "corpus/src/workers/reconciliationWorker.js",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: Balance is read before the awaits and written back after, so concurrent ticks lose updates.",
+      "pattern": "race_condition",
+      "line": 28,
+      "cliScore": 0.72,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 397,
+      "evidence": {
+        "score": 0.6825,
+        "confidence": 0.44
+      },
+      "impact": {
+        "score": 0.5675,
+        "confidence": 0.52
+      },
+      "priority": 0.38731875,
+      "usage": {
+        "inputTokens": 1928,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "previous#2/corpus-ts/src/api/order.controller.ts",
+      "arm": "previous",
+      "trial": 2,
+      "file": "corpus-ts/src/api/order.controller.ts",
+      "kind": "clean",
+      "stratum": "judged",
+      "correct": false,
+      "basis": "False alarm on a clean control. Infers order.lines may be undefined from the optional chaining in lines(), but OrderDto is imported from ../lib/types, which is not in the corpus, so the premise is unverifiable from available source.",
+      "pattern": "null_reference",
+      "line": 49,
+      "cliScore": 0.72,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 619,
+      "evidence": {
+        "score": 0.4475,
+        "confidence": 0.27
+      },
+      "impact": {
+        "score": 0.48,
+        "confidence": 0.9
+      },
+      "priority": 0.2148,
+      "usage": {
+        "inputTokens": 1223,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "previous#2/corpus-ts/src/lib/paginate.mts",
+      "arm": "previous",
+      "trial": 2,
+      "file": "corpus-ts/src/lib/paginate.mts",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: The loop bound is <= lastPage, so pageBounds returns one more page than the documented ceil(total / pageSize), and the extra page is empty.",
+      "pattern": "off_by_one",
+      "line": 23,
+      "cliScore": 0.92,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 456,
+      "evidence": {
+        "score": 0.9325,
+        "confidence": 0.77
+      },
+      "impact": {
+        "score": 0.2475,
+        "confidence": 0.98
+      },
+      "priority": 0.23079375,
+      "usage": {
+        "inputTokens": 1014,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "previous#2/corpus-ts/src/models/cart.model.ts",
+      "arm": "previous",
+      "trial": 2,
+      "file": "corpus-ts/src/models/cart.model.ts",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: discount is declared optional on CartRow and dereferenced without a guard, while the equally optional lines is guarded one line above.",
+      "pattern": "null_reference",
+      "line": 28,
+      "cliScore": 0.9,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 293,
+      "evidence": {
+        "score": 0.9175,
+        "confidence": 0.72
+      },
+      "impact": {
+        "score": 0.4825,
+        "confidence": 0.91
+      },
+      "priority": 0.44269375,
+      "usage": {
+        "inputTokens": 924,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "previous#2/corpus-ts/src/models/invoice.entity.ts",
+      "arm": "previous",
+      "trial": 2,
+      "file": "corpus-ts/src/models/invoice.entity.ts",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: settledAt is a nullable TypeORM column, so an unsettled row loads as null rather than undefined, and isSettled() returns true for every unsettled invoice.",
+      "pattern": "other",
+      "line": 28,
+      "cliScore": 0.75,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 292,
+      "evidence": {
+        "score": 0.34,
+        "confidence": 0.51
+      },
+      "impact": {
+        "score": 0.245,
+        "confidence": 0.93
+      },
+      "priority": 0.0833,
+      "usage": {
+        "inputTokens": 1026,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "previous#2/corpus-ts/src/services/cache.service.ts",
+      "arm": "previous",
+      "trial": 2,
+      "file": "corpus-ts/src/services/cache.service.ts",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: The sweep interval started in the constructor is never cleared on destroy, so the timer keeps the process alive after shutdown.",
+      "pattern": "resource_leak",
+      "line": 23,
+      "cliScore": 0.8,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 339,
+      "evidence": {
+        "score": 0.8875,
+        "confidence": 0.62
+      },
+      "impact": {
+        "score": 0.2975,
+        "confidence": 0.01
+      },
+      "priority": 0.26403125,
+      "usage": {
+        "inputTokens": 1203,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "previous#2/corpus-ts/src/services/supplier.service.ts",
+      "arm": "previous",
+      "trial": 2,
+      "file": "corpus-ts/src/services/supplier.service.ts",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: eligible() returns the inactive suppliers, the exact opposite of what its documentation and name promise. No exception is thrown; the caller sends purchase orders to suspended suppliers.",
+      "pattern": "other",
+      "line": 15,
+      "cliScore": 0.95,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 306,
+      "evidence": {
+        "score": 0.74,
+        "confidence": 0.13
+      },
+      "impact": {
+        "score": 0.35,
+        "confidence": 0.61
+      },
+      "priority": 0.259,
+      "usage": {
+        "inputTokens": 973,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "previous#2/corpus-ts/src/services/sync.service.ts",
+      "arm": "previous",
+      "trial": 2,
+      "file": "corpus-ts/src/services/sync.service.ts",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: modifiedSince filters on createdAt instead of updatedAt, so an incremental sync silently skips every record that was edited after it was created.",
+      "pattern": "other",
+      "line": 16,
+      "cliScore": 0.78,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 397,
+      "evidence": {
+        "score": 0.62,
+        "confidence": 0.22
+      },
+      "impact": {
+        "score": 0.3975,
+        "confidence": 0.47
+      },
+      "priority": 0.24645,
+      "usage": {
+        "inputTokens": 988,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "previous#2/corpus/src/accuracy/discount.ts",
+      "arm": "previous",
+      "trial": 2,
+      "file": "corpus/src/accuracy/discount.ts",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: Row permits an absent discount, which is dereferenced without a guard.",
+      "pattern": "null_reference",
+      "line": 3,
+      "cliScore": 0.9,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 364,
+      "evidence": {
+        "score": 0.7525,
+        "confidence": 0.18
+      },
+      "impact": {
+        "score": 0.4775,
+        "confidence": 0.9
+      },
+      "priority": 0.35931874999999996,
+      "usage": {
+        "inputTokens": 710,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 1
+    },
+    {
+      "id": "previous#2/corpus/src/accuracy/forwarded-coupon.ts",
+      "arm": "previous",
+      "trial": 2,
+      "file": "corpus/src/accuracy/forwarded-coupon.ts",
+      "kind": "buggy",
+      "stratum": "below-cut",
+      "correct": true,
+      "basis": "answer key only; finding did not reach the actionable cut",
+      "pattern": "null_reference",
+      "line": 3,
+      "cliScore": 0.3,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 377,
+      "evidence": {
+        "score": 0.5225,
+        "confidence": 0.08
+      },
+      "impact": {
+        "score": 0.465,
+        "confidence": 0.84
+      },
+      "priority": 0.2429625,
+      "usage": {
+        "inputTokens": 741,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 1
+    },
+    {
+      "id": "previous#2/corpus/src/accuracy/late-member.ts",
+      "arm": "previous",
+      "trial": 2,
+      "file": "corpus/src/accuracy/late-member.ts",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: The directory Map starts empty; get returns undefined for a missing id, then displayName dereferences name.",
+      "pattern": "null_reference",
+      "line": 3,
+      "cliScore": 0.85,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 259,
+      "evidence": {
+        "score": 0.78,
+        "confidence": 0.27
+      },
+      "impact": {
+        "score": 0.4975,
+        "confidence": 0.96
+      },
+      "priority": 0.38805,
+      "usage": {
+        "inputTokens": 772,
+        "outputTokens": 36
+      },
+      "truncated": "Imported definitions are excerpted.",
+      "calleeCount": 1
+    },
+    {
+      "id": "previous#2/corpus/src/api/adminController.js",
+      "arm": "previous",
+      "trial": 2,
+      "file": "corpus/src/api/adminController.js",
+      "kind": "clean",
+      "stratum": "below-cut",
+      "correct": false,
+      "basis": "answer key only; finding did not reach the actionable cut",
+      "pattern": "other",
+      "line": 14,
+      "cliScore": 0.55,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 309,
+      "evidence": {
+        "score": 0.775,
+        "confidence": 0.25
+      },
+      "impact": {
+        "score": 0.4575,
+        "confidence": 0.7
+      },
+      "priority": 0.3545625,
+      "usage": {
+        "inputTokens": 4239,
+        "outputTokens": 36
+      },
+      "truncated": "verdict covers 248 of 373 lines in selected excerpts; omitted code was not reviewed",
+      "calleeCount": 0
+    },
+    {
+      "id": "previous#2/corpus/src/lib/dateWindow.js",
+      "arm": "previous",
+      "trial": 2,
+      "file": "corpus/src/lib/dateWindow.js",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: Loop bound is <= days, so every window contains one extra day.",
+      "pattern": "off_by_one",
+      "line": 7,
+      "cliScore": 0.85,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 282,
+      "evidence": {
+        "score": 0.585,
+        "confidence": 0
+      },
+      "impact": {
+        "score": 0.2425,
+        "confidence": 0.96
+      },
+      "priority": 0.14186249999999997,
+      "usage": {
+        "inputTokens": 833,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "previous#2/corpus/src/lib/retry.js",
+      "arm": "previous",
+      "trial": 2,
+      "file": "corpus/src/lib/retry.js",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: The final attempt's rejection is swallowed, so retry resolves undefined instead of throwing.",
+      "pattern": "other",
+      "line": 11,
+      "cliScore": 0.9,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 264,
+      "evidence": {
+        "score": 0.95,
+        "confidence": 0.83
+      },
+      "impact": {
+        "score": 0.3325,
+        "confidence": 0.63
+      },
+      "priority": 0.315875,
+      "usage": {
+        "inputTokens": 785,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "previous#2/corpus/src/models/cartTotals.js",
+      "arm": "previous",
+      "trial": 2,
+      "file": "corpus/src/models/cartTotals.js",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: discount is optional on the row but dereferenced unguarded, throwing for carts with no coupon.",
+      "pattern": "null_reference",
+      "line": 6,
+      "cliScore": 0.82,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 287,
+      "evidence": {
+        "score": 0.87,
+        "confidence": 0.56
+      },
+      "impact": {
+        "score": 0.49,
+        "confidence": 0.92
+      },
+      "priority": 0.4263,
+      "usage": {
+        "inputTokens": 780,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "previous#2/corpus/src/services/inventoryService.js",
+      "arm": "previous",
+      "trial": 2,
+      "file": "corpus/src/services/inventoryService.js",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: await inside forEach is not awaited, so reserve() returns before any stock is decremented.",
+      "pattern": "async_misuse",
+      "line": 28,
+      "cliScore": 0.88,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 345,
+      "evidence": {
+        "score": 0.895,
+        "confidence": 0.65
+      },
+      "impact": {
+        "score": 0.475,
+        "confidence": 0.78
+      },
+      "priority": 0.425125,
+      "usage": {
+        "inputTokens": 1950,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "previous#2/corpus/src/services/orderService.js",
+      "arm": "previous",
+      "trial": 2,
+      "file": "corpus/src/services/orderService.js",
+      "kind": "clean",
+      "stratum": "judged",
+      "correct": false,
+      "basis": "False alarm on a clean control. Claims the resolve block re-applies rounding after fetch; the two options are applied sequentially by design across all eleven near-identical methods, and no documented contract makes the combination wrong. Not a demonstrated runtime defect.",
+      "pattern": "other",
+      "line": 26,
+      "cliScore": 0.72,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 285,
+      "evidence": {
+        "score": 0.855,
+        "confidence": 0.52
+      },
+      "impact": {
+        "score": 0.24,
+        "confidence": 0.94
+      },
+      "priority": 0.2052,
+      "usage": {
+        "inputTokens": 4175,
+        "outputTokens": 36
+      },
+      "truncated": "verdict covers 258 of 296 lines in selected excerpts; omitted code was not reviewed",
+      "calleeCount": 0
+    },
+    {
+      "id": "previous#2/corpus/src/services/pricingService.js",
+      "arm": "previous",
+      "trial": 2,
+      "file": "corpus/src/services/pricingService.js",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: Tier loop reads tiers[i + 1] without bounding i, so the last tier dereferences undefined.",
+      "pattern": "off_by_one",
+      "line": 36,
+      "cliScore": 0.88,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 268,
+      "evidence": {
+        "score": 0.86,
+        "confidence": 0.54
+      },
+      "impact": {
+        "score": 0.505,
+        "confidence": 0.92
+      },
+      "priority": 0.4343,
+      "usage": {
+        "inputTokens": 2382,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "previous#2/corpus/src/workers/reconciliationWorker.js",
+      "arm": "previous",
+      "trial": 2,
+      "file": "corpus/src/workers/reconciliationWorker.js",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: Balance is read before the awaits and written back after, so concurrent ticks lose updates.",
+      "pattern": "race_condition",
+      "line": 28,
+      "cliScore": 0.75,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 376,
+      "evidence": {
+        "score": 0.7175,
+        "confidence": 0.46
+      },
+      "impact": {
+        "score": 0.585,
+        "confidence": 0.45
+      },
+      "priority": 0.4197375,
+      "usage": {
+        "inputTokens": 1943,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "previous#3/corpus-ts/src/lib/paginate.mts",
+      "arm": "previous",
+      "trial": 3,
+      "file": "corpus-ts/src/lib/paginate.mts",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: The loop bound is <= lastPage, so pageBounds returns one more page than the documented ceil(total / pageSize), and the extra page is empty.",
+      "pattern": "off_by_one",
+      "line": 23,
+      "cliScore": 0.93,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 609,
+      "evidence": {
+        "score": 0.8625,
+        "confidence": 0.54
+      },
+      "impact": {
+        "score": 0.2475,
+        "confidence": 0.97
+      },
+      "priority": 0.21346875,
+      "usage": {
+        "inputTokens": 995,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "previous#3/corpus-ts/src/models/cart.model.ts",
+      "arm": "previous",
+      "trial": 3,
+      "file": "corpus-ts/src/models/cart.model.ts",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: discount is declared optional on CartRow and dereferenced without a guard, while the equally optional lines is guarded one line above.",
+      "pattern": "null_reference",
+      "line": 28,
+      "cliScore": 0.9,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 315,
+      "evidence": {
+        "score": 0.8975,
+        "confidence": 0.66
+      },
+      "impact": {
+        "score": 0.485,
+        "confidence": 0.91
+      },
+      "priority": 0.4352875,
+      "usage": {
+        "inputTokens": 918,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "previous#3/corpus-ts/src/models/invoice.entity.ts",
+      "arm": "previous",
+      "trial": 3,
+      "file": "corpus-ts/src/models/invoice.entity.ts",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: settledAt is a nullable TypeORM column, so an unsettled row loads as null rather than undefined, and isSettled() returns true for every unsettled invoice.",
+      "pattern": "other",
+      "line": 28,
+      "cliScore": 0.75,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 396,
+      "evidence": {
+        "score": 0.495,
+        "confidence": 0.14
+      },
+      "impact": {
+        "score": 0.2525,
+        "confidence": 0.96
+      },
+      "priority": 0.1249875,
+      "usage": {
+        "inputTokens": 1020,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "previous#3/corpus-ts/src/services/cache.service.ts",
+      "arm": "previous",
+      "trial": 3,
+      "file": "corpus-ts/src/services/cache.service.ts",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: The sweep interval started in the constructor is never cleared on destroy, so the timer keeps the process alive after shutdown.",
+      "pattern": "resource_leak",
+      "line": 23,
+      "cliScore": 0.82,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 429,
+      "evidence": {
+        "score": 0.7825,
+        "confidence": 0.28
+      },
+      "impact": {
+        "score": 0.2425,
+        "confidence": 0.19
+      },
+      "priority": 0.18975625,
+      "usage": {
+        "inputTokens": 1207,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "previous#3/corpus-ts/src/services/supplier.service.ts",
+      "arm": "previous",
+      "trial": 3,
+      "file": "corpus-ts/src/services/supplier.service.ts",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: eligible() returns the inactive suppliers, the exact opposite of what its documentation and name promise. No exception is thrown; the caller sends purchase orders to suspended suppliers.",
+      "pattern": "other",
+      "line": 15,
+      "cliScore": 0.95,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 284,
+      "evidence": {
+        "score": 0.7,
+        "confidence": 0
+      },
+      "impact": {
+        "score": 0.34,
+        "confidence": 0.63
+      },
+      "priority": 0.238,
+      "usage": {
+        "inputTokens": 976,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "previous#3/corpus-ts/src/services/sync.service.ts",
+      "arm": "previous",
+      "trial": 3,
+      "file": "corpus-ts/src/services/sync.service.ts",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: modifiedSince filters on createdAt instead of updatedAt, so an incremental sync silently skips every record that was edited after it was created.",
+      "pattern": "other",
+      "line": 16,
+      "cliScore": 0.78,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 309,
+      "evidence": {
+        "score": 0.585,
+        "confidence": 0
+      },
+      "impact": {
+        "score": 0.3675,
+        "confidence": 0.57
+      },
+      "priority": 0.21498749999999997,
+      "usage": {
+        "inputTokens": 987,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "previous#3/corpus/src/accuracy/discount.ts",
+      "arm": "previous",
+      "trial": 3,
+      "file": "corpus/src/accuracy/discount.ts",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: Row permits an absent discount, which is dereferenced without a guard.",
+      "pattern": "null_reference",
+      "line": 3,
+      "cliScore": 0.88,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 595,
+      "evidence": {
+        "score": 0.6675,
+        "confidence": 0
+      },
+      "impact": {
+        "score": 0.485,
+        "confidence": 0.92
+      },
+      "priority": 0.32373749999999996,
+      "usage": {
+        "inputTokens": 709,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 1
+    },
+    {
+      "id": "previous#3/corpus/src/accuracy/forwarded-coupon.ts",
+      "arm": "previous",
+      "trial": 3,
+      "file": "corpus/src/accuracy/forwarded-coupon.ts",
+      "kind": "buggy",
+      "stratum": "below-cut",
+      "correct": true,
+      "basis": "answer key only; finding did not reach the actionable cut",
+      "pattern": "null_reference",
+      "line": 3,
+      "cliScore": 0.5,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 373,
+      "evidence": {
+        "score": 0.6875,
+        "confidence": 0
+      },
+      "impact": {
+        "score": 0.48,
+        "confidence": 0.9
+      },
+      "priority": 0.32999999999999996,
+      "usage": {
+        "inputTokens": 748,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 1
+    },
+    {
+      "id": "previous#3/corpus/src/accuracy/late-member.ts",
+      "arm": "previous",
+      "trial": 3,
+      "file": "corpus/src/accuracy/late-member.ts",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: The directory Map starts empty; get returns undefined for a missing id, then displayName dereferences name.",
+      "pattern": "null_reference",
+      "line": 3,
+      "cliScore": 0.85,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 553,
+      "evidence": {
+        "score": 0.7725,
+        "confidence": 0.24
+      },
+      "impact": {
+        "score": 0.495,
+        "confidence": 0.96
+      },
+      "priority": 0.3823875,
+      "usage": {
+        "inputTokens": 776,
+        "outputTokens": 36
+      },
+      "truncated": "Imported definitions are excerpted.",
+      "calleeCount": 1
+    },
+    {
+      "id": "previous#3/corpus/src/lib/dateWindow.js",
+      "arm": "previous",
+      "trial": 3,
+      "file": "corpus/src/lib/dateWindow.js",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: Loop bound is <= days, so every window contains one extra day.",
+      "pattern": "off_by_one",
+      "line": 7,
+      "cliScore": 0.85,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 356,
+      "evidence": {
+        "score": 0.595,
+        "confidence": 0
+      },
+      "impact": {
+        "score": 0.24,
+        "confidence": 0.95
+      },
+      "priority": 0.14279999999999998,
+      "usage": {
+        "inputTokens": 841,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "previous#3/corpus/src/lib/retry.js",
+      "arm": "previous",
+      "trial": 3,
+      "file": "corpus/src/lib/retry.js",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: The final attempt's rejection is swallowed, so retry resolves undefined instead of throwing.",
+      "pattern": "other",
+      "line": 11,
+      "cliScore": 0.9,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 281,
+      "evidence": {
+        "score": 0.9425,
+        "confidence": 0.81
+      },
+      "impact": {
+        "score": 0.315,
+        "confidence": 0.66
+      },
+      "priority": 0.2968875,
+      "usage": {
+        "inputTokens": 785,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "previous#3/corpus/src/models/cartTotals.js",
+      "arm": "previous",
+      "trial": 3,
+      "file": "corpus/src/models/cartTotals.js",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: discount is optional on the row but dereferenced unguarded, throwing for carts with no coupon.",
+      "pattern": "null_reference",
+      "line": 6,
+      "cliScore": 0.83,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 461,
+      "evidence": {
+        "score": 0.895,
+        "confidence": 0.65
+      },
+      "impact": {
+        "score": 0.4925,
+        "confidence": 0.91
+      },
+      "priority": 0.4407875,
+      "usage": {
+        "inputTokens": 780,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "previous#3/corpus/src/services/inventoryService.js",
+      "arm": "previous",
+      "trial": 3,
+      "file": "corpus/src/services/inventoryService.js",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: await inside forEach is not awaited, so reserve() returns before any stock is decremented.",
+      "pattern": "async_misuse",
+      "line": 28,
+      "cliScore": 0.9,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 257,
+      "evidence": {
+        "score": 0.91,
+        "confidence": 0.7
+      },
+      "impact": {
+        "score": 0.5025,
+        "confidence": 0.8
+      },
+      "priority": 0.457275,
+      "usage": {
+        "inputTokens": 1958,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "previous#3/corpus/src/services/orderService.js",
+      "arm": "previous",
+      "trial": 3,
+      "file": "corpus/src/services/orderService.js",
+      "kind": "clean",
+      "stratum": "judged",
+      "correct": false,
+      "basis": "False alarm on a clean control. Claims the resolve block re-rounds after a strict fetch floor; the two options are applied sequentially by design across all eleven near-identical methods, and no documented contract makes the combination wrong. Not a demonstrated runtime defect.",
+      "pattern": "other",
+      "line": 26,
+      "cliScore": 0.75,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 329,
+      "evidence": {
+        "score": 0.7975,
+        "confidence": 0.33
+      },
+      "impact": {
+        "score": 0.2375,
+        "confidence": 0.93
+      },
+      "priority": 0.18940625,
+      "usage": {
+        "inputTokens": 4180,
+        "outputTokens": 36
+      },
+      "truncated": "verdict covers 258 of 296 lines in selected excerpts; omitted code was not reviewed",
+      "calleeCount": 0
+    },
+    {
+      "id": "previous#3/corpus/src/services/pricingService.js",
+      "arm": "previous",
+      "trial": 3,
+      "file": "corpus/src/services/pricingService.js",
+      "kind": "buggy",
+      "stratum": "judged",
+      "correct": true,
+      "basis": "Reported cause matches the planted defect: Tier loop reads tiers[i + 1] without bounding i, so the last tier dereferences undefined.",
+      "pattern": "off_by_one",
+      "line": 36,
+      "cliScore": 0.88,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 288,
+      "evidence": {
+        "score": 0.7975,
+        "confidence": 0.33
+      },
+      "impact": {
+        "score": 0.495,
+        "confidence": 0.92
+      },
+      "priority": 0.3947625,
+      "usage": {
+        "inputTokens": 2374,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    },
+    {
+      "id": "previous#3/corpus/src/workers/reconciliationWorker.js",
+      "arm": "previous",
+      "trial": 3,
+      "file": "corpus/src/workers/reconciliationWorker.js",
+      "kind": "buggy",
+      "stratum": "below-cut",
+      "correct": true,
+      "basis": "answer key only; finding did not reach the actionable cut",
+      "pattern": "race_condition",
+      "line": 13,
+      "cliScore": 0.6,
+      "status": "scored",
+      "reason": null,
+      "wallMs": 266,
+      "evidence": {
+        "score": 0.76,
+        "confidence": 0.46
+      },
+      "impact": {
+        "score": 0.6325,
+        "confidence": 0.6
+      },
+      "priority": 0.48069999999999996,
+      "usage": {
+        "inputTokens": 1918,
+        "outputTokens": 36
+      },
+      "truncated": null,
+      "calleeCount": 0
+    }
+  ],
+  "updatedAt": "2026-09-18T15:41:16.771Z"
+}

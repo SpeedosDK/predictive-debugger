@@ -6,6 +6,20 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- Optional Typesafe Jev scoring for existing predictions, with separate evidence,
+  impact, confidence and review ranking. MCP opts in with `jev: true`; VS Code
+  provides connect/disconnect commands backed by SecretStorage. Normal predictions
+  still work without Jev, and unavailable scoring preserves the original verdict.
+  Scoring adds one paid Typesafe request per eligible file, bounded without retries.
+  Not merged to a release: measured against the score `predict_failures` already
+  produces for free, Jev's ranking is worse (AUC 0.837 against 0.949) and blending
+  the two is worse than the free score alone. Parked on `feat/typesafe-jev` for
+  re-evaluation. See [setup](docs/jev.md) and [measurements](bench/RESULTS-jev.md).
+- Typesafe keys are excluded from child-process environments. Jev uses a fixed
+  HTTPS endpoint, refuses redirects and returns sanitized failure categories.
+
 ## [0.8.1] - 2026-09-10
 
 ### Changed

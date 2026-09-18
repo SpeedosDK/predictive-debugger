@@ -94,3 +94,98 @@ estimates, but use tokens for the published comparison. These development cases
 informed the tool and do not measure held-out accuracy on arbitrary projects.
 
 [Dependency improvements and local measurements](DEPENDENCY-IMPROVEMENTS.md)
+
+## Jev ranking (separate experiment, not a release comparison)
+
+Jev attaches a ranking and leaves `score`, `combinedScore`, `actionable` and finding
+order unchanged, so it cannot move the detection or false-alarm counts above. Rerunning
+`workflows.mjs` with and without it returns the same counts twice and bills for both.
+The measurable question is whether its rubric scores order correct findings above wrong
+ones, which `jev-discrimination.mjs` answers by replaying the findings already recorded
+in `results-v072-full.json` rather than running fresh sessions. No CLI tokens are spent;
+only Jev varies between that experiment and this one.
+
+Typesafe's own API is invite-only. OpenRouter resells the same model as
+`typesafe/jev-1.13`, and that is the reachable path. Note that the model does not appear
+in OpenRouter's `/api/v1/models` listing -- its modality is `text->decisions` -- and it is
+served at `/api/alpha/decisions` rather than chat/completions, which answers with a 400
+naming the correct endpoint. `jev-openrouter-transport.mjs` swaps only the transport, so
+the shipped `createJevReviewer` still builds, caps and validates every request.
+
+```powershell
+npm run compile
+node bench/jev-discrimination.mjs --dry-run                   # plumbing check, no key, no spend
+node bench/jev-discrimination.mjs --scorer=openrouter         # Jev via OpenRouter, needs sk-or-... credits
+node bench/jev-discrimination.mjs --scorer=jev                # Jev via Typesafe directly, needs an invite key
+node bench/jev-report.mjs --input=results-jev-openrouter.json # re-report completed data
+```
+
+Jev is scored against the ordering `predict_failures` already produces for free, which is
+what "not using Jev" actually means. See [RESULTS-jev.md](RESULTS-jev.md).
+
+Each replayed finding is bound to the recorded `sourceHash`, and the working-tree corpus
+must still match it: scoring a finding against drifted source measures nothing. Findings
+that reached the agent as a defect carry a hash-bound judgment and form the primary
+stratum; findings the tool produced below the actionable cut are labelled from the answer
+key alone and reported separately, because the corpus saying a file is clean is weaker
+evidence about one finding than a reviewer who read it.
+
+The pool this corpus yields is 92 correct findings against 3 wrong ones, plus 6 below the
+cut. That is enough to measure Jev's token cost and to see the shape of its score
+distribution, and it is **not** enough to establish discrimination: one reclassification
+moves the AUC by about a third. A confident ranking claim needs an answer key extended
+with cases the current build actually gets wrong. The report prints this caveat whenever
+a class has fewer than ten members.
+
+`--dry-run` answers from a fixture derived from the CLI's own score. It verifies the
+harness, labelling and report; its numbers are never a result about Jev.
+
+### Adversarial cases
+
+The pool above is 92 correct findings against 3 wrong ones, which cannot measure ranking:
+one reclassification swings the AUC by a third. `adversarial-cases.mjs` adds 20 files to
+the existing corpus — extending the answer key rather than starting a second one, so
+results stay comparable with everything already in `RESULTS.md`.
+
+Fourteen are controls that match a bug shape the detector knows and are safe anyway, with
+the invariant that proves it visible in the same file. That last part is deliberate: a
+control whose safety depends on code Jev never sees would measure context limits rather
+than judgment, and the evidence rubric's lowest levels ("contradicts", "assumptions not
+established by the shown source") are only answerable when the proof is in scope. A
+finding on one of these is a false alarm, which is the negative class the ranking test
+needs.
+
+Six are real defects wearing innocuous shapes. They exist to catch the opposite failure:
+a scorer that scores well on controls by disbelieving every finding equally.
+
+`adversarial-cases.test.mjs` executes all twenty. Every other label in this corpus is a
+human claim about source; these are the cases where a mislabelled control would corrupt
+the measurement in the one direction the experiment cannot self-detect, so where the
+defect is observable at runtime the test observes it.
+
+```powershell
+node bench/generate-corpus.mjs          # writes the cases and the manifest section
+node --test bench/adversarial-cases.test.mjs
+node bench/adversarial-run.mjs --env-file=.env
+node bench/adversarial-report.mjs       # re-report without model calls
+```
+
+`adversarial-run.mjs` takes one detector call per file and scores its findings with Jev in
+the same pass, so the verdict and the ranking come from one source snapshot. The report
+counts a finding whenever the model names a pattern, and reports separately whether it
+cleared the actionable cut — a scorer shown only actionable findings is being asked an
+easier question than a user experiences.
+
+These cases are adversarial by construction and say nothing about held-out accuracy.
+
+Results are in [RESULTS-jev.md](RESULTS-jev.md), regenerated by `node bench/jev-results.mjs`
+from the three saved experiments. Edit that generator, not the page.
+
+Every arm uses the same model as the rest of this benchmark. Swapping in a weaker detector
+to manufacture false alarms was tried and discarded: it produces a negative class, but the
+result is no longer comparable with anything in `RESULTS.md`, which is the whole point of
+extending the existing corpus rather than starting a new one.
+
+The comparison that matters is against the free baseline. "Not using Jev" does not mean
+presenting findings unordered -- it means ordering them by the score the tool already
+produces at no extra cost, so that is what Jev is scored against rather than against chance.
