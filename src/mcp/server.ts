@@ -13,6 +13,7 @@ import {
     predictionStatus
 } from "../core/prediction/confidence";
 import { predictFile } from "../core/prediction/predictFile";
+import { createJevReviewer } from "../core/prediction/jev";
 import { DEFAULT_CONCURRENCY, predictFiles } from "../core/prediction/predictFiles";
 import { collectSourceFiles, isTestFile } from "../core/sourceFiles";
 import { FilePrediction } from "../core/types";
@@ -312,6 +313,7 @@ function predictionBody(
         checked: checked ?? [],
         combinedScore: round(result.combinedScore),
         staticRisk: round(result.riskScore),
+        ...(result.jev ? { jev: result.jev } : {}),
         ...(truncated ? { truncated } : {}),
         ...(options.verbose ? { metrics: result.metrics, logs: result.logs } : {}),
         ...(!options.verbose && options.logFile ? { logAnomalies: result.logs.anomalyCount } : {})
@@ -402,6 +404,11 @@ server.registerTool(
                         "Experimental: the precision gate was measured on one-finding " +
                         "replies, so `actionable` is less well characterised here."
                 ),
+            jev: z.boolean().optional().describe(
+                "Opt in to paid Typesafe Jev evidence/impact scoring of findings (default false). " +
+                "Sends bounded source and imported context to Typesafe; requires TYPESAFE_API_KEY in the server environment. " +
+                "Returns a separate ranking without changing the original verdict. Never pass the key as a tool argument."
+            ),
             logFile: z
                 .string()
                 .optional()
@@ -414,7 +421,7 @@ server.registerTool(
                 )
         }
     },
-    async ({ file, files, concurrency, provider, model, logFile, verbose, calleeContext, multi }) => {
+    async ({ file, files, concurrency, provider, model, logFile, verbose, calleeContext, multi, jev }, extra) => {
         const batched = Boolean(files && files.length > 0);
         const requested = batched ? files! : file ? [file] : [];
         if (requested.length === 0) {
@@ -441,6 +448,8 @@ server.registerTool(
                 model,
                 calleeContext,
                 multi,
+                signal: extra.signal,
+                jev: jev ? createJevReviewer({ apiKey: process.env.TYPESAFE_API_KEY }) : undefined,
                 logs: logFile ? { logPath: path.resolve(logFile) } : undefined
             };
 

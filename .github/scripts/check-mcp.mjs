@@ -52,6 +52,10 @@ try {
     // on the advertised schema rather than by calling the tool, which would need
     // the credentials CI does not have.
     const predict = tools.find((t) => t.name === "predict_failures");
+    assert.equal(predict.inputSchema?.properties?.jev?.type, "boolean");
+    assert.ok(!predict.inputSchema.required?.includes("jev"));
+    assert.ok(!Object.keys(predict.inputSchema.properties).some(key => /api.?key|token|secret/i.test(key)),
+        "credentials must not be MCP tool arguments");
     assert.ok(
         predict.inputSchema?.properties?.files,
         "predict_failures should accept a `files` batch"

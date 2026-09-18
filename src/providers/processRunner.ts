@@ -20,6 +20,10 @@ export interface RunOptions {
 
 const isWindows = process.platform === "win32";
 
+function childEnvironment(env: NodeJS.ProcessEnv = process.env): NodeJS.ProcessEnv {
+    return Object.fromEntries(Object.entries(env).filter(([key]) => key.toUpperCase() !== "TYPESAFE_API_KEY"));
+}
+
 /** Quote a single argument for cmd.exe when using windowsVerbatimArguments. */
 export function quoteForCmd(arg: string): string {
     // cmd.exe does not honour backslash-escaped quotes, and expands percent
@@ -62,7 +66,7 @@ export function runProcess(options: RunOptions): Promise<RunResult> {
     return new Promise((resolve, reject) => {
         const child = spawn(spawnFile, spawnArgs, {
             cwd,
-            env: env ?? process.env,
+            env: childEnvironment(env),
             windowsHide: true,
             windowsVerbatimArguments: verbatim,
             detached: !isWindows,
@@ -154,7 +158,7 @@ async function killProcessTree(pid: number): Promise<void> {
     const taskkill = path.join(process.env.SystemRoot || "C:\\Windows", "System32", "taskkill.exe");
     await new Promise<void>((resolve, reject) => {
         const killer = spawn(taskkill, ["/pid", String(pid), "/t", "/f"], {
-            windowsHide: true, stdio: "ignore"
+            windowsHide: true, stdio: "ignore", env: childEnvironment()
         });
         const timer = setTimeout(() => {
             killer.kill();

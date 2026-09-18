@@ -6,6 +6,7 @@ import { analyzeLogs, LogAnalysisOptions } from "../logs/analyzeLogs";
 import { FilePrediction, LogSignal } from "../types";
 import { predictBug } from "./predictBug";
 import { combineScores } from "./score";
+import { JevReviewer } from "./jev";
 
 export interface PredictOptions {
     provider: CliProvider;
@@ -24,6 +25,7 @@ export interface PredictOptions {
      * (default false). See `PredictBugOptions.multi` and issue #7.
      */
     multi?: boolean;
+    jev?: JevReviewer;
 }
 
 /**
@@ -81,6 +83,9 @@ async function predictWithLogs(
     });
 
     const logs = await getLogs();
+    const jev = options.jev
+        ? await options.jev({ code, callees, assessment: ai, signal: options.signal })
+        : undefined;
 
     // The headline score follows the top finding. A file's risk is set by its
     // worst demonstrable defect, not by how many the model chose to list.
@@ -96,7 +101,8 @@ async function predictWithLogs(
         riskScore: staticAnalysis.riskScore,
         ai,
         logs,
-        combinedScore
+        combinedScore,
+        ...(jev ? { jev } : {})
     };
 }
 

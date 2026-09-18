@@ -6,6 +6,7 @@ import { predictProject } from "../core/prediction/predictProject";
 import { ActiveProvider, NoProviderError, ProviderRegistry } from "../providers/registry";
 import { connectMenu, getConfiguredModel, reportCliError } from "./connectMenu";
 import { PredictionReporter, percent, summarize } from "./reporting";
+import { connectedJev, registerJevConnection } from "./jevConnection";
 
 const SUPPORTED_LANGUAGES = new Set([
     "javascript",
@@ -17,8 +18,11 @@ const SUPPORTED_LANGUAGES = new Set([
 let registry: ProviderRegistry;
 let reporter: PredictionReporter;
 let statusBar: vscode.StatusBarItem;
+let secrets: vscode.SecretStorage;
 
 export function activate(context: vscode.ExtensionContext): void {
+    secrets = context.secrets;
+    registerJevConnection(context);
     registry = new ProviderRegistry(context.globalState);
 
     const diagnostics = vscode.languages.createDiagnosticCollection("predictiveDebugger");
@@ -101,6 +105,7 @@ async function predictCurrentFile(): Promise<void> {
         active,
         async (signal) => {
             const result = await predictFile(filePath, {
+                jev: await connectedJev(secrets),
                 provider: active.provider,
                 location: active.location,
                 model: getConfiguredModel(active.provider.id),
@@ -135,6 +140,7 @@ async function predictWorkspace(): Promise<void> {
         active,
         async (signal, progress) => {
             const result = await predictProject(folder.uri.fsPath, {
+                jev: await connectedJev(secrets),
                 provider: active.provider,
                 location: active.location,
                 model: getConfiguredModel(active.provider.id),

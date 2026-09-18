@@ -17,11 +17,16 @@ and no prebuilt VSIX is distributed.
 | Command | What it does |
 | --- | --- |
 | `Predictive Debugger: Connect` | Pick a CLI and verify live access |
+| `Predictive Debugger: Connect Typesafe Jev` | Store an optional API key in SecretStorage and enable paid finding scores |
+| `Predictive Debugger: Disconnect Typesafe Jev` | Remove the key and disable scoring for new predictions |
 | `Predictive Debugger: Predict Failures in Current File` | Analyze the open file |
 | `Predictive Debugger: Predict Failures Across Project` | Analyze source files across the workspace, including tests |
 
 Results appear in the Problems panel and **Output > Predictive Debugger**.
 The extension requires a trusted workspace.
+
+[Jev scoring](jev.md) is optional. Its scores appear in Output and do not change
+which findings reach Problems.
 
 Use the **Run Extension (bug-patterns test folder)** launch configuration to
 try the project-wide command. Its development host opens a separate fixture

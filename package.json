@@ -66,6 +66,14 @@
   "contributes": {
     "commands": [
       {
+        "command": "predictiveDebugger.connectJev",
+        "title": "Predictive Debugger: Connect Typesafe Jev"
+      },
+      {
+        "command": "predictiveDebugger.disconnectJev",
+        "title": "Predictive Debugger: Disconnect Typesafe Jev"
+      },
+      {
         "command": "predictiveDebugger.connect",
         "title": "Predictive Debugger: Connect"
       },

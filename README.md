@@ -17,6 +17,9 @@ Uses the Claude Code, Codex or GitHub Copilot CLI you already have installed.
 Prediction calls use that CLI's model access and usage allowance. No separate
 API key is needed.
 
+[Optional Typesafe Jev scoring](docs/jev.md) adds evidence and impact scores to
+existing predictions using your own paid API key. It is off by default.
+
 <a id="using-it-from-an-agent-mcp"></a>
 <a id="download-and-install"></a>
 

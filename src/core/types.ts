@@ -1,3 +1,5 @@
+import type { JevReview } from "./prediction/jev";
+
 export interface FileMetrics {
     functions: number;
     longFunctions: number;
@@ -105,6 +107,7 @@ export interface FilePrediction {
     ai: BugAssessment;
     logs: LogSignal;
     combinedScore: number;
+    jev?: JevReview;
 }
 
 export interface ProjectPrediction {

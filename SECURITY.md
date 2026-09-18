@@ -18,11 +18,24 @@ dismissal.
 
 ## Security model
 
-Credentials stay with the provider CLI. Predictive Debugger stores only the
+CLI credentials stay with the provider CLI. Predictive Debugger stores only the
 selected provider id and checks whether credential files exist and are non-empty;
 it does not read their secret values. Copilot's system credential store is not
 read. The macOS Claude Keychain check and Copilot's credential-store check
 are provisional; the extension's live connection check confirms access.
+
+Optional Typesafe Jev scoring is a separate API integration. MCP reads its key
+from `TYPESAFE_API_KEY` and requires `jev: true` per call. VS Code stores a key in
+SecretStorage after an explicit masked connection prompt. There is no key in
+tool arguments or workspace settings. The key is excluded from child process
+environments, including explicit environment overrides.
+
+Jev sends bounded source, imported definitions and findings to a fixed Typesafe
+HTTPS endpoint. It rejects redirects, bounds response reads, and reports only
+local error categories. It does not log request bodies, headers, or raw remote
+errors. Source is not redacted and can itself contain secrets. Standard Typesafe
+accounts have no confirmed zero-retention guarantee. See [Jev setup and data
+handling](docs/jev.md) before enabling it.
 
 `predict_failures` sends source and bounded imported definitions and referenced
 types to the CLI's model provider. Set `calleeContext: false` to omit dependency
@@ -63,9 +76,10 @@ The parts most worth attacking:
   `reason` fields are length-capped. A crafted source file that gets the
   provider CLI to read unrelated files, run a command, or make a network
   request is in scope.
-- **Credential handling.** The project reads no secret values. It checks only
-  that a credentials file exists and is non-empty. Any path by which a token is
-  read, logged, or transmitted is in scope.
+- **Credential handling.** CLI credential files are checked only for existence
+  and non-empty content. Jev reads its explicitly configured API key and sends
+  it to Typesafe for authentication. Unintended credential reads, logging, or
+  transmission are in scope.
 - **Path handling.** The MCP tools accept absolute paths from the calling agent
   and will read any file the process can read. That is by design and is not a
   vulnerability on its own; a path that escapes an intended restriction, or

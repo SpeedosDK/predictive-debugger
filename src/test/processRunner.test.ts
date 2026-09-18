@@ -37,6 +37,13 @@ describe("quoteForCmd", () => {
 });
 
 describe("runProcess", () => {
+    it("withholds Typesafe keys from real children, including explicit environment overrides", async () => {
+        const result = await runProcess({ file: process.execPath,
+            args: ["-e", "process.stdout.write(JSON.stringify({keys:Object.keys(process.env).filter(k=>k.toUpperCase()==='TYPESAFE_API_KEY'),kept:process.env.PD_KEEP}))"],
+            env: { ...process.env, TYPESAFE_API_KEY: "secret", typesafe_api_key: "also-secret", PD_KEEP: "yes" } });
+        assert.equal(result.code, 0);
+        assert.deepEqual(JSON.parse(result.stdout), { keys: [], kept: "yes" });
+    });
     for (const mode of ["timeout", "abort"] as const) {
         it(`stops the Windows shim child on ${mode}`, { skip: process.platform !== "win32" }, async () => {
             const dir = await fs.mkdtemp(path.join(os.tmpdir(), "pd-tree-test-"));

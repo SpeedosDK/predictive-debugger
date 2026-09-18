@@ -57,6 +57,21 @@ export class PredictionReporter {
                     (result.ai.truncated ? `\n      partial: ${result.ai.truncated}` : "") +
                     (result.logs.skipped ? `\n      logs: ${result.logs.skipped}` : "")
             );
+            if (result.jev) {
+                if (result.jev.status === "scored") {
+                    this.output.appendLine(`      Jev ${result.jev.model}: experimental rubric scores, not failure probabilities`);
+                    for (const finding of result.jev.findings) {
+                        this.output.appendLine(
+                            `      finding #${finding.findingIndex + 1}: priority ${finding.priority.toFixed(2)}, ` +
+                            `evidence ${finding.evidence.score.toFixed(2)} (confidence ${finding.evidence.confidence.toFixed(2)}), ` +
+                            `impact ${finding.impact.score.toFixed(2)} (confidence ${finding.impact.confidence.toFixed(2)})`
+                        );
+                    }
+                    if (result.jev.truncated) this.output.appendLine(`      Jev partial: ${result.jev.truncated}`);
+                } else {
+                    this.output.appendLine(`      Jev ${result.jev.status}: ${result.jev.reason}; original prediction retained`);
+                }
+            }
         }
 
         for (const failure of failures) {

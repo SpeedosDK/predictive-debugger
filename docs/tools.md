@@ -93,6 +93,7 @@ model. Each file requires a model call and uses the provider's usage allowance.
 | `model` | CLI default | Model override passed to the provider |
 | `calleeContext` | `true` | Include bounded imported definitions and referenced types |
 | `multi` | `false` | Request all demonstrable findings; experimental |
+| `jev` | `false` | Add optional paid Typesafe evidence/impact scoring; requires a server-side key |
 | `logFile` | None | Log file to include in the combined score |
 | `verbose` | `false` | Include static metrics and the full log breakdown |
 
@@ -118,9 +119,13 @@ self-report, and an empty list means no coverage was reported. Additional
 findings appear in `findings` when returned. The reporting threshold was measured
 on single-finding replies, so `multi: true` is less well characterized.
 
+See [optional Jev scoring](jev.md) for connection, data transfer, limits, and the
+separate `jev` result. The existing verdict and reporting threshold stay intact.
+
 Large files send at most 120,000 source characters, selected as whole
 declarations with original line numbers. The reply discloses truncation;
-omitted code remains unreviewed. There is no automatic second model pass.
+omitted code remains unreviewed. Jev only scores existing findings when enabled;
+it does not search omitted source for more defects.
 
 ### Dependency context
 
