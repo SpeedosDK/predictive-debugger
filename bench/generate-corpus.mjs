@@ -11,6 +11,7 @@ import fs from "fs/promises";
 import path from "path";
 import { fileURLToPath } from "url";
 import { writeAccuracyCases } from "./accuracy-cases.mjs";
+import { writeAdversarialCases } from "./adversarial-cases.mjs";
 import { writeDependencyCases } from "./dependency-cases.mjs";
 import { acceptableRanges } from "./enclosing-function.mjs";
 
@@ -777,13 +778,15 @@ async function main() {
     // the manifest cannot drift out of sync with the source it describes.
     const accuracy = await writeAccuracyCases(root);
     const dependencyMap = await writeDependencyCases(root);
+    const adversarial = await writeAdversarialCases(root);
     const manifest = {
         generatedBy: "bench/generate-corpus.mjs",
         accuracy,
         dependencyMap,
+        adversarial,
         language: "javascript",
         corpus: "corpus",
-        fileCount: written.length + accuracy.fileCount + dependencyMap.fileCount,
+        fileCount: written.length + accuracy.fileCount + dependencyMap.fileCount + adversarial.fileCount,
         // The per-file harness used to hardcode these. Naming them here keeps
         // the answer key and the control group in one file, so a corpus can be
         // measured without the harness knowing anything about it.

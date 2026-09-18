@@ -1,122 +1,5 @@
 {
   "generatedBy": "bench/generate-corpus.mjs",
-  "language": "javascript",
-  "corpus": "corpus",
-  "fileCount": 71,
-  "controls": [
-    "src/services/orderService.js",
-    "src/api/adminController.js",
-    "src/repositories/orderRepository.js",
-    "src/lib/paging.js",
-    "src/models/payment.js",
-    "src/services/auditService.js"
-  ],
-  "bugs": [
-    {
-      "file": "src/services/pricingService.js",
-      "pattern": "off-by-one",
-      "complexity": "high",
-      "summary": "Tier loop reads tiers[i + 1] without bounding i, so the last tier dereferences undefined.",
-      "line": 34,
-      "acceptableLines": [
-        34,
-        36
-      ],
-      "acceptableRanges": [
-        [
-          29,
-          55
-        ]
-      ],
-      "anchor": "const next = tiers[i + 1];"
-    },
-    {
-      "file": "src/workers/reconciliationWorker.js",
-      "pattern": "race-condition",
-      "complexity": "high",
-      "summary": "Balance is read before the awaits and written back after, so concurrent ticks lose updates.",
-      "line": 28,
-      "acceptableLines": [
-        28,
-        40
-      ],
-      "acceptableRanges": [
-        [
-          24,
-          43
-        ]
-      ],
-      "anchor": "const balance = await this.ledger.balanceOf(account.id);"
-    },
-    {
-      "file": "src/services/inventoryService.js",
-      "pattern": "async-misuse",
-      "complexity": "high",
-      "summary": "await inside forEach is not awaited, so reserve() returns before any stock is decremented.",
-      "line": 28,
-      "acceptableLines": [
-        28
-      ],
-      "acceptableRanges": [
-        [
-          28,
-          36
-        ]
-      ],
-      "anchor": "lines.forEach(async (line) => {"
-    },
-    {
-      "file": "src/lib/dateWindow.js",
-      "pattern": "off-by-one",
-      "complexity": "low",
-      "summary": "Loop bound is <= days, so every window contains one extra day.",
-      "line": 7,
-      "acceptableLines": [
-        7
-      ],
-      "acceptableRanges": [
-        [
-          5,
-          11
-        ]
-      ],
-      "anchor": "for (let i = 0; i <= days; i++) {"
-    },
-    {
-      "file": "src/models/cartTotals.js",
-      "pattern": "null-pointer",
-      "complexity": "low",
-      "summary": "discount is optional on the row but dereferenced unguarded, throwing for carts with no coupon.",
-      "line": 6,
-      "acceptableLines": [
-        6
-      ],
-      "acceptableRanges": [
-        [
-          3,
-          13
-        ]
-      ],
-      "anchor": "const discount = row.discount.amount;"
-    },
-    {
-      "file": "src/lib/retry.js",
-      "pattern": "async-misuse",
-      "complexity": "low",
-      "summary": "The final attempt's rejection is swallowed, so retry resolves undefined instead of throwing.",
-      "line": 7,
-      "acceptableLines": [
-        7
-      ],
-      "acceptableRanges": [
-        [
-          3,
-          11
-        ]
-      ],
-      "anchor": "} catch (err) {"
-    }
-  ],
   "accuracy": {
     "fileCount": 23,
     "note": "Development cases, not a held-out accuracy claim. Both billing variants are clean because normalization is idempotent.",
@@ -294,5 +177,240 @@
         "unresolvedLines": []
       }
     ]
-  }
+  },
+  "adversarial": {
+    "fileCount": 20,
+    "note": "Adversarial cases. Controls match a known bug shape but are safe, and the invariant proving it is visible in the same file. Bugs wear innocuous shapes. Built to create a negative class for ranking measurement, not to estimate held-out accuracy.",
+    "bugs": [
+      {
+        "file": "src/adversarial/shallow-overrides.js",
+        "pattern": "other",
+        "summary": "Spread copies only the top level, so writing copy.retry.attempts mutates the caller's shared retry object.",
+        "line": 7,
+        "acceptableLines": [
+          7
+        ],
+        "acceptableRanges": [
+          [
+            4,
+            10
+          ]
+        ],
+        "anchor": "copy.retry.attempts = overrides.attempts"
+      },
+      {
+        "file": "src/adversarial/float-cents.js",
+        "pattern": "other",
+        "summary": "Amounts are floating-point currency, so accumulated representation error makes the strict equality fail for values that are equal.",
+        "line": 6,
+        "acceptableLines": [
+          6
+        ],
+        "acceptableRanges": [
+          [
+            3,
+            9
+          ]
+        ],
+        "anchor": "return charged === paid;"
+      },
+      {
+        "file": "src/adversarial/in-place-sort.js",
+        "pattern": "other",
+        "summary": "sort mutates the caller's array, so suppliers is reordered as a side effect of asking for a ranking.",
+        "line": 5,
+        "acceptableLines": [
+          5
+        ],
+        "acceptableRanges": [
+          [
+            2,
+            8
+          ]
+        ],
+        "anchor": ".sort((a, b) => b.volume - a.volume)"
+      },
+      {
+        "file": "src/adversarial/unawaited-close.js",
+        "pattern": "async-misuse",
+        "summary": "close() returns a promise that is never awaited, so write resolves before the handle is flushed and closed.",
+        "line": 18,
+        "acceptableLines": [
+          18
+        ],
+        "acceptableRanges": [
+          [
+            15,
+            21
+          ]
+        ],
+        "anchor": "handle.close();"
+      },
+      {
+        "file": "src/adversarial/var-capture.js",
+        "pattern": "other",
+        "summary": "var is function-scoped, so every scheduled callback reads the same i and notifies pending[pending.length] repeatedly.",
+        "line": 5,
+        "acceptableLines": [
+          5
+        ],
+        "acceptableRanges": [
+          [
+            2,
+            8
+          ]
+        ],
+        "anchor": "schedule(() => notify(pending[i]),"
+      },
+      {
+        "file": "src/adversarial/filtered-average.js",
+        "pattern": "other",
+        "summary": "The total sums only settled orders but the divisor counts every order, so the average is understated whenever any order is unsettled.",
+        "line": 10,
+        "acceptableLines": [
+          10
+        ],
+        "acceptableRanges": [
+          [
+            7,
+            13
+          ]
+        ],
+        "anchor": "return Math.round(total / orders.length);"
+      }
+    ],
+    "controls": [
+      "src/adversarial/bounded-lookahead.js",
+      "src/adversarial/sequential-reserve.js",
+      "src/adversarial/locked-balance.js",
+      "src/adversarial/guarded-profile.js",
+      "src/adversarial/checked-divisor.js",
+      "src/adversarial/closed-handle.js",
+      "src/adversarial/preset-index.js",
+      "src/adversarial/validated-index.js",
+      "src/adversarial/empty-rows.js",
+      "src/adversarial/deep-clone-config.js",
+      "src/adversarial/optional-chain.js",
+      "src/adversarial/awaited-later.js",
+      "src/adversarial/copied-sort.js",
+      "src/adversarial/integer-cents.js"
+    ]
+  },
+  "language": "javascript",
+  "corpus": "corpus",
+  "fileCount": 91,
+  "controls": [
+    "src/services/orderService.js",
+    "src/api/adminController.js",
+    "src/repositories/orderRepository.js",
+    "src/lib/paging.js",
+    "src/models/payment.js",
+    "src/services/auditService.js"
+  ],
+  "bugs": [
+    {
+      "file": "src/services/pricingService.js",
+      "pattern": "off-by-one",
+      "complexity": "high",
+      "summary": "Tier loop reads tiers[i + 1] without bounding i, so the last tier dereferences undefined.",
+      "line": 34,
+      "acceptableLines": [
+        34,
+        36
+      ],
+      "acceptableRanges": [
+        [
+          29,
+          55
+        ]
+      ],
+      "anchor": "const next = tiers[i + 1];"
+    },
+    {
+      "file": "src/workers/reconciliationWorker.js",
+      "pattern": "race-condition",
+      "complexity": "high",
+      "summary": "Balance is read before the awaits and written back after, so concurrent ticks lose updates.",
+      "line": 28,
+      "acceptableLines": [
+        28,
+        40
+      ],
+      "acceptableRanges": [
+        [
+          24,
+          43
+        ]
+      ],
+      "anchor": "const balance = await this.ledger.balanceOf(account.id);"
+    },
+    {
+      "file": "src/services/inventoryService.js",
+      "pattern": "async-misuse",
+      "complexity": "high",
+      "summary": "await inside forEach is not awaited, so reserve() returns before any stock is decremented.",
+      "line": 28,
+      "acceptableLines": [
+        28
+      ],
+      "acceptableRanges": [
+        [
+          28,
+          36
+        ]
+      ],
+      "anchor": "lines.forEach(async (line) => {"
+    },
+    {
+      "file": "src/lib/dateWindow.js",
+      "pattern": "off-by-one",
+      "complexity": "low",
+      "summary": "Loop bound is <= days, so every window contains one extra day.",
+      "line": 7,
+      "acceptableLines": [
+        7
+      ],
+      "acceptableRanges": [
+        [
+          5,
+          11
+        ]
+      ],
+      "anchor": "for (let i = 0; i <= days; i++) {"
+    },
+    {
+      "file": "src/models/cartTotals.js",
+      "pattern": "null-pointer",
+      "complexity": "low",
+      "summary": "discount is optional on the row but dereferenced unguarded, throwing for carts with no coupon.",
+      "line": 6,
+      "acceptableLines": [
+        6
+      ],
+      "acceptableRanges": [
+        [
+          3,
+          13
+        ]
+      ],
+      "anchor": "const discount = row.discount.amount;"
+    },
+    {
+      "file": "src/lib/retry.js",
+      "pattern": "async-misuse",
+      "complexity": "low",
+      "summary": "The final attempt's rejection is swallowed, so retry resolves undefined instead of throwing.",
+      "line": 7,
+      "acceptableLines": [
+        7
+      ],
+      "acceptableRanges": [
+        [
+          3,
+          11
+        ]
+      ],
+      "anchor": "} catch (err) {"
+    }
+  ]
 }
