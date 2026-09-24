@@ -1,0 +1,22 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.SpeedosDK/predictive-debugger",
+  "title": "Predictive Debugger",
+  "description": "Predicts where JavaScript and TypeScript code will fail at runtime, for coding agents.",
+  "websiteUrl": "https://predictivedebugger.dev",
+  "repository": {
+    "url": "https://github.com/SpeedosDK/predictive-debugger",
+    "source": "github"
+  },
+  "version": "0.8.2",
+  "packages": [
+    {
+      "registryType": "npm",
+      "identifier": "predictive-debugger",
+      "version": "0.8.2",
+      "transport": {
+        "type": "stdio"
+      }
+    }
+  ]
+}
