@@ -6,6 +6,11 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Changed
+
+- Linked the website, predictivedebugger.dev, from the README and set it as the
+  npm homepage. Added `mcpName` and `server.json` for the official MCP Registry.
+
 ## [0.8.1] - 2026-09-10
 
 ### Changed

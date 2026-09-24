@@ -4,6 +4,8 @@
 
 # Predictive Debugger
 
+**Website and docs: [predictivedebugger.dev](https://predictivedebugger.dev)**
+
 [![npm version](https://img.shields.io/npm/v/predictive-debugger)](https://www.npmjs.com/package/predictive-debugger)
 [![CI](https://github.com/SpeedosDK/predictive-debugger/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/SpeedosDK/predictive-debugger/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
@@ -175,6 +177,7 @@ See [trying the extension](docs/vscode.md).
 
 ## Documentation
 
+- [predictivedebugger.dev](https://predictivedebugger.dev): website, quickstart and guides.
 - [Advanced setup](docs/setup.md): provider login, project scope, updates and local builds.
 - [Tool reference](docs/tools.md): parameters, prediction results, dependency context and scoring.
 - [VS Code preview](docs/vscode.md): development host, commands and settings.
