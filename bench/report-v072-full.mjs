@@ -1,5 +1,5 @@
 /**
- * Full analysis behind the concise RESULTS.md: the v0.7.1-vs-v0.8.0 comparison on the
+ * Full analysis behind the concise RESULTS-v080.md: the v0.7.1-vs-v0.8.0 comparison on the
  * 37-case corpus, with the evidence for each claim that page makes briefly -- which
  * definitions reached the model on the new cases, why the false alarms are the model
  * rather than either build, alongside the complete workflow token totals.
@@ -175,7 +175,7 @@ export function renderReport(arms, groups, data, evidence, fp, sessions) {
 
 **${current.detected}/${current.bugs} planted bug trials matched, plus ${current.otherVerified ?? 0} verified alternative ${(current.otherVerified ?? 0) === 1 ? 'finding' : 'findings'}. ${current.falseAlarms} false alarms.**
 
-The detailed analysis behind [RESULTS.md](RESULTS.md). Every arm here was run fresh against
+The detailed analysis behind [RESULTS-v080.md](RESULTS-v080.md). Every arm here was run fresh against
 the same 37 cases: no reused sessions, no promoted baseline, no proxy build. The baseline is the
 real v0.7.1 release (tag \`v0.7.1\`, bundle \`${b.previous.slice(0, 12)}\`); the candidate is
 \`feat/dependency-context\` (bundle \`${b.current.slice(0, 12)}\`). All arms saw identical

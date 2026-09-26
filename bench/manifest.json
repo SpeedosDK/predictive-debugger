@@ -304,6 +304,32 @@
       "src/holdout/profile.ts"
     ]
   },
+  "discovered": [
+    {
+      "file": "src/services/pricingService.js",
+      "summary": "roundMoney is imported from ../lib/currency, which does not export it, so every quote throws.",
+      "acceptableRanges": [
+        [
+          26,
+          26
+        ]
+      ]
+    },
+    {
+      "file": "src/api/adminController.js",
+      "summary": "toDto is imported from ../lib/serialise, which does not export it, so the module exports toDto as undefined.",
+      "acceptableRanges": [
+        [
+          1,
+          1
+        ],
+        [
+          372,
+          372
+        ]
+      ]
+    }
+  ],
   "language": "javascript",
   "corpus": "corpus",
   "fileCount": 83,

@@ -2,7 +2,7 @@
 
 **51/51 planted bug trials matched, plus 0 verified alternative findings. 0 false alarms.**
 
-The detailed analysis behind [RESULTS.md](RESULTS.md). Every arm here was run fresh against
+The detailed analysis behind [RESULTS-v080.md](RESULTS-v080.md). Every arm here was run fresh against
 the same 37 cases: no reused sessions, no promoted baseline, no proxy build. The baseline is the
 real v0.7.1 release (tag `v0.7.1`, bundle `4149dc74126d`); the candidate is
 `feat/dependency-context` (bundle `7ecd7bd6667d`). All arms saw identical

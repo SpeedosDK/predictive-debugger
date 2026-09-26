@@ -13,7 +13,7 @@ import os from 'node:os';
 import { createHash } from 'node:crypto';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
-import { providerUsage } from './usage.mjs';
+import { namesDiscoveredDefect, providerUsage } from './usage.mjs';
 
 const require = createRequire(import.meta.url);
 const { predictBugs } = require('../out/core/prediction/predictBug.js');
@@ -35,8 +35,9 @@ export function score(targets, verdicts) {
         const unavailable = findings.length === 0 || findings[0].pattern === 'unknown';
         const hit = target.kind === 'buggy' && actionable.some(f => f.line !== undefined &&
             target.acceptableRanges.some(([start, end]) => f.line >= start && f.line <= end));
-        return { file: target.file, kind: target.kind, unavailable, hit,
-            falseAlarm: target.kind !== 'buggy' && actionable.length > 0, top: findings[0] };
+        const otherVerified = !hit && actionable.some(f => namesDiscoveredDefect(target.file, f.line));
+        return { file: target.file, kind: target.kind, unavailable, hit, otherVerified,
+            falseAlarm: target.kind !== 'buggy' && actionable.length > 0 && !otherVerified, top: findings[0] };
     });
     return {
         bugs: rows.filter(r => r.kind === 'buggy').length,
@@ -44,6 +45,7 @@ export function score(targets, verdicts) {
         controls: rows.filter(r => r.kind !== 'buggy').length,
         falseAlarms: rows.filter(r => r.falseAlarm).length,
         unavailable: rows.filter(r => r.unavailable).length,
+        otherVerified: rows.filter(r => r.otherVerified).length,
         rows
     };
 }

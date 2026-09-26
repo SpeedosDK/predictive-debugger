@@ -1,45 +1,59 @@
 # Benchmark results
 
-**v0.8.0 identified 51/51 planted bug trials with 0 false alarms.**
+Measured September 26, 2026 on 49 JavaScript/TypeScript files: 24 bugs (planted, or found
+later and kept) and 25 clean files. Each session is a complete agent run. It reviews every
+file and reports one verdict per file. Tokens count the agent and every model call the tool
+makes. Each row is two sessions.
 
-Sonnet reviewed 37 JavaScript and TypeScript cases 3 times per workflow, every session fresh:
-the 28 cases from the [previous results](results/results-v07-balanced.json) and 9 new dependency cases.
-The baseline is tagged v0.7.1; v0.8.0 labels the measured candidate build.
-The saved records retain its original v0.7.2 label and exact bundle hash.
+| CLI | Agent reads the files | Agent + v0.8.2 | Agent + this version |
+|---|---|---|---|
+| Claude Code 2.1.283 (Sonnet) | 21, 21 bugs · 0 false alarms · 279k tokens | 21, 21 · 0 · 771k | **21, 22 · 0 · 173k** |
+| GitHub Copilot 1.0.82 (Sonnet) | 20, 20 · 1 · 883k | 22, 24 · 0 · 1.50M | **22, 22 · 0 · 598k** |
+| Codex 0.157.1 (GPT-5.6 sol) | 22, 21 · 0 · 1.01M | cannot run | **23, 23 · 2, 0 · 308k** |
 
-![Detection and false alarms](charts/detection.svg)
+Tokens are the average per session.
 
-| Across three trials | Agent reads files | v0.7.1 | v0.8.0 |
-|---|---:|---:|---:|
-| Original 28 cases: defects found | 35/39 | 38/39 | 39/39 |
-| New 9 cases: defects found | 12/12 | 3/12 | 12/12 |
-| Total planted bug trials found | 47/51 | 41/51 | 51/51 |
-| Other verified findings | 1 | 0 | 0 |
-| False alarms on clean files | 0/60 | 3/60 | 0/60 |
-| Total reported tokens | 2,120,442 | 1,433,632 | 1,481,267 |
+- **Against an agent reading the files itself,** the tool finds as many bugs or more with
+  every CLI, at 38% (Claude), 32% (Copilot) and 69% (Codex) fewer tokens. The reading agent
+  also returned an incomplete or malformed answer twice with Copilot; tool sessions never did.
+- **Against the released v0.8.2,** accuracy is the same with Claude at 78% fewer tokens.
+  With Copilot, v0.8.2 finds two more bugs over the two sessions at 2.5 times the tokens.
+  v0.8.2 cannot run in Codex, which refuses its tool calls when approvals are off.
+- **Both of Codex's false alarms** were in one session: `headers.mts` and `receipt.entity.ts`,
+  the same two Codex-only findings seen in every Codex run.
 
-## Why v0.7.1 scores lower than before
+On the 12 held-out files, which were written and frozen before any run, grouped review
+found 7/7 bugs with Claude and Codex and 6/7 with Copilot, with no false alarms over two
+runs each ([engine checkpoint](checkpoints/ENGINE-ACCURACY.md#held-out-cases)).
 
-On the original cases v0.7.1 found 38/39, the same as v0.7 in the previous results.
-The test grew from 28 to 37 cases to exercise dependency resolution that the old cases barely covered.
-Each new bug case needs a definition from another file. v0.7.1 leaves it out of its prompt and found
-3/12; v0.8.0 includes it and found 12/12.
-Direct reading can inspect those dependencies and found 12/12 new bug trials,
-which explains its stronger showing against v0.7.1 on the expanded test.
+## Not measured yet
 
-v0.7.1's 3 false alarms are on clean files whose tool prompt has not changed since the previous
-results, where v0.7 raised none. The model now scores them just above the reporting cut. v0.8.0
-sends the same prompt; these results do not establish a precision improvement ([analysis](RESULTS-v072-full.md#the-false-alarms-come-from-the-model-not-the-build)).
+These shipped after the comparison above and have unit tests, but no benchmark run:
 
-![Caller and internal model usage](charts/usage.svg)
+- **CommonJS `require()` support.** The model now sees `require`d definitions, and is told
+  when a required name provably is not exported. On this benchmark it changes one prompt:
+  `pricingService.js`, where one review then reported the unexported `roundMoney`, a real
+  defect, rather than the planted one. The scorers count that as a separate verified finding.
+- **Reusing verdicts for unchanged files** in a server session. This cannot change a verdict;
+  a repeated three-file call went from 3.6 s to 8 ms.
 
-v0.8.0 used 3% more tokens than v0.7.1 and 30% fewer than direct reading.
+Run `npm run bench:canary -- --provider=<id>` after a CLI update to check for drift in about
+a minute.
 
-All 9 sessions completed with a verdict for every file; no results are unavailable.
-Tokens include caller and internal model usage, including cache reads and writes.
+## Known limits
 
-There are 17 buggy files and 20 clean controls; repeated trials are not additional bugs.
-These development cases informed the tool, so this is not a held-out accuracy estimate.
+- `reconciliationWorker.js` (a race across an `await`) and `cartTotals.js` (a missing field
+  whose optionality the file only implies) are the most-missed bugs, by the tool and by
+  agents reading the files. Copilot's grouped review also tends to miss `dateWindow.js`.
+- The answer key informed the tool's design, except for the 12 held-out files. Treat these
+  numbers as evidence about these cases, not a guarantee for every project.
+- Two defects in the generated corpus were created by accident and found by agents. They
+  are listed in `manifest.json` under `discovered`, and a verdict naming one is credited
+  separately, never as a false alarm.
 
-[Method and reproduction](METHOD.md) | [Full analysis](RESULTS-v072-full.md) | [Raw runs](results/results-v072-full.json) |
-[Defect judgments](results/judgments-v072-full.json) | [Token breakdown](results/workflow-summary.json)
+## Details
+
+- [Full comparison, judgments and failed sessions](checkpoints/FINAL-COMPARISON.md)
+- [How grouped review regained its accuracy](checkpoints/ENGINE-ACCURACY.md)
+- [Method and folder layout](METHOD.md)
+- History: [v0.8.0 against v0.7.1](RESULTS-v080.md) and its [full analysis](RESULTS-v072-full.md)

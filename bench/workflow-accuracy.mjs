@@ -9,7 +9,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { providerUsage } from './usage.mjs';
+import { namesDiscoveredDefect, providerUsage } from './usage.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const sum = (a, b) => Object.fromEntries(['input', 'cacheRead', 'cacheWrite', 'output', 'total'].map(k => [k, (a[k] ?? 0) + (b[k] ?? 0)]));
@@ -27,7 +27,9 @@ export function scoreWorkflow(config, run, judgments = {}) {
         const verdict = (run.verdicts ?? []).find(v => v.file === target.file);
         if (target.kind === 'buggy') row.bugs++; else row.controls++;
         if (!verdict || typeof verdict.defect !== 'boolean') { row.missing++; continue; }
-        const judgment = judgments[`${config.provider}/${run.id}/${target.file}`];
+        const judgment = judgments[`${config.provider}/${run.id}/${target.file}`] ??
+            (verdict.defect && namesDiscoveredDefect(target.file, verdict.line)
+                ? { responseHash: run.responseHash, matchesDefect: false, validDefect: true, note: 'manifest.discovered' } : undefined);
         if (judgment && judgment.responseHash !== run.responseHash) throw Error(`Stale judgment: ${run.id}/${target.file}`);
         if (target.kind === 'buggy') {
             const hit = verdict.defect && (judgment ? judgment.matchesDefect : typeof verdict.line === 'number' &&

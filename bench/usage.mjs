@@ -1,4 +1,16 @@
 /** Token accounting for captured CLI calls: each cache category counted once, no invented dollar costs. */
+import fs from 'node:fs';
+
+const manifest = JSON.parse(fs.readFileSync(new URL('./manifest.json', import.meta.url), 'utf8'));
+
+/**
+ * Whether a verdict cites one of the generator-made defects in manifest.discovered. Such a
+ * verdict is a verified finding with separate credit: not the planted bug, not a false alarm.
+ */
+export function namesDiscoveredDefect(file, line) {
+    const entry = (manifest.discovered ?? []).find(d => `corpus/${d.file}` === file);
+    return Boolean(entry && typeof line === 'number' && entry.acceptableRanges.some(([s, e]) => line >= s && line <= e));
+}
 import { usage } from './workflow-summary.mjs';
 
 const empty = () => ({ input: 0, cacheRead: 0, cacheWrite: 0, output: 0, total: 0,

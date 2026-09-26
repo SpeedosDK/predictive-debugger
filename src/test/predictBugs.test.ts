@@ -264,3 +264,15 @@ test("an unchanged file is not reviewed twice; a changed one is, and failures ar
     await predictBugs([{ filePath: "u.js", code: "x" }], broken);
     assert.equal(failing, 2);
 });
+
+test("a missing export is labelled and explained only in prompts that contain one", async () => {
+    const prompts: string[] = [];
+    const reply = options(prompt => { prompts.push(prompt); return '{"pattern":"none","score":0}'; });
+    const missing = { name: "roundMoney", from: "./currency.js", source: "/* not exported */", missing: true as const };
+    const present = { name: "pad", from: "./strings.js", source: "function pad() {}" };
+    await predictBugs([{ filePath: "a.js", code: "roundMoney(1)", callees: [missing] }], reply);
+    await predictBugs([{ filePath: "b.js", code: "pad(1)", callees: [present] }], reply);
+    assert.match(prompts[0], /roundMoney — from \.\/currency\.js — NOT EXPORTED/);
+    assert.match(prompts[0], /An entry marked NOT EXPORTED is different/);
+    assert.doesNotMatch(prompts[1], /NOT EXPORTED/);
+});

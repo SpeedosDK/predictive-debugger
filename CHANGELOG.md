@@ -48,6 +48,17 @@ All notable changes to this project are documented here. The format follows
 - After two failed provider calls in a row, the remaining files fail at once with
   the reason instead of each waiting out its timeout. A file's re-check starts as
   soon as its group finishes, and files are read and parsed in parallel.
+- Imported definitions now include CommonJS: `require()` bindings, and exports
+  from `module.exports`/`exports`. When a required name is provably not exported
+  (the module's exports are one complete object literal), the model is told so;
+  in any less certain shape nothing is claimed. Not yet benchmarked: on the
+  existing cases it changes only `pricingService.js`, whose unexported
+  `roundMoney` is a real defect the generator created.
+- `bench/RESULTS.md` now summarizes the current comparison; the v0.8.0 report
+  moved to `bench/RESULTS-v080.md`. Two defects the corpus generator created by
+  accident are listed under `discovered` in `bench/manifest.json` and scored as
+  verified findings. `npm run bench` is replaced by `npm run bench:canary` and
+  `npm run bench:report`.
 - Re-reviewing a set after editing one file no longer pays for the unchanged
   ones: within a server session, identical review input returns the earlier
   verdict with `cached: true`. Failed and unavailable verdicts are not reused.

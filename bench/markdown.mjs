@@ -101,7 +101,7 @@ async function main() {
         baseline: data.config.baseline, candidate: data.config.candidate, bundles: data.config.bundles,
         arms, groups, sessions, previousResults: { file: 'results-v07-balanced.json', ...priorScore }
     }, null, 2) + '\n');
-    await fs.writeFile(path.join(here, 'RESULTS.md'), renderReport({ arms, groups, sessions, prior: priorScore, trials }));
+    await fs.writeFile(path.join(here, 'RESULTS-v080.md'), renderReport({ arms, groups, sessions, prior: priorScore, trials }));
     console.log('Wrote report and validated graph data. Run python bench/plot-workflows.py to render graphs.');
 }
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {

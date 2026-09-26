@@ -316,7 +316,8 @@ function runQueue<T>(initial: readonly T[], limit: number, run: (task: T) => Pro
 function buildBatchPrompt(group: readonly ReviewSource[], multi?: boolean): string {
     const schema = multi ? MULTI_SCHEMA : SINGLE_SCHEMA;
     return [
-        ...buildPolicy(multi, group.some(entry => Boolean(entry.input.callees?.length))),
+        ...buildPolicy(multi, group.some(entry => Boolean(entry.input.callees?.length)),
+            group.some(entry => Boolean(entry.input.callees?.some(callee => callee.missing)))),
         "Apply the task and evidence policy independently to EVERY review ID below.",
         "Definitions attached to a file are context for that file, not another review target.",
         "Return one JSON object and nothing else. Include exactly one result per numeric ID:",
@@ -444,16 +445,22 @@ function responseFormat(multi?: boolean): string[] {
  * Conditional because a policy referring to a section that is not in the prompt
  * is both wasted tokens and an invitation to reason about absent material.
  */
-function calleePolicy(hasCallees: boolean): string[] {
+function calleePolicy(hasCallees: boolean, hasMissing: boolean): string[] {
     if (!hasCallees) {
         return [];
     }
+    // Only when an entry is marked, so every other prompt stays byte-identical.
+    const missing = hasMissing ? [
+        "  An entry marked NOT EXPORTED is different: its module's complete export list",
+        "  was read and lacks the name, so that import is undefined when this file runs."
+    ] : [];
     return [
         "- When a called function's definition appears under CALLEE DEFINITIONS, read it",
         "  before flagging what it is passed or what it returns. A callee that already",
         "  guards the input, is idempotent, or normalises the value disproves the",
         "  candidate. The converse does not follow: a callee whose definition is absent",
-        "  is not thereby suspect — judge it by its ordinary contract, as above."
+        "  is not thereby suspect — judge it by its ordinary contract, as above.",
+        ...missing
     ];
 }
 
@@ -474,7 +481,7 @@ function renderCallees(callees: CalleeContext[]): string[] {
         "----- BEGIN CALLEE DEFINITIONS -----",
         ...callees.map((callee) =>
             [
-                `// ${callee.name} — from ${callee.from}${callee.excerpted ? " (definition truncated)" : ""}`,
+                `// ${callee.name} — from ${callee.from}${callee.missing ? " — NOT EXPORTED" : callee.excerpted ? " (definition truncated)" : ""}`,
                 callee.source
             ].join("\n")
         ),
@@ -489,12 +496,12 @@ function buildPrompt(
     multi?: boolean
 ): { prompt: string; truncated?: string } {
     return { prompt: [
-        ...buildPolicy(multi, Boolean(callees?.length)),
+        ...buildPolicy(multi, Boolean(callees?.length), Boolean(callees?.some(callee => callee.missing))),
         ...responseFormat(multi), "", ...renderSource(filePath, source, callees)
     ].join("\n"), truncated: source.truncated };
 }
 
-function buildPolicy(multi: boolean | undefined, hasCallees: boolean): string[] {
+function buildPolicy(multi: boolean | undefined, hasCallees: boolean, hasMissing = false): string[] {
     const catalogue = BUG_PATTERNS.map((p) => `- ${p.id}: ${p.summary}`).join("\n");
 
     // The source is untrusted input: it may contain text engineered to look like
@@ -541,7 +548,7 @@ function buildPolicy(multi: boolean | undefined, hasCallees: boolean): string[] 
         "  derived from the stale read is a defect on that basis alone — no malformed",
         "  input is needed. This applies only to state outside the call: a local variable",
         "  accumulated inside one invocation is not shared.",
-        ...calleePolicy(hasCallees),
+        ...calleePolicy(hasCallees, hasMissing),
         "- In the reason, name the triggering condition and the observable wrong result.",
         "  Check numerical claims against a concrete valid input.",
         "- The expected result must come from the shown code: its documentation, types,",

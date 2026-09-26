@@ -752,3 +752,63 @@ describe("bounded export resolution", () => {
         assert.equal(context.from, './client.ts');
     });
 });
+
+describe("collectCalleeContext with CommonJS", () => {
+    const helper = [
+        "function round(v) { return Math.round(v * 100) / 100; }",
+        "const pad = (s) => String(s).padStart(2, '0');",
+        "module.exports = { round, pad, twice(v) { return v * 2; } };"
+    ].join("\n");
+
+    it("resolves destructured, aliased and member requires to their definitions", async () => {
+        const callees = await collect({
+            "index.js": [
+                'const { round, pad: zeroPad } = require("./helper");',
+                'const helper = require("./helper");',
+                'const twice = require("./helper").twice;',
+                "module.exports = (v) => [round(v), zeroPad(v), helper.pad(v), twice(v)];"
+            ].join("\n"),
+            "helper.js": helper
+        }, "index.js");
+        const byName = new Map(callees.map(c => [c.name, c]));
+        assert.match(byName.get("round")!.source, /Math\.round/);
+        assert.match(byName.get("zeroPad")!.source, /padStart/);
+        assert.match(byName.get("helper.pad")!.source, /padStart/);
+        assert.match(byName.get("twice")!.source, /v \* 2/);
+        assert.ok(callees.every(c => !c.missing));
+    });
+
+    it("marks a name missing from a complete module.exports object literal", async () => {
+        const callees = await collect({
+            "index.js": 'const { roundMoney } = require("./helper");\nmodule.exports = (v) => roundMoney(v);',
+            "helper.js": helper
+        }, "index.js");
+        assert.equal(callees.length, 1);
+        assert.equal(callees[0].missing, true);
+        assert.equal(callees[0].from, "./helper.js");
+    });
+
+    it("never claims a name is missing when the export surface is not fully known", async () => {
+        for (const exportsCode of [
+            "const base = {};\nmodule.exports = { ...base, round: 1 };",
+            "module.exports = { round: 1 };\nObject.assign(module.exports, require('./more'));",
+            "exports.round = 1;",
+            "module.exports = factory();",
+            "module.exports = { round: 1 };\nfunction add(k, v) { exports[k] = v; }"
+        ]) {
+            const callees = await collect({
+                "index.js": 'const { roundMoney } = require("./helper");\nmodule.exports = (v) => roundMoney(v);',
+                "helper.js": exportsCode
+            }, "index.js");
+            assert.ok(callees.every(c => !c.missing), exportsCode);
+        }
+    });
+
+    it("resolves exports.name assignments", async () => {
+        const callees = await collect({
+            "index.js": 'const { clamp } = require("./helper");\nmodule.exports = (v) => clamp(v);',
+            "helper.js": "exports.clamp = function clamp(v) { return Math.max(0, v); };"
+        }, "index.js");
+        assert.match(callees[0].source, /Math\.max/);
+    });
+});
