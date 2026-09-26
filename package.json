@@ -56,7 +56,6 @@
     "package": "npm run build && vsce package --allow-missing-repository --skip-license",
     "vscode:prepublish": "npm run build",
     "bundle:dev": "node esbuild.mjs",
-    "bench:report": "node bench/markdown.mjs && node bench/report-v072-full.mjs",
     "bench:canary": "npm run compile && node bench/canary.mjs"
   },
   "engines": {

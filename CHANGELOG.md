@@ -54,11 +54,11 @@ All notable changes to this project are documented here. The format follows
   in any less certain shape nothing is claimed. Not yet benchmarked: on the
   existing cases it changes only `pricingService.js`, whose unexported
   `roundMoney` is a real defect the generator created.
-- `bench/RESULTS.md` now summarizes the current comparison; the v0.8.0 report
-  moved to `bench/RESULTS-v080.md`. Two defects the corpus generator created by
-  accident are listed under `discovered` in `bench/manifest.json` and scored as
-  verified findings. `npm run bench` is replaced by `npm run bench:canary` and
-  `npm run bench:report`.
+- `bench/RESULTS.md` now summarizes the current comparison. The v0.7/v0.8 reports,
+  their generators and data are removed from the tree; they remain at the release
+  tags. Two defects the corpus generator created by accident are listed under
+  `discovered` in `bench/manifest.json` and scored as verified findings.
+  `npm run bench` is replaced by `npm run bench:canary`.
 - Re-reviewing a set after editing one file no longer pays for the unchanged
   ones: within a server session, identical review input returns the earlier
   verdict with `cached: true`. Failed and unavailable verdicts are not reused.

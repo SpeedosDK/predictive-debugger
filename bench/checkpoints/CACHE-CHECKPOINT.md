@@ -9,7 +9,7 @@ cost less without losing detections?
 
 ## What the v0.8.0 records showed
 
-The internal calls in `results-v072-full.json` had 317k fresh (uncached) input tokens.
+The internal calls in `results-v072-full.json` (the v0.8.0 benchmark, in Git history at tag `v0.8.0`) had 317k fresh (uncached) input tokens.
 Almost all of them came from a `claude-haiku-4-5` call that `claude --print` makes
 on its own for session metadata. That call receives the whole prompt uncached and
 returns about 10 tokens. The Sonnet verdict call was already mostly cache reads.

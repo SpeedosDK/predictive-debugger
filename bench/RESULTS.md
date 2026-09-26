@@ -56,4 +56,4 @@ a minute.
 - [Full comparison, judgments and failed sessions](checkpoints/FINAL-COMPARISON.md)
 - [How grouped review regained its accuracy](checkpoints/ENGINE-ACCURACY.md)
 - [Method and folder layout](METHOD.md)
-- History: [v0.8.0 against v0.7.1](RESULTS-v080.md) and its [full analysis](RESULTS-v072-full.md)
+- History: [v0.8.0 against v0.7.1](https://github.com/SpeedosDK/predictive-debugger/blob/v0.8.0/bench/RESULTS.md), at the v0.8.0 tag

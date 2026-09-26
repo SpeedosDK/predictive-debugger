@@ -63,9 +63,8 @@ next person who changes it has to remember to change both, and usually doesn't.
   a new result incomparable to every existing one in `bench/RESULTS.md`; extend the answer key
   instead of building a parallel corpus.
 - `bench/RESULTS.md` is the current summary, maintained by hand from the checkpoint it links;
-  update it when a new comparison replaces that one. `bench/RESULTS-v080.md` and
-  `bench/RESULTS-v072-full.md` are generated (`npm run bench:report`): edit their generators,
-  not the files.
+  update it when a new comparison replaces that one. Older release reports live in Git
+  history at their tags.
 - Saved results describe a specific prompt, source and model configuration. Use a separate
   output file for a different experiment, and bind adjudications to the source, prompt and
   response hashes. Historical snapshots removed from the working tree remain in Git history.

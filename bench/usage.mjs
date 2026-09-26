@@ -11,7 +11,34 @@ export function namesDiscoveredDefect(file, line) {
     const entry = (manifest.discovered ?? []).find(d => `corpus/${d.file}` === file);
     return Boolean(entry && typeof line === 'number' && entry.acceptableRanges.some(([s, e]) => line >= s && line <= e));
 }
-import { usage } from './workflow-summary.mjs';
+
+/**
+ * Claude's own report. `modelUsage` is preferred because it includes auxiliary model
+ * calls that the top-level `usage` omits.
+ */
+export function claudeUsage(report) {
+    if (report?.modelUsage && Object.keys(report.modelUsage).length) {
+        const result = { input: 0, output: 0, cacheWrite: 0, cacheRead: 0, total: 0, cost: report.total_cost_usd };
+        if (!Number.isFinite(result.cost) || result.cost < 0) throw Error('Missing CLI usage or cost.');
+        for (const model of Object.values(report.modelUsage)) {
+            for (const [key, field] of Object.entries({ input: 'inputTokens', output: 'outputTokens',
+                cacheWrite: 'cacheCreationInputTokens', cacheRead: 'cacheReadInputTokens' })) {
+                if (!Number.isFinite(model[field]) || model[field] < 0) throw Error('Missing CLI model usage.');
+                result[key] += model[field]; result.total += model[field];
+            }
+        }
+        return result;
+    }
+    const u = report?.usage;
+    const keys = ['input_tokens', 'output_tokens', 'cache_creation_input_tokens', 'cache_read_input_tokens'];
+    if (!u || keys.some(key => !Number.isFinite(u[key]) || u[key] < 0) ||
+        !Number.isFinite(report.total_cost_usd) || report.total_cost_usd < 0) {
+        throw Error('Missing CLI usage or cost; cannot claim complete accounting.');
+    }
+    return { input: u.input_tokens, output: u.output_tokens,
+        cacheWrite: u.cache_creation_input_tokens, cacheRead: u.cache_read_input_tokens,
+        total: keys.reduce((sum, key) => sum + u[key], 0), cost: report.total_cost_usd };
+}
 
 const empty = () => ({ input: 0, cacheRead: 0, cacheWrite: 0, output: 0, total: 0,
     cost: null, premiumRequests: null, nanoAiu: null });
@@ -25,7 +52,7 @@ export function copilotUsage(report) {
 
 /** Claude reports its own usage; Codex cached input is part of input and reasoning part of output. */
 export function providerUsage(provider, report) {
-    if (provider === 'claude') return { ...empty(), ...usage(report) };
+    if (provider === 'claude') return { ...empty(), ...claudeUsage(report) };
     if (provider === 'copilot') {
         const tokens = copilotUsage(report);
         if (!tokens) throw Error('Missing Copilot token accounting.');
