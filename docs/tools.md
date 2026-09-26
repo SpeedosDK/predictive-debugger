@@ -142,6 +142,12 @@ imported definitions, provider and model) returns its earlier verdict with
 `cached: true` instead of calling the model again, for up to an hour. Failed and
 unavailable verdicts are never reused.
 
+Only JavaScript/TypeScript source files are sent to the model; other paths fail
+before any provider call. Each review call starts the CLI in a new, empty
+temporary folder that is deleted afterwards, so the CLI does not load your
+project's `CLAUDE.md` or `AGENTS.md` into the review. [SECURITY.md](../SECURITY.md#security-model)
+explains why.
+
 ### Reading a verdict
 
 The reply includes `pattern`, `score`, `line`, `reason`, `status` and `actionable`.
