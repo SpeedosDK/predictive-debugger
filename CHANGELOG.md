@@ -15,6 +15,11 @@ All notable changes to this project are documented here. The format follows
 
 ### Changed
 
+- Measured on all 49 benchmark cases in full agent sessions: this build finds as
+  many planted bugs as an agent reading the files, or more, with each CLI, using
+  32-69% fewer tokens, and matches or nearly matches v0.8.2 at 60-78% fewer tokens.
+  See [the final comparison](bench/checkpoints/FINAL-COMPARISON.md).
+
 - Prediction batches now share the review policy and CLI context across up to
   eight small files per model call for Claude, Codex and Copilot. Groups have a
   bounded prompt size and retain per-file verdicts, line validation and errors.
@@ -43,6 +48,9 @@ All notable changes to this project are documented here. The format follows
 - After two failed provider calls in a row, the remaining files fail at once with
   the reason instead of each waiting out its timeout. A file's re-check starts as
   soon as its group finishes, and files are read and parsed in parallel.
+- Re-reviewing a set after editing one file no longer pays for the unchanged
+  ones: within a server session, identical review input returns the earlier
+  verdict with `cached: true`. Failed and unavailable verdicts are not reused.
 - Replies include `providerVersion`, the CLI version that produced the verdicts.
   `npm run bench:canary -- --provider=<id>` checks an installed CLI against the
   held-out cases in about a minute and logs drift to `bench/canary-log.jsonl`.

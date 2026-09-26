@@ -2,10 +2,12 @@ import assert from "node:assert/strict";
 import fs from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
-import { after, before, describe, it } from "node:test";
+import { after, before, beforeEach, describe, it } from "node:test";
 import { CliLocation, CliProvider, CompleteOptions } from "../providers/types";
 import { DEFAULT_CONCURRENCY, predictFiles } from "../core/prediction/predictFiles";
-import { MAX_BATCH_FILES } from "../core/prediction/predictBug";
+import { clearVerdictCache, MAX_BATCH_FILES } from "../core/prediction/predictBug";
+
+beforeEach(clearVerdictCache);
 
 let dir = "";
 

@@ -118,3 +118,5 @@ informed the tool and do not measure held-out accuracy on arbitrary projects.
 [Production compiler checks, grouped workflows and accuracy limitations](checkpoints/PRODUCTION-IMPROVEMENTS.md)
 
 [Grouped prediction accuracy and near-gate re-checks](checkpoints/ENGINE-ACCURACY.md)
+
+[Agent reading vs. v0.8.2 vs. this build, all 49 cases](checkpoints/FINAL-COMPARISON.md)

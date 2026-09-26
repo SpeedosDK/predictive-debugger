@@ -74,6 +74,8 @@ export interface BugAssessment {
      * parsed at all.
      */
     checked?: string[];
+    /** Reused from an identical earlier review in this process; see predictBugs. */
+    cached?: true;
     /**
      * Set when the file was too large to send in full. The findings are then
      * based on a prefix of the file, which the caller should make visible.

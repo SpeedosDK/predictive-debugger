@@ -105,7 +105,7 @@ async function main() {
         }));
         const started = Date.now();
         const outcomes = await predictBugs(inputs, { provider: impl, location: { file: shimFile }, model,
-            concurrency, maxBatchFiles: size });
+            concurrency, maxBatchFiles: size, cache: false });
         const verdicts = {}, failures = {};
         outcomes.forEach((outcome, i) => {
             if (outcome.kind === 'assessment') verdicts[ordered[i].file] = outcome.assessment.findings;

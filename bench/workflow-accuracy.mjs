@@ -15,20 +15,36 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 const sum = (a, b) => Object.fromEntries(['input', 'cacheRead', 'cacheWrite', 'output', 'total'].map(k => [k, (a[k] ?? 0) + (b[k] ?? 0)]));
 const zero = { input: 0, cacheRead: 0, cacheWrite: 0, output: 0, total: 0 };
 
-export function scoreWorkflow(config, run) {
+/**
+ * `judgments` maps `${provider}/${runId}/${file}` to { responseHash, matchesDefect, validDefect, note }
+ * for verdicts the line rule gets wrong: the planted defect cited on a nearby line, or a real
+ * defect other than the planted one. Bound to the reply's hash so a rerun cannot inherit them.
+ */
+export function scoreWorkflow(config, run, judgments = {}) {
     const row = { arm: run.arm, trial: run.trial, failed: run.failed, detected: 0, falseAlarms: 0, missing: 0,
-        bugs: 0, controls: 0, misses: [], alarms: [], calls: run.internal.length };
+        bugs: 0, controls: 0, otherVerified: 0, verifiedControlFindings: 0, misses: [], alarms: [], calls: run.internal.length };
     for (const target of config.targets) {
         const verdict = (run.verdicts ?? []).find(v => v.file === target.file);
         if (target.kind === 'buggy') row.bugs++; else row.controls++;
         if (!verdict || typeof verdict.defect !== 'boolean') { row.missing++; continue; }
+        const judgment = judgments[`${config.provider}/${run.id}/${target.file}`];
+        if (judgment && judgment.responseHash !== run.responseHash) throw Error(`Stale judgment: ${run.id}/${target.file}`);
         if (target.kind === 'buggy') {
-            const hit = verdict.defect && typeof verdict.line === 'number' &&
-                target.acceptableRanges.some(([s, e]) => verdict.line >= s && verdict.line <= e);
-            if (hit) row.detected++; else row.misses.push(`${target.file} ${verdict.defect ? `L${verdict.line}` : 'none'}`);
+            const hit = verdict.defect && (judgment ? judgment.matchesDefect : typeof verdict.line === 'number' &&
+                target.acceptableRanges.some(([s, e]) => verdict.line >= s && verdict.line <= e));
+            if (hit) row.detected++;
+            else {
+                if (verdict.defect && judgment?.validDefect) row.otherVerified++;
+                row.misses.push(`${target.file} ${verdict.defect ? `L${verdict.line}` : 'none'}${judgment ? ` (${judgment.note})` : ''}`);
+            }
         } else if (verdict.defect) {
-            row.falseAlarms++;
-            row.alarms.push(`${target.file} L${verdict.line}: ${String(verdict.reason).slice(0, 120)}`);
+            if (judgment?.validDefect) {
+                row.verifiedControlFindings++;
+                row.alarms.push(`${target.file} L${verdict.line}: verified real defect (${judgment.note})`);
+            } else {
+                row.falseAlarms++;
+                row.alarms.push(`${target.file} L${verdict.line}: ${String(verdict.reason).slice(0, 120)}`);
+            }
         }
     }
     row.caller = providerUsage(config.provider, run.report);
@@ -38,13 +54,15 @@ export function scoreWorkflow(config, run) {
 }
 
 async function main() {
-    for (const file of process.argv.slice(2)) {
+    const judgmentsFlag = process.argv.find(a => a.startsWith('--judgments='))?.slice(12);
+    const judgments = judgmentsFlag ? JSON.parse(await fs.readFile(path.resolve(here, 'results', judgmentsFlag), 'utf8')) : {};
+    for (const file of process.argv.slice(2).filter(a => !a.startsWith('--'))) {
         const data = JSON.parse(await fs.readFile(path.resolve(here, 'results', file), 'utf8'));
         console.log(`## ${file} (${data.config.provider} ${data.config.version.split('\n')[0]}, ${data.status})`);
         for (const run of data.runs) {
-            const r = scoreWorkflow(data.config, run);
+            const r = scoreWorkflow(data.config, run, judgments);
             console.log(`${r.arm.padEnd(8)} #${r.trial} ${r.detected}/${r.bugs} detected, ${r.falseAlarms}/${r.controls} false alarms, ` +
-                `${r.missing} missing | caller ${r.caller.total} + internal ${r.internal.total} (${r.calls} calls) = ${r.tokens.total} tokens`);
+                `${r.otherVerified + r.verifiedControlFindings} other verified, ${r.missing} missing | caller ${r.caller.total} + internal ${r.internal.total} (${r.calls} calls) = ${r.tokens.total} tokens`);
             for (const m of r.misses) console.log(`    miss ${m}`);
             for (const a of r.alarms) console.log(`    FA   ${a}`);
         }

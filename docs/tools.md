@@ -137,6 +137,11 @@ function that awaits a read and later awaits a write, the shape of a lost update
 that group replies missed. A failed CLI call affects its group and is not retried;
 retry only files whose assessment failed or is unavailable.
 
+Within one server session, a file whose review input is unchanged (its source,
+imported definitions, provider and model) returns its earlier verdict with
+`cached: true` instead of calling the model again, for up to an hour. Failed and
+unavailable verdicts are never reused.
+
 ### Reading a verdict
 
 The reply includes `pattern`, `score`, `line`, `reason`, `status` and `actionable`.

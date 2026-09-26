@@ -1,3 +1,4 @@
+import { createHash } from "crypto";
 import fs from "fs/promises";
 import os from "os";
 import path from "path";
@@ -112,6 +113,8 @@ export type BugInput = Pick<PredictBugOptions, "filePath" | "code" | "callees"> 
 };
 export type BugOptions = Omit<PredictBugOptions, keyof BugInput> & {
     concurrency?: number;
+    /** Reuse verdicts for identical review input in this process (default true). */
+    cache?: boolean;
     /** Files per model call (default {@link MAX_BATCH_FILES}); 1 sends every file alone. */
     maxBatchFiles?: number;
 };
@@ -124,6 +127,43 @@ interface ReviewSource {
     index: number;
     input: BugInput;
     source: SourceContext;
+    key?: string;
+}
+
+/**
+ * Agents re-run a review after editing one file of a set; the unchanged files
+ * would otherwise be paid for again. The key is the file's whole single-file
+ * prompt (source, imported definitions, policy) plus provider and model, so any
+ * change to the file, its dependencies or this build's prompt misses. Failed and
+ * unavailable verdicts are never stored, so retrying them still calls the model.
+ */
+const verdictCache = new Map<string, { assessment: BugAssessment; at: number }>();
+const CACHE_ENTRIES = 500;
+const CACHE_TTL_MS = 60 * 60 * 1000;
+
+function cacheKey(input: BugInput, source: SourceContext, options: BugOptions): string {
+    const prompt = buildPrompt(input.filePath, source, input.callees, options.multi).prompt;
+    return createHash("sha256").update(JSON.stringify([options.provider.id, options.model ?? "", prompt])).digest("hex");
+}
+
+function cachedVerdict(key: string): BugAssessment | undefined {
+    const entry = verdictCache.get(key);
+    if (!entry || Date.now() - entry.at > CACHE_TTL_MS) {
+        verdictCache.delete(key);
+        return undefined;
+    }
+    return entry.assessment;
+}
+
+function rememberVerdict(key: string, assessment: BugAssessment): void {
+    verdictCache.delete(key);
+    verdictCache.set(key, { assessment, at: Date.now() });
+    if (verdictCache.size > CACHE_ENTRIES) verdictCache.delete(verdictCache.keys().next().value!);
+}
+
+/** For tests. */
+export function clearVerdictCache(): void {
+    verdictCache.clear();
 }
 
 /** Share policy and CLI setup while keeping every verdict tied to its own source. */
@@ -142,7 +182,12 @@ export async function predictBugs(inputs: readonly BugInput[], options: BugOptio
                 outcomes[index] = { kind: "assessment", assessment: {
                     ...unavailable("No source line fits the analysis budget."), truncated: source.truncated
                 } };
-            } else sources.push({ index, input, source });
+            } else {
+                const key = options.cache === false ? undefined : cacheKey(input, source, options);
+                const hit = key === undefined ? undefined : cachedVerdict(key);
+                if (hit) outcomes[index] = { kind: "assessment", assessment: { ...hit, cached: true } };
+                else sources.push({ index, input, source, key });
+            }
         } catch (error) {
             outcomes[index] = { kind: "failure", reason: error instanceof Error ? error.message : String(error) };
         }
@@ -211,6 +256,12 @@ export async function predictBugs(inputs: readonly BugInput[], options: BugOptio
             : group.filter(needsRecheck).map(entry => ({ group: [entry], recheck: true }));
     };
     await runQueue(groups.map(group => ({ group, recheck: false })), concurrency, review, options.signal);
+    for (const entry of sources) {
+        const outcome = outcomes[entry.index];
+        if (entry.key && outcome.kind === "assessment" && outcome.assessment.findings[0]?.pattern !== "unknown") {
+            rememberVerdict(entry.key, outcome.assessment);
+        }
+    }
     return outcomes;
 }
 

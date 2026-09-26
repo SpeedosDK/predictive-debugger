@@ -34,7 +34,16 @@ for (const corpus of ['corpus', 'corpus-ts']) await fs.cp(path.join(here, corpus
 for (const file of original.config.corpus) {
     if (hash(await fs.readFile(path.join(stage, file.file))) !== file.hash) throw Error(`Source changed: ${file.file}`);
 }
-const targets = original.config.targets;
+// dev: the 37 original targets. all: plus the 12 held-out cases from manifest.json.
+const suite = flag('suite', 'dev');
+const manifest = JSON.parse(await fs.readFile(path.join(here, 'manifest.json'), 'utf8'));
+const holdout = [
+    ...manifest.holdout.bugs.map(bug => ({ ...bug, file: `corpus/${bug.file}`, kind: 'buggy', suite: 'holdout' })),
+    ...manifest.holdout.controls.map(file => ({ file: `corpus/${file}`, kind: 'clean', suite: 'holdout' }))
+];
+if (!['dev', 'all'].includes(suite)) throw Error('--suite must be dev or all.');
+for (const target of holdout) target.sourceHash = hash(await fs.readFile(path.join(stage, target.file)));
+const targets = suite === 'all' ? [...original.config.targets, ...holdout] : original.config.targets;
 const versions = { previous: baseline, current: root };
 const bundles = Object.fromEntries(await Promise.all(Object.entries(versions).map(async ([arm, dir]) =>
     [arm, hash(await fs.readFile(path.join(dir, 'dist/mcp-server.js')))])));
@@ -43,7 +52,7 @@ if (revision !== '4e9d9729215b48563109b9c4683e6fc274f710ab' || bundles.previous 
     throw Error('Release baseline does not match verified v0.8.2.');
 }
 const version = (await runProcess({ file: cli, args: ['--version'] })).stdout.trim();
-const config = { provider, model, trials, arms, ...(caller === 'strict' ? {} : { caller }), version, bundles, targets, corpus: original.config.corpus,
+const config = { provider, model, trials, arms, ...(caller === 'strict' ? {} : { caller }), ...(suite === 'dev' ? {} : { suite }), version, bundles, targets, corpus: original.config.corpus,
     baseline: { tag: 'v0.8.2', revision, verifiedRelease: 'https://github.com/SpeedosDK/predictive-debugger/releases/tag/v0.8.2' },
     runnerHash: hash(await fs.readFile(fileURLToPath(import.meta.url))),
     wrapperHash: hash(await fs.readFile(path.join(here, 'capture-provider.cjs'))),

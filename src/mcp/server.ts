@@ -331,6 +331,7 @@ function predictionBody(
         // Always present, even empty: an empty list is itself the signal that
         // no coverage was reported, and `verbose` would hide that.
         checked: checked ?? [],
+        ...(result.ai.cached ? { cached: true } : {}),
         combinedScore: round(result.combinedScore),
         staticRisk: round(result.riskScore),
         ...(truncated ? { truncated } : {}),

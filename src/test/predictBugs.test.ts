@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
-import { test } from "node:test";
-import { BugInput, parseAssessment, parseBatchAssessment, predictBugs } from "../core/prediction/predictBug";
+import { beforeEach, test } from "node:test";
+import { BugInput, clearVerdictCache, parseAssessment, parseBatchAssessment, predictBugs } from "../core/prediction/predictBug";
+
+beforeEach(clearVerdictCache);
 import { CliProvider } from "../providers/types";
 
 function options(reply: (prompt: string) => string | Promise<string>) {
@@ -238,4 +240,27 @@ test("a group's re-check starts before slower groups finish", async () => {
         return JSON.stringify({ results: ids.map(id => ({ id, pattern: id === 0 && !slow ? "other" : "none", score: id === 0 && !slow ? 0.5 : 0, line: 1 })) });
     }), concurrency: 2 });
     assert.deepEqual(order, ["fast group", "recheck", "slow group"]);
+});
+
+test("an unchanged file is not reviewed twice; a changed one is, and failures are never reused", async () => {
+    let calls = 0;
+    const reply = options(() => { calls++; return '{"pattern":"none","score":0}'; });
+    const first = await predictBugs([inputs[1]], reply);
+    const second = await predictBugs([inputs[1]], reply);
+    assert.equal(calls, 1);
+    if (first[0].kind !== "assessment" || second[0].kind !== "assessment") throw Error("missing result");
+    assert.equal(first[0].assessment.cached, undefined);
+    assert.equal(second[0].assessment.cached, true);
+    await predictBugs([{ ...inputs[1], code: "two" }], reply);
+    assert.equal(calls, 2);
+    await predictBugs([inputs[1]], { ...reply, model: "other-model" });
+    assert.equal(calls, 3);
+    await predictBugs([inputs[1]], { ...reply, cache: false });
+    assert.equal(calls, 4);
+
+    let failing = 0;
+    const broken = options(() => { failing++; return "not json"; });
+    await predictBugs([{ filePath: "u.js", code: "x" }], broken);
+    await predictBugs([{ filePath: "u.js", code: "x" }], broken);
+    assert.equal(failing, 2);
 });
