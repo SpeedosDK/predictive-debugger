@@ -1,122 +1,5 @@
 {
   "generatedBy": "bench/generate-corpus.mjs",
-  "language": "javascript",
-  "corpus": "corpus",
-  "fileCount": 71,
-  "controls": [
-    "src/services/orderService.js",
-    "src/api/adminController.js",
-    "src/repositories/orderRepository.js",
-    "src/lib/paging.js",
-    "src/models/payment.js",
-    "src/services/auditService.js"
-  ],
-  "bugs": [
-    {
-      "file": "src/services/pricingService.js",
-      "pattern": "off-by-one",
-      "complexity": "high",
-      "summary": "Tier loop reads tiers[i + 1] without bounding i, so the last tier dereferences undefined.",
-      "line": 34,
-      "acceptableLines": [
-        34,
-        36
-      ],
-      "acceptableRanges": [
-        [
-          29,
-          55
-        ]
-      ],
-      "anchor": "const next = tiers[i + 1];"
-    },
-    {
-      "file": "src/workers/reconciliationWorker.js",
-      "pattern": "race-condition",
-      "complexity": "high",
-      "summary": "Balance is read before the awaits and written back after, so concurrent ticks lose updates.",
-      "line": 28,
-      "acceptableLines": [
-        28,
-        40
-      ],
-      "acceptableRanges": [
-        [
-          24,
-          43
-        ]
-      ],
-      "anchor": "const balance = await this.ledger.balanceOf(account.id);"
-    },
-    {
-      "file": "src/services/inventoryService.js",
-      "pattern": "async-misuse",
-      "complexity": "high",
-      "summary": "await inside forEach is not awaited, so reserve() returns before any stock is decremented.",
-      "line": 28,
-      "acceptableLines": [
-        28
-      ],
-      "acceptableRanges": [
-        [
-          28,
-          36
-        ]
-      ],
-      "anchor": "lines.forEach(async (line) => {"
-    },
-    {
-      "file": "src/lib/dateWindow.js",
-      "pattern": "off-by-one",
-      "complexity": "low",
-      "summary": "Loop bound is <= days, so every window contains one extra day.",
-      "line": 7,
-      "acceptableLines": [
-        7
-      ],
-      "acceptableRanges": [
-        [
-          5,
-          11
-        ]
-      ],
-      "anchor": "for (let i = 0; i <= days; i++) {"
-    },
-    {
-      "file": "src/models/cartTotals.js",
-      "pattern": "null-pointer",
-      "complexity": "low",
-      "summary": "discount is optional on the row but dereferenced unguarded, throwing for carts with no coupon.",
-      "line": 6,
-      "acceptableLines": [
-        6
-      ],
-      "acceptableRanges": [
-        [
-          3,
-          13
-        ]
-      ],
-      "anchor": "const discount = row.discount.amount;"
-    },
-    {
-      "file": "src/lib/retry.js",
-      "pattern": "async-misuse",
-      "complexity": "low",
-      "summary": "The final attempt's rejection is swallowed, so retry resolves undefined instead of throwing.",
-      "line": 7,
-      "acceptableLines": [
-        7
-      ],
-      "acceptableRanges": [
-        [
-          3,
-          11
-        ]
-      ],
-      "anchor": "} catch (err) {"
-    }
-  ],
   "accuracy": {
     "fileCount": 23,
     "note": "Development cases, not a held-out accuracy claim. Both billing variants are clean because normalization is idempotent.",
@@ -294,5 +177,274 @@
         "unresolvedLines": []
       }
     ]
-  }
+  },
+  "holdout": {
+    "fileCount": 12,
+    "note": "Held out: frozen before any run and not used for tuning. Add cases rather than editing measured ones.",
+    "bugs": [
+      {
+        "file": "src/holdout/eventBridge.js",
+        "pattern": "resource-leak",
+        "summary": "detach() passes a new bound function to off(), so the listener from attach() is never removed and messages keep being forwarded.",
+        "line": 27,
+        "acceptableLines": [
+          27
+        ],
+        "acceptableRanges": [
+          [
+            20,
+            28
+          ]
+        ],
+        "anchor": "this.emitter.off(\"message\", this.onMessage.bind(this));"
+      },
+      {
+        "file": "src/holdout/tokenBucket.ts",
+        "pattern": "race-condition",
+        "summary": "take() reads the bucket, awaits, then writes a value from that read; concurrent requests spend the same token and exceed capacity.",
+        "line": 23,
+        "acceptableLines": [
+          23
+        ],
+        "acceptableRanges": [
+          [
+            22,
+            31
+          ]
+        ],
+        "anchor": "const state = (await this.store.get(clientId))"
+      },
+      {
+        "file": "src/holdout/feed.js",
+        "pattern": "other",
+        "summary": "The sort comparator returns a boolean, never a negative number, so posts are not reliably newest first.",
+        "line": 4,
+        "acceptableLines": [
+          4
+        ],
+        "acceptableRanges": [
+          [
+            3,
+            4
+          ]
+        ],
+        "anchor": "a.publishedAt < b.publishedAt"
+      },
+      {
+        "file": "src/holdout/leaderboard.js",
+        "pattern": "other",
+        "summary": "for...in yields string keys, so rank is the string \"01\", \"11\", ... instead of the number 1, 2, ...",
+        "line": 11,
+        "acceptableLines": [
+          11
+        ],
+        "acceptableRanges": [
+          [
+            9,
+            11
+          ]
+        ],
+        "anchor": "rank: index + 1"
+      },
+      {
+        "file": "src/holdout/heartbeat.js",
+        "pattern": "unhandled-error",
+        "summary": "A rejected ping is never caught: the health flag is never cleared and the rejection is unhandled.",
+        "line": 19,
+        "acceptableLines": [
+          19
+        ],
+        "acceptableRanges": [
+          [
+            18,
+            21
+          ]
+        ],
+        "anchor": "await this.client.ping();"
+      },
+      {
+        "file": "src/holdout/poller.ts",
+        "pattern": "race-condition",
+        "discovered": true,
+        "summary": "Overlapping interval fetches can resolve out of order; an older result overwrites a newer one.",
+        "line": 19,
+        "acceptableLines": [
+          19
+        ],
+        "acceptableRanges": [
+          [
+            17,
+            22
+          ]
+        ],
+        "anchor": "(items) => { this.latest = items; this.failures = 0; },"
+      },
+      {
+        "file": "src/holdout/recent.ts",
+        "pattern": "off-by-one",
+        "summary": "lastN starts the slice one element early and returns n + 1 visits.",
+        "line": 11,
+        "acceptableLines": [
+          11
+        ],
+        "acceptableRanges": [
+          [
+            11,
+            11
+          ]
+        ],
+        "anchor": "visits.length - n - 1"
+      }
+    ],
+    "controls": [
+      "src/holdout/notifier.js",
+      "src/holdout/quota.ts",
+      "src/holdout/range.js",
+      "src/holdout/sortUsers.ts",
+      "src/holdout/profile.ts"
+    ]
+  },
+  "discovered": [
+    {
+      "file": "src/services/pricingService.js",
+      "summary": "roundMoney is imported from ../lib/currency, which does not export it, so every quote throws.",
+      "acceptableRanges": [
+        [
+          26,
+          26
+        ]
+      ]
+    },
+    {
+      "file": "src/api/adminController.js",
+      "summary": "toDto is imported from ../lib/serialise, which does not export it, so the module exports toDto as undefined.",
+      "acceptableRanges": [
+        [
+          1,
+          1
+        ],
+        [
+          372,
+          372
+        ]
+      ]
+    }
+  ],
+  "language": "javascript",
+  "corpus": "corpus",
+  "fileCount": 83,
+  "controls": [
+    "src/services/orderService.js",
+    "src/api/adminController.js",
+    "src/repositories/orderRepository.js",
+    "src/lib/paging.js",
+    "src/models/payment.js",
+    "src/services/auditService.js"
+  ],
+  "bugs": [
+    {
+      "file": "src/services/pricingService.js",
+      "pattern": "off-by-one",
+      "complexity": "high",
+      "summary": "Tier loop reads tiers[i + 1] without bounding i, so the last tier dereferences undefined.",
+      "line": 34,
+      "acceptableLines": [
+        34,
+        36
+      ],
+      "acceptableRanges": [
+        [
+          29,
+          55
+        ]
+      ],
+      "anchor": "const next = tiers[i + 1];"
+    },
+    {
+      "file": "src/workers/reconciliationWorker.js",
+      "pattern": "race-condition",
+      "complexity": "high",
+      "summary": "Balance is read before the awaits and written back after, so concurrent ticks lose updates.",
+      "line": 28,
+      "acceptableLines": [
+        28,
+        40
+      ],
+      "acceptableRanges": [
+        [
+          24,
+          43
+        ]
+      ],
+      "anchor": "const balance = await this.ledger.balanceOf(account.id);"
+    },
+    {
+      "file": "src/services/inventoryService.js",
+      "pattern": "async-misuse",
+      "complexity": "high",
+      "summary": "await inside forEach is not awaited, so reserve() returns before any stock is decremented.",
+      "line": 28,
+      "acceptableLines": [
+        28
+      ],
+      "acceptableRanges": [
+        [
+          28,
+          36
+        ]
+      ],
+      "anchor": "lines.forEach(async (line) => {"
+    },
+    {
+      "file": "src/lib/dateWindow.js",
+      "pattern": "off-by-one",
+      "complexity": "low",
+      "summary": "Loop bound is <= days, so every window contains one extra day.",
+      "line": 7,
+      "acceptableLines": [
+        7
+      ],
+      "acceptableRanges": [
+        [
+          5,
+          11
+        ]
+      ],
+      "anchor": "for (let i = 0; i <= days; i++) {"
+    },
+    {
+      "file": "src/models/cartTotals.js",
+      "pattern": "null-pointer",
+      "complexity": "low",
+      "summary": "discount is optional on the row but dereferenced unguarded, throwing for carts with no coupon.",
+      "line": 6,
+      "acceptableLines": [
+        6
+      ],
+      "acceptableRanges": [
+        [
+          3,
+          13
+        ]
+      ],
+      "anchor": "const discount = row.discount.amount;"
+    },
+    {
+      "file": "src/lib/retry.js",
+      "pattern": "async-misuse",
+      "complexity": "low",
+      "summary": "The final attempt's rejection is swallowed, so retry resolves undefined instead of throwing.",
+      "line": 7,
+      "acceptableLines": [
+        7
+      ],
+      "acceptableRanges": [
+        [
+          3,
+          11
+        ]
+      ],
+      "anchor": "} catch (err) {"
+    }
+  ]
 }

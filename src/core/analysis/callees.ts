@@ -19,6 +19,11 @@ export interface CalleeContext {
     source: string;
     /** Set when the body was cut, so the prompt can say so rather than imply completeness. */
     excerpted?: boolean;
+    /**
+     * The module provably does not export this name, so the import is undefined at
+     * runtime. Only set for CommonJS modules whose whole `module.exports` is known.
+     */
+    missing?: true;
 }
 
 /**
@@ -60,11 +65,13 @@ interface ResolvedDefinition {
     excerpted?: boolean;
 }
 
-type DefinitionResolution = ResolvedDefinition | "missing" | "unknown";
+type DefinitionResolution = ResolvedDefinition | { absent: string } | "missing" | "unknown";
 
 // Missing exports allow another wildcard branch to resolve; unknown exports
 // cannot rule out a conflicting binding and must stop resolution.
-type ExportLookupResult = ExportDefinition | ImportBinding | { stars: string[] } | "missing" | "unknown";
+// "absent" is stronger than "missing": the module's complete export list is known
+// and lacks the name, which is itself evidence for the model, not just no context.
+type ExportLookupResult = ExportDefinition | ImportBinding | { stars: string[] } | "absent" | "missing" | "unknown";
 type ExportLookup = (imported: string, callName: string, budget: number, member?: string) => ExportLookupResult;
 
 interface CallSite {
@@ -144,6 +151,7 @@ export async function collectCalleeContext(
         const lookup = definitionCache.get(resolved);
         if (!lookup) return "unknown";
         const definition = lookup(binding.imported, name, budget, binding.member);
+        if (definition === "absent") return { absent: resolved };
         if (typeof definition === "string") return definition;
         if ("local" in definition) return { identity: `${resolved}\0${definition.local}`,
             source: definition.text, file: resolved, excerpted: definition.excerpted };
@@ -154,7 +162,7 @@ export async function collectCalleeContext(
                 // An unreadable branch might export a conflicting binding. Absence
                 // and uncertainty must stay distinct when checking star exports.
                 if (candidate === "unknown") return "unknown";
-                if (candidate === "missing") continue;
+                if (candidate === "missing" || "absent" in candidate) continue;
                 if (typeof found !== "string" && found.identity !== candidate.identity) return "unknown";
                 found = candidate;
             }
@@ -180,7 +188,14 @@ export async function collectCalleeContext(
         }
 
         const resolved = await definitionFor(dir, binding, name, budget);
-        if (typeof resolved === "string" || resolved.source === undefined) continue;
+        if (typeof resolved === "string") continue;
+        if ("absent" in resolved) {
+            const note = `/* not exported: this module's module.exports does not include "${binding.imported}" */`;
+            spent += note.length;
+            collected.push({ name, from: relativeSpecifier(dir, resolved.absent), source: note, missing: true });
+            continue;
+        }
+        if (resolved.source === undefined) continue;
         const definition = resolved.source;
         const cut = definition.length > budget;
         const excerpted = resolved.excerpted || cut;
@@ -210,6 +225,27 @@ async function readCallGraph(
     let order = 0;
 
     traverse(ast, {
+        VariableDeclarator(path: any) {
+            const init = path.node.init;
+            let source = requireSource(init);
+            let member: string | undefined;
+            if (!source && init?.type === "MemberExpression" && !init.computed && init.property.type === "Identifier") {
+                source = requireSource(init.object);
+                member = init.property.name;
+            }
+            if (!source) return;
+            const id = path.node.id;
+            if (id.type === "Identifier") {
+                imports.set(id.name, { source, imported: member ?? "*" });
+            } else if (id.type === "ObjectPattern" && !member) {
+                for (const property of id.properties) {
+                    if (property.type !== "ObjectProperty" || property.computed) continue;
+                    const imported = property.key.name ?? property.key.value;
+                    const value = property.value.type === "AssignmentPattern" ? property.value.left : property.value;
+                    if (typeof imported === "string" && value.type === "Identifier") imports.set(value.name, { source, imported });
+                }
+            }
+        },
         ImportDeclaration(path: any) {
             const source = path.node.source.value;
             if (typeof source !== "string") {
@@ -238,7 +274,7 @@ async function readCallGraph(
                 (parent.isBlockStatement() && parent.node.body.some((node: any) =>
                     (node.type === "TSTypeAliasDeclaration" || node.type === "TSInterfaceDeclaration") && node.id.name === name.name)))) return;
             const binding = path.scope.getBinding(name.name);
-            if (!binding || !binding.path.parentPath?.isImportDeclaration()) return;
+            if (!binding || !isImportBinding(binding)) return;
             calls.push({ local: name.name, order: order++, typeOnly: true });
         },
         "CallExpression|OptionalCallExpression|NewExpression"(path: any) {
@@ -247,7 +283,7 @@ async function readCallGraph(
                 : (callee.type === "MemberExpression" || callee.type === "OptionalMemberExpression") && callee.object.type === "Identifier"
                     ? callee.object.name : undefined;
             const binding = local ? path.scope.getBinding(local) : undefined;
-            if (!binding || !binding.path.parentPath?.isImportDeclaration()) {
+            if (!binding || !isImportBinding(binding)) {
                 return;
             }
             if (callee.type === "Identifier") {
@@ -268,6 +304,19 @@ async function readCallGraph(
     } as any);
 
     return { imports, calls };
+}
+
+/** `require("./x")` with a literal specifier. */
+function requireSource(node: any): string | undefined {
+    return node?.type === "CallExpression" && node.callee.type === "Identifier" && node.callee.name === "require" &&
+        node.arguments.length === 1 && node.arguments[0].type === "StringLiteral" ? node.arguments[0].value : undefined;
+}
+
+/** An ES import, or a declaration initialised from `require(...)` or `require(...).name`. */
+function isImportBinding(binding: any): boolean {
+    if (binding.path.parentPath?.isImportDeclaration()) return true;
+    const init = binding.path.isVariableDeclarator() ? binding.path.node.init : undefined;
+    return requireSource(init) !== undefined || (init?.type === "MemberExpression" && requireSource(init.object) !== undefined);
 }
 
 /**
@@ -337,9 +386,8 @@ async function readExportedDefinitions(
     try {
         const { parse } = await loadBabel();
         ast = parse(code, PARSE_OPTIONS);
-        // A script may expose CommonJS exports that this ESM index cannot prove
-        // absent, so it cannot clear a competing wildcard branch.
-        if (ast.errors?.length || ast.program.sourceType !== "module") return undefined;
+        if (ast.errors?.length) return undefined;
+        if (ast.program.sourceType !== "module") return await readCommonJsExports(ast, code);
     } catch {
         return undefined;
     }
@@ -518,4 +566,84 @@ function cutAtLineBoundary(text: string, limit: number): string {
 function relativeSpecifier(fromDir: string, target: string): string {
     const relative = path.relative(fromDir, target).replace(/\\/g, "/");
     return relative.startsWith(".") ? relative : `./${relative}`;
+}
+
+/**
+ * Index a CommonJS module's exports: `module.exports = { ... }`, `module.exports.x =`
+ * and `exports.x =` at the top level. A name is reported absent only when the whole
+ * export surface is one object literal without spreads and nothing else touches
+ * `module.exports` or `exports`; any other shape answers "unknown", never absent.
+ */
+async function readCommonJsExports(ast: any, code: string): Promise<ExportLookup> {
+    const { traverse } = await loadBabel();
+    const declarations = new Map<string, { start: number; end: number; prefix: string }>();
+    const exported = new Map<string, { local?: string; range?: { start: number; end: number; prefix: string } }>();
+    const consumed = new Set<number>();
+    let complete = false;
+    let opaque = false;
+    const isModuleExports = (node: any) => node?.type === "MemberExpression" && !node.computed &&
+        node.object.type === "Identifier" && node.object.name === "module" &&
+        node.property.type === "Identifier" && node.property.name === "exports";
+    const namedTarget = (node: any): string | undefined => node?.type === "MemberExpression" && !node.computed &&
+        node.property.type === "Identifier" && (isModuleExports(node.object) ||
+            (node.object.type === "Identifier" && node.object.name === "exports")) ? node.property.name : undefined;
+
+    for (const node of ast.program.body) {
+        if (node.type === "FunctionDeclaration" || node.type === "ClassDeclaration") {
+            if (node.id?.name) declarations.set(node.id.name, { start: node.start, end: node.end, prefix: "" });
+            continue;
+        }
+        if (node.type === "VariableDeclaration") {
+            for (const declarator of node.declarations) {
+                if (declarator.id?.type === "Identifier") {
+                    declarations.set(declarator.id.name, { start: declarator.start, end: declarator.end, prefix: `${node.kind} ` });
+                }
+            }
+            continue;
+        }
+        const assignment = node.type === "ExpressionStatement" && node.expression.type === "AssignmentExpression" &&
+            node.expression.operator === "=" ? node.expression : undefined;
+        if (!assignment) continue;
+        const value = assignment.right;
+        if (isModuleExports(assignment.left)) {
+            consumed.add(assignment.left.start);
+            if (value.type !== "ObjectExpression") { opaque = true; continue; }
+            complete = true;
+            for (const property of value.properties) {
+                const key = property.computed ? undefined : property.key?.name ?? property.key?.value;
+                if (property.type === "SpreadElement" || typeof key !== "string") { opaque = true; continue; }
+                exported.set(key, property.type === "ObjectProperty" && property.value.type === "Identifier"
+                    ? { local: property.value.name } : { range: { start: property.start, end: property.end, prefix: "" } });
+            }
+            continue;
+        }
+        const name = namedTarget(assignment.left);
+        if (name) {
+            consumed.add(assignment.left.object.start);
+            exported.set(name, value.type === "Identifier" ? { local: value.name }
+                : { range: { start: node.start, end: node.end, prefix: "" } });
+        }
+    }
+    // Any other use of module.exports or a free `exports` (Object.assign, computed
+    // keys, writes inside functions) means the list above may be incomplete.
+    traverse(ast, {
+        MemberExpression(path: any) {
+            if (isModuleExports(path.node) && !consumed.has(path.node.start)) opaque = true;
+        },
+        Identifier(path: any) {
+            if (path.node.name !== "exports" || path.scope.getBinding("exports") || consumed.has(path.node.start)) return;
+            const parent = path.parentPath;
+            if (parent.isMemberExpression() && parent.node.property === path.node && !parent.node.computed) return;
+            if ((parent.isObjectProperty() || parent.isObjectMethod()) && parent.node.key === path.node && !parent.node.computed) return;
+            opaque = true;
+        }
+    } as any);
+
+    return (imported) => {
+        if (imported === "*" || imported === "default") return "unknown";
+        const entry = exported.get(imported);
+        if (!entry) return complete && !opaque ? "absent" : "unknown";
+        const range = entry.local ? declarations.get(entry.local) : entry.range;
+        return range ? { local: entry.local ?? imported, text: slice(code, range) } : { local: entry.local ?? imported };
+    };
 }

@@ -3,6 +3,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
 import { analyzeFile } from "../core/analysis/risk";
+import { checkTypes } from "../core/analysis/checkTypes";
 import { mapDependencies } from "../core/analysis/dependencies";
 import { analyzeLogs } from "../core/logs/analyzeLogs";
 import {
@@ -29,6 +30,9 @@ const VERSION = typeof __PACKAGE_VERSION__ === "string" ? __PACKAGE_VERSION__ : 
 
 const registry = new ProviderRegistry();
 
+/** Bounds one predict_failures call's model spend; larger change sets are split by the caller. */
+const MAX_PREDICT_FILES = 100;
+
 /**
  * Advertised once at initialize, so a session pays for this prose one time
  * rather than per call.
@@ -44,7 +48,8 @@ const registry = new ProviderRegistry();
 const INSTRUCTIONS = [
     "Deterministic tools first: scan_project and analyze_file cost nothing and answer most " +
         "questions about where the risk sits. Use map_dependencies for imports, reverse imports " +
-        "and tests connected by imports. predict_failures spawns a second model, so call " +
+        "and tests connected by imports. Use check_types for selected files' compiler diagnostics " +
+        "with no model call; compiler errors are not proof of runtime failure. predict_failures spawns a second model, so call " +
         "it when you want a verdict independent of your own.",
     "When you point these tools at code you wrote in this session -- a fix for something they " +
         "flagged, or a feature you just finished -- have it checked from outside the context " +
@@ -54,15 +59,14 @@ const INSTRUCTIONS = [
     "Which outside seat depends on how far the change reaches. A change confined to one file, " +
         "including a whole feature in one file: a fresh predict_failures on it, a second model " +
         "for one call. A change spanning several files: a sub-agent where the host has them, " +
-        "because predict_failures reads each file on its own and never sees how they have to " +
-        "agree. File count is the test -- not how large the change felt, and not whether it " +
+        "because predict_failures returns local defect verdicts rather than checking the " +
+        "whole feature's requirements. File count is the test -- not how large the change felt, and not whether it " +
         "was a fix or a feature. A clean predict_failures on new code is not a clearance -- it " +
         "means the file is locally sound, not that the feature is right.",
     "Reviewing more than one file: pass them all as `files` in a single predict_failures call. " +
-        "The verdicts are independent and run concurrently, so a batch bills the same as the " +
-        "same files one at a time and returns in roughly the time of the slowest one. Calling " +
-        "once per file pays that wait again for every file and is the main reason this tool " +
-        "feels slow.",
+        "Small files share bounded model calls, amortizing the CLI context and review policy. " +
+        "Groups run concurrently, and each file keeps its own verdict. Large files run alone. " +
+        "Missing verdicts are unavailable, not clean; retry only the files that need another assessment.",
     "Scope the sub-agent: give it the changed files and what you were trying to do, and ask " +
         "it to review only that. An unscoped agent rebuilds the project from cold and reports " +
         "on code nobody touched, which is what makes this expensive. Where the host can run it " +
@@ -104,10 +108,24 @@ function failure(message: string) {
 
 /* ---- Deterministic tools: no model call, no credentials, milliseconds. ---- */
 
+server.registerTool("check_types", {
+    title: "Check selected files with TypeScript",
+    annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
+    description: "Return TypeScript compiler diagnostics for selected JavaScript/TypeScript files. " +
+        "Uses the full local project's declarations and settings, but reports selected files only. " +
+        "No model, emit, plugins or project code execution. Without a config, uses inferred null checking " +
+        "with JS checking. Reports skipped files, incomplete context and limits; no diagnostics is not proof of runtime safety.",
+    inputSchema: {
+        files: z.array(z.string()).min(1).max(20).describe("Absolute paths of up to 20 files in one project"),
+        project: z.string().optional().describe("Explicit tsconfig.json/jsconfig.json path; otherwise discovered")
+    }
+}, async options => json(checkTypes(options)));
+
 server.registerTool(
     "map_dependencies",
     {
         title: "Map a file's dependency neighborhood",
+        annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
         description: "Find a file's local imports, reverse imports and tests connected by imports. " +
             "Each relationship includes a source path and line as evidence. Static file relationships, " +
             "not runtime callers or test coverage. Scans JavaScript/TypeScript including tests, with " +
@@ -133,6 +151,7 @@ server.registerTool(
     "analyze_file",
     {
         title: "Analyze one source file",
+        annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
         description:
             "Return static complexity metrics and a heuristic risk score (0-1) for a single " +
             "JavaScript or TypeScript file. Deterministic and fast — no model call. " +
@@ -156,6 +175,7 @@ server.registerTool(
     "scan_project",
     {
         title: "Rank a project's files by risk",
+        annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
         description:
             "Walk a directory and rank its JavaScript/TypeScript files by risk density — " +
             "how concentrated the failure-prone code is, not how big the file is. " +
@@ -246,6 +266,7 @@ server.registerTool(
     "analyze_logs",
     {
         title: "Find anomalous log lines",
+        annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
         description:
             "Score a log file's lines by severity and how unusual their wording is, and " +
             "return the anomalies, worst first. Deterministic — no model call, no API key. " +
@@ -310,6 +331,7 @@ function predictionBody(
         // Always present, even empty: an empty list is itself the signal that
         // no coverage was reported, and `verbose` would hide that.
         checked: checked ?? [],
+        ...(result.ai.cached ? { cached: true } : {}),
         combinedScore: round(result.combinedScore),
         staticRisk: round(result.riskScore),
         ...(truncated ? { truncated } : {}),
@@ -325,6 +347,26 @@ function predictionBody(
  * clean reply on code the agent just wrote is the turn this matters most and
  * is least likely to be remembered as needing it.
  */
+/**
+ * Uncertain findings name a defect scored under the gate. On the benchmark most
+ * were real, and an agent reading only the verdicts dropped them; the calling
+ * agent has the file and can settle one by reading a few lines. See
+ * bench/checkpoints/ENGINE-ACCURACY.md.
+ */
+function uncertainHint(results: FilePrediction[]): { check?: string } {
+    return results.some((result) => assessmentStatus(result.ai) === "uncertain")
+        ? { check: "uncertain results: read the cited lines and confirm or dismiss each yourself" }
+        : {};
+}
+
+/**
+ * Verdict quality moves with CLI releases (see bench/checkpoints/CACHE-CHECKPOINT.md), so a
+ * reply names the version that produced it.
+ */
+function providerVersion(location: { version?: string }): { providerVersion?: string } {
+    return location.version ? { providerVersion: location.version } : {};
+}
+
 function reviewHint(results: FilePrediction[]): string {
     return results.some((result) => actionableFindings(result.ai).length > 0)
         ? "verify the fix outside this context unless mechanical"
@@ -335,6 +377,7 @@ server.registerTool(
     "predict_failures",
     {
         title: "Predict the most likely runtime failure in a file",
+        annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: true },
         description:
             "Combine static analysis with a second-opinion verdict from the signed-in " +
             "Claude Code, Codex, or GitHub Copilot CLI, returning the most likely runtime " +
@@ -346,15 +389,16 @@ server.registerTool(
             "reported. Pass `multi: true` to get every " +
             "finding the model can demonstrate, ranked, in a `findings` array instead of " +
             "one verdict — experimental, and more findings per call is also more surface " +
-            "for false positives per call. Treat it as a defect only when " +
-            "`actionable` is true; " +
-            `that applies the measured score >= ${MIN_ACTIONABLE_SCORE} precision gate. ` +
+            "for false positives per call. `actionable` applies the measured " +
+            `score >= ${MIN_ACTIONABLE_SCORE} precision gate. \`uncertain\` names a candidate the ` +
+            "reviewer could not confirm: read its cited lines before dismissing it, and " +
+            "report it only if you confirm it yourself. " +
             "This spawns another model and takes 5-15 seconds, so only call it " +
             "when you specifically want an independent second opinion. If you are yourself " +
             "reviewing the code, use analyze_file and read the source instead. " +
             "Reviewing several files? Pass them all as `files` in one call rather than " +
-            "calling once per file: the verdicts run concurrently, so the batch costs the " +
-            "same and takes about as long as a single file.",
+            "calling once per file: small files share bounded model calls to reduce repeated " +
+            "CLI context. Groups run concurrently, with individual verdicts and explicit failures.",
         inputSchema: {
             file: z
                 .string()
@@ -362,13 +406,13 @@ server.registerTool(
                 .describe("Absolute path to a .js/.jsx/.ts/.tsx file"),
             files: z
                 .array(z.string())
+                .max(MAX_PREDICT_FILES)
                 .optional()
                 .describe(
-                    "Absolute paths to review in one call, run concurrently. Prefer this " +
-                        "over one call per file when checking a change set: the verdicts are " +
-                        "independent, so a batch bills the same as the same files one at a " +
-                        "time but finishes in roughly the time of the slowest one. Replies " +
-                        "carry a `results` array in the order given. Supersedes `file`."
+                    "Absolute paths to review in one call. Small files share bounded model " +
+                        "calls, reducing repeated CLI context; large files run alone. Replies " +
+                        "carry a `results` array in the order given. Supersedes `file`. " +
+                        `At most ${MAX_PREDICT_FILES}; only JavaScript/TypeScript source is sent to the model.`
                 ),
             concurrency: z
                 .number()
@@ -377,7 +421,7 @@ server.registerTool(
                 .max(8)
                 .optional()
                 .describe(
-                    `Verdicts in flight at once for a batch (default ${DEFAULT_CONCURRENCY}). ` +
+                    `Model calls in flight at once (default ${DEFAULT_CONCURRENCY}), each covering up to eight files. ` +
                         "Lower it if the provider starts rate-limiting."
                 ),
             provider: z
@@ -453,7 +497,9 @@ server.registerTool(
                 return json({
                     ...predictionBody(givenFor.get(targets[0])!, result, { verbose, logFile }),
                     review: reviewHint([result]),
-                    viaProvider: active.provider.id
+                    ...uncertainHint([result]),
+                    viaProvider: active.provider.id,
+                    ...providerVersion(active.location)
                 });
             }
 
@@ -470,7 +516,9 @@ server.registerTool(
                     })
                 ),
                 review: reviewHint(results), // hoisted: identical for every entry
+                ...uncertainHint(results),
                 viaProvider: active.provider.id,
+                ...providerVersion(active.location),
                 ...(failures.length > 0
                     ? {
                           failures: failures.map((entry) => ({
@@ -491,6 +539,7 @@ server.registerTool(
     "list_providers",
     {
         title: "Show available CLI providers",
+        annotations: { readOnlyHint: true, destructiveHint: false, openWorldHint: false },
         description:
             "Report which supported CLIs (Claude Code, Codex, GitHub Copilot) are installed " +
             "and signed in. " +

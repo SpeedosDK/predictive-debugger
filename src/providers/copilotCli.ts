@@ -125,6 +125,9 @@ export function completeArgs(model?: string): string[] {
         // Text in, text out. Denials beat every allow rule, including a future
         // `--allow-all-tools`, and the source we send is untrusted input.
         "--deny-tool=shell,write,url",
+        // Built-in MCP disabling leaves custom servers loaded. An empty tool
+        // allowlist also prevents calls to inherited, pre-approved MCP tools.
+        "--available-tools=",
         "--disable-builtin-mcps",
         // Nobody is there to answer a question in this mode.
         "--no-ask-user"

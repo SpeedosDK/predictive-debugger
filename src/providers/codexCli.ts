@@ -67,23 +67,7 @@ export class CodexCliProvider implements CliProvider {
         const tempDir = fs.mkdtempSync(path.join(os.tmpdir(), "predictive-debugger-"));
         const messagePath = path.join(tempDir, "last-message.txt");
 
-        const args = [
-            "exec",
-            // Read the prompt from stdin.
-            "-",
-            "--skip-git-repo-check",
-            // Don't leave session files behind for a one-shot classification.
-            "--ephemeral",
-            "--sandbox",
-            "read-only",
-            "--color",
-            "never",
-            "--output-last-message",
-            messagePath
-        ];
-        if (options.model) {
-            args.push("--model", options.model);
-        }
+        const args = execArgs(messagePath, options.model);
 
         try {
             const result = await runProcess({
@@ -118,4 +102,39 @@ function readIfPresent(file: string): string | undefined {
     } catch {
         return undefined;
     }
+}
+
+/**
+ * Agent features a review never needs. Enabled by default, they give a model reading
+ * untrusted source a shell (read-only sandbox, so it can still read any file), a
+ * browser, computer use, plugins and sub-agents. The `-c` form is used because
+ * `--disable` rejects names a CLI version does not know, which would turn a future
+ * rename into a failed review; unknown `-c` feature keys are ignored.
+ *
+ * Measured on CLI 0.157.1: per-call context 17.8k -> 14.0k tokens, but none of it is
+ * served from Codex's shared prompt cache any more (+~9k uncached tokens per call).
+ */
+const DISABLED_FEATURES = [
+    "shell_tool", "unified_exec", "browser_use", "browser_use_external", "browser_use_full_cdp_access",
+    "computer_use", "in_app_browser", "apps", "plugins", "multi_agent", "image_generation",
+    "skill_search", "tool_suggest", "view_image", "goals", "sleep_tool", "code_mode_host", "collaboration_modes"
+];
+
+export function execArgs(messagePath: string, model?: string): string[] {
+    return [
+        "exec",
+        // Read the prompt from stdin.
+        "-",
+        "--skip-git-repo-check",
+        // Don't leave session files behind for a one-shot classification.
+        "--ephemeral",
+        "--sandbox",
+        "read-only",
+        "--color",
+        "never",
+        ...DISABLED_FEATURES.flatMap(feature => ["-c", `features.${feature}=false`]),
+        "--output-last-message",
+        messagePath,
+        ...(model ? ["--model", model] : [])
+    ];
 }

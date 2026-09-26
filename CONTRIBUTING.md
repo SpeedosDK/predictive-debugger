@@ -126,12 +126,15 @@ tested without a model call — `core/prediction/confidence.ts` and
 
 Weights, thresholds and prompt wording in this project are backed by
 measurements in [bench/RESULTS.md](bench/RESULTS.md), and the comments next to
-them say which measurement. If you change one, re-run the benchmark and update
-both the comment and the report:
+them say which measurement. If you change one, check it against a real CLI and
+update both the comment and the report:
 
 ```bash
-npm run bench      # real CLI calls; takes minutes and consumes model usage
+npm run bench:canary -- --provider=claude   # ~1 minute on the held-out cases
 ```
+
+A full comparison (`bench/cli-workflows.mjs`, see [bench/METHOD.md](bench/METHOD.md))
+takes hours and consumes model usage.
 
 If the benchmark cannot be run for a change, say so in the pull request rather
 than adjusting the documented figures by hand. Note that the corpora are generated

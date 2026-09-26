@@ -10,6 +10,9 @@
  * ESM-only, so unbundled code has to reach them through a dynamic import.
  */
 import { readFileSync } from "fs";
+import { mkdir, readdir, copyFile } from "fs/promises";
+import { createRequire } from "module";
+import path from "path";
 import esbuild from "esbuild";
 
 // The MCP server reports its version over the wire. Injecting it here keeps that
@@ -28,7 +31,7 @@ const shared = {
     target: "node18",
     minify: production,
     sourcemap: production ? false : "linked",
-    define: { __PACKAGE_VERSION__: JSON.stringify(version) },
+    define: { __PACKAGE_VERSION__: JSON.stringify(version), __TYPESCRIPT_LIB_DIR__: '"typescript-lib"' },
     logLevel: "info"
 };
 
@@ -47,6 +50,15 @@ const targets = [
         banner: { js: "#!/usr/bin/env node" }
     }
 ];
+
+const require = createRequire(import.meta.url);
+const compilerDirectory = path.dirname(require.resolve("typescript"));
+await mkdir("dist/typescript-lib", { recursive: true });
+for (const file of (await readdir(compilerDirectory)).filter(name => /^lib.*\.d\.ts$/.test(name))) {
+    await copyFile(path.join(compilerDirectory, file), path.join("dist/typescript-lib", file));
+}
+await copyFile(path.join(compilerDirectory, "../LICENSE.txt"), "dist/typescript-lib/LICENSE.txt");
+await copyFile(path.join(compilerDirectory, "../ThirdPartyNoticeText.txt"), "dist/typescript-lib/ThirdPartyNoticeText.txt");
 
 if (watch) {
     const contexts = await Promise.all(targets.map((options) => esbuild.context(options)));

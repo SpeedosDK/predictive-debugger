@@ -9,6 +9,8 @@ import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
+import { mkdtemp, writeFile, rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -19,6 +21,7 @@ const [command = process.execPath, ...args] = process.argv.slice(2);
 const EXPECTED_TOOLS = [
     "analyze_file",
     "analyze_logs",
+    "check_types",
     "list_providers",
     "map_dependencies",
     "predict_failures",
@@ -26,6 +29,7 @@ const EXPECTED_TOOLS = [
 ];
 
 const client = new Client({ name: "ci-smoke", version: "1.0.0" });
+const typeFixture = await mkdtemp(path.join(tmpdir(), "predictive-type-smoke-"));
 
 try {
     await client.connect(
@@ -44,6 +48,9 @@ try {
 
     for (const tool of tools) {
         assert.ok(tool.description?.length > 40, `${tool.name} needs a real description`);
+        assert.equal(tool.annotations?.readOnlyHint, true, `${tool.name} should describe its read-only behavior`);
+        assert.equal(tool.annotations?.destructiveHint, false, `${tool.name} should not advertise destructive effects`);
+        assert.equal(tool.annotations?.openWorldHint, tool.name === "predict_failures");
     }
 
     // Batching is the difference between a review of four files costing four
@@ -67,7 +74,11 @@ try {
     // itself, and the routing that keeps it from sending every change to a
     // sub-agent, which is the half that decides whether the rule is affordable.
     const instructions = client.getInstructions();
+    assert.match(instructions, /check_types/);
     assert.ok(instructions, "server should advertise instructions");
+    assert.match(instructions, /Small files share bounded model calls/);
+    assert.match(instructions, /Missing verdicts are unavailable, not clean/);
+    assert.doesNotMatch(instructions, /batch bills the same/);
     assert.match(instructions, /Use map_dependencies for imports, reverse imports/);
     assert.match(
         instructions,
@@ -117,7 +128,19 @@ try {
     assert.ok(neighborhood.dependencies.every(entry => entry.via.every(edge => edge.line > 0)));
     assert.equal(neighborhood.coverage.scanLimited, false);
 
+    await writeFile(path.join(typeFixture, "tsconfig.json"), JSON.stringify({ compilerOptions: { strict: true, target: "ES2022" } }));
+    const typedFile = path.join(typeFixture, "value.ts");
+    await writeFile(typedFile, 'export async function value(): Promise<string> { document.createElement("div"); return 1; }');
+    const typed = await client.callTool({ name: "check_types", arguments: { files: [typedFile] } });
+    const typeResult = JSON.parse(typed.content[0].text);
+    assert.equal(typeResult.status, "checked", JSON.stringify(typeResult));
+    assert.deepEqual(typeResult.contextIssues, [], "Packaged compiler must find Promise and DOM libraries");
+    assert.equal(typeResult.diagnostics.length, 1);
+    assert.equal(typeResult.diagnostics[0].code, 2322);
     console.log(`MCP server OK — ${names.length} tools, deterministic calls verified`);
 } finally {
     await client.close();
+    assert.equal(path.dirname(typeFixture), path.resolve(tmpdir()));
+    assert.ok(path.basename(typeFixture).startsWith("predictive-type-smoke-"));
+    await rm(typeFixture, { recursive: true, force: true });
 }

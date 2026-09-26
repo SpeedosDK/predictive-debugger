@@ -1,0 +1,74 @@
+{
+  "copilot/read#1/corpus-ts/src/api/order.controller.ts": {
+    "responseHash": "cf30dbe13016e8d05867e7c15b3a08156863078dc942281707fc76f629240743",
+    "matchesDefect": false,
+    "validDefect": false,
+    "note": "order?.lines ?? [] guards an absent order; no shown order lacks lines"
+  },
+  "copilot/read#1/corpus/src/holdout/heartbeat.js": {
+    "responseHash": "cf30dbe13016e8d05867e7c15b3a08156863078dc942281707fc76f629240743",
+    "matchesDefect": true,
+    "validDefect": false,
+    "note": "planted unhandled ping rejection, cited one line above the range"
+  },
+  "copilot/read#1/corpus/src/holdout/recent.ts": {
+    "responseHash": "cf30dbe13016e8d05867e7c15b3a08156863078dc942281707fc76f629240743",
+    "matchesDefect": true,
+    "validDefect": false,
+    "note": "planted n+1 slice, cited at the early-return line"
+  },
+  "copilot/current#2/corpus/src/workers/reconciliationWorker.js": {
+    "responseHash": "65eee5059d93f042d8caf44df16d2e859ec052507d1529b9a8fd69090278c370",
+    "matchesDefect": true,
+    "validDefect": false,
+    "note": "planted stale-balance race, cited at start()"
+  },
+  "copilot/read#2/corpus-ts/src/services/sync.service.ts": {
+    "responseHash": "cff112d3407af168b26d530d21d5cb16602d21296a1fd1de4461e9b76bdca3e1",
+    "matchesDefect": true,
+    "validDefect": false,
+    "note": "planted createdAt filter, cited at the method line"
+  },
+  "codex/read#1/corpus/src/services/pricingService.js": {
+    "responseHash": "61b29f951e75f31de51c18444f93ee6a3b8f8782719acc2ebe936729c9463d08",
+    "matchesDefect": false,
+    "validDefect": true,
+    "note": "real unplanted defect: ../lib/currency does not export roundMoney"
+  },
+  "codex/read#1/corpus/src/workers/reconciliationWorker.js": {
+    "responseHash": "61b29f951e75f31de51c18444f93ee6a3b8f8782719acc2ebe936729c9463d08",
+    "matchesDefect": false,
+    "validDefect": true,
+    "note": "real different defect: backfill replaces the balance with a partial sum"
+  },
+  "codex/read#1/corpus/src/api/adminController.js": {
+    "responseHash": "61b29f951e75f31de51c18444f93ee6a3b8f8782719acc2ebe936729c9463d08",
+    "matchesDefect": false,
+    "validDefect": true,
+    "note": "real unplanted defect: ../lib/serialise does not export toDto"
+  },
+  "codex/current#1/corpus-ts/src/models/receipt.entity.ts": {
+    "responseHash": "190f6e5ae059e83120c0bbd86e980f76df252291e424fe77f3582be0ac5a00ac",
+    "matchesDefect": false,
+    "validDefect": false,
+    "note": "no wrong result in the shown code: amount is only interpolated"
+  },
+  "codex/current#1/corpus-ts/src/lib/headers.mts": {
+    "responseHash": "190f6e5ae059e83120c0bbd86e980f76df252291e424fe77f3582be0ac5a00ac",
+    "matchesDefect": false,
+    "validDefect": false,
+    "note": "no shown caller supplies mixed-case keys; Node lowercases incoming headers (Astra judged this real)"
+  },
+  "codex/read#2/corpus/src/services/pricingService.js": {
+    "responseHash": "a39855b6bc2cbf137aa7810b57aa361087d21cab277cbee6954ef991832a0fd9",
+    "matchesDefect": false,
+    "validDefect": true,
+    "note": "real unplanted defect: ../lib/currency does not export roundMoney"
+  },
+  "codex/read#2/corpus/src/workers/reconciliationWorker.js": {
+    "responseHash": "a39855b6bc2cbf137aa7810b57aa361087d21cab277cbee6954ef991832a0fd9",
+    "matchesDefect": false,
+    "validDefect": true,
+    "note": "real different defect: backfill replaces the balance with a partial sum"
+  }
+}

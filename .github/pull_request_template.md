@@ -11,7 +11,7 @@
 
 ## If this changes a weight, threshold, or the classifier prompt
 
-- [ ] Benchmark re-run (`npm run bench`), or noted below that it was not
+- [ ] Canary run (`npm run bench:canary -- --provider=<id>`) or a full comparison, or noted below that it was not
 - [ ] The comment next to the number and `bench/RESULTS.md` both updated
 
 <!-- Numbers in this project are in-sample: the corpora are generated and the

@@ -6,6 +6,78 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.9.0] - 2026-09-26
+
+Measured on 49 benchmark files in full agent sessions with Claude, Copilot and Codex:
+this release finds as many bugs as an agent reading the files itself, or more, with
+32–69% fewer tokens, and matches v0.8.2's accuracy with Claude at 78% fewer tokens.
+With Copilot, v0.8.2 found two more bugs over two sessions at 2.5 times the tokens.
+See [the results](bench/RESULTS.md).
+
+### Added
+
+- `check_types` returns selected JavaScript/TypeScript files' compiler diagnostics
+  without model calls. It preserves configured project declarations and options,
+  reports incomplete context and limits, and bundles TypeScript's standard libraries.
+  Compiler diagnostics are separate from model confidence and runtime predictions.
+- Imported definitions now include CommonJS: `require()` bindings and exports from
+  `module.exports`/`exports`. When a required name provably is not exported (the
+  module's exports are one complete object literal), the model is told so; in any
+  less certain shape nothing is claimed. Not yet benchmarked.
+- Replies to `predict_failures` include `providerVersion`, the CLI version that
+  produced the verdicts, and `cached: true` for a reused verdict (below).
+- `npm run bench:canary -- --provider=<id>` checks an installed CLI against 12
+  held-out benchmark files in about a minute and reports PASS or DRIFT.
+
+### Changed
+
+- Small files share model calls: up to eight per call, with a bounded prompt, each
+  keeping its own verdict and line validation. Large files still run alone. A file
+  whose group verdict names a defect with a score under 0.80, or that the group
+  calls clean although it reads, awaits and writes back shared state, is reviewed
+  again on its own, and that verdict replaces the group's. Missing or malformed
+  group verdicts are unavailable, never clean.
+- Scores are anchored to a trigger the shown code permits and a result the shown
+  code contradicts, and the expected behavior must come from the code, not from the
+  model's own assumptions.
+- `uncertain` results are no longer something to ignore: replies containing one add
+  `check`, asking the calling agent to read the cited lines and confirm or dismiss it.
+- Re-reviewing a set after editing one file no longer pays for the unchanged ones.
+  Within a server session, identical review input returns the earlier verdict with
+  `cached: true`; failed and unavailable verdicts are never reused.
+- After two failed provider calls in a row, the remaining files fail at once with
+  the reason instead of each waiting out its timeout. Re-checks start as soon as
+  their group finishes, and files are read and parsed in parallel.
+- Claude reviews no longer make a hidden side call that sent every prompt uncached,
+  and no longer load your skills, MCP servers or session files.
+- `concurrency` counts model calls in flight, each covering up to eight files.
+- `bench/RESULTS.md` summarizes the current comparison; older reports remain at the
+  release tags. `npm run bench` is replaced by `npm run bench:canary`.
+
+### Security
+
+- Only JavaScript/TypeScript source files are sent to the model. A path to a `.env`
+  or key file is refused before any provider call, imports resolve only to source
+  files, and one call accepts at most 100 files.
+- Each review call starts the CLI in a new, empty temporary folder, deleted
+  afterwards. In the project folder, all three CLIs loaded its `CLAUDE.md`/`AGENTS.md`
+  into every review, costing tokens and letting the repository under review instruct
+  its reviewer. See [SECURITY.md](SECURITY.md#security-model).
+- Codex reviews turn off Codex's agent tools (shell, patching, web, browser, computer
+  use, plugins, sub-agents, image generation). With its defaults, asked to read a
+  file, the reviewing Codex called its shell. Each Codex call now sends about 9k more
+  uncached tokens, because its shared prompt cache no longer applies.
+- Copilot reviews expose no tools to the model, including MCP tools from your own
+  configuration.
+- MCP tools declare themselves read-only and non-destructive, which also lets Codex
+  call them with approvals off; v0.8.2 could not run there.
+
+### Fixed
+
+- Brackets in prose before a model's verdict (`checked [x]`, `line [12]`) no longer
+  make the verdict unavailable.
+- An explicit `unknown` verdict stays unavailable instead of becoming a clean result.
+
 ## [0.8.2] - 2026-09-24
 
 ### Changed
@@ -62,7 +134,7 @@ All notable changes to this project are documented here. The format follows
   3% more total tokens than v0.7.1 in the complete comparison. The report separates
   the original cases from new dependency cases and compares tokens, with no monetary
   savings claim. See [benchmark results](bench/RESULTS.md).
-- Shared batch caching is deferred after [profiling](bench/BATCH-PARSING-CHECKPOINT.md)
+- Shared batch caching is deferred after [profiling](bench/checkpoints/BATCH-PARSING-CHECKPOINT.md)
   found little repeated indexing time worth saving.
 - Release comparisons reuse compatible saved results for the latest official
   release and test only the candidate. Detailed results belong in `bench/`, with
@@ -704,7 +776,8 @@ README.
 - `@types/vscode` was newer than the declared `engines.vscode`, which prevented
   packaging and allowed use of APIs missing from the minimum supported version.
 
-[Unreleased]: https://github.com/SpeedosDK/predictive-debugger/compare/v0.8.2...HEAD
+[Unreleased]: https://github.com/SpeedosDK/predictive-debugger/compare/v0.9.0...HEAD
+[0.9.0]: https://github.com/SpeedosDK/predictive-debugger/compare/v0.8.2...v0.9.0
 [0.8.2]: https://github.com/SpeedosDK/predictive-debugger/compare/v0.8.1...v0.8.2
 [0.8.1]: https://github.com/SpeedosDK/predictive-debugger/compare/v0.8.0...v0.8.1
 [0.8.0]: https://github.com/SpeedosDK/predictive-debugger/compare/v0.7.1...v0.8.0

@@ -1,5 +1,6 @@
 import fs from "fs/promises";
 import path from "path";
+import { isSourceFile } from "../sourceFiles";
 
 /** Extensions we can parse, in the order a resolver should try them. */
 const RESOLVE_EXTENSIONS = [".ts", ".tsx", ".mts", ".cts", ".js", ".jsx", ".mjs", ".cjs"];
@@ -40,8 +41,10 @@ export async function resolveModule(fromDir: string, specifier: string): Promise
         candidates.push(path.join(base, `index${ext}`));
     }
 
+    // Resolved definitions are sent to the model, so a JSON or dotfile import
+    // never resolves, even if nothing would be extracted from it today.
     for (const candidate of candidates) {
-        if (await isFile(candidate)) {
+        if (isSourceFile(candidate) && await isFile(candidate)) {
             return candidate;
         }
     }
