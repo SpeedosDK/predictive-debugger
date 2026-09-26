@@ -57,7 +57,8 @@
     "vscode:prepublish": "npm run build",
     "bundle:dev": "node esbuild.mjs",
     "bench": "npm run compile && npm run build && node .github/scripts/check-mcp.mjs && node bench/prepare-master.mjs && node bench/workflows.mjs --output=results-v072-full.json && node bench/markdown.mjs && python bench/plot-workflows.py && node bench/report-v072-full.mjs && python bench/plot-v072-full.py",
-    "bench:agents": "node bench/workflows.mjs --output=results-v072-full.json"
+    "bench:agents": "node bench/workflows.mjs --output=results-v072-full.json",
+    "bench:canary": "npm run compile && node bench/canary.mjs"
   },
   "engines": {
     "vscode": "^1.85.0",
@@ -119,7 +120,7 @@
         "predictiveDebugger.maxFiles": {
           "type": "number",
           "default": 25,
-          "description": "Maximum number of files to analyse in a project run. Each file costs one CLI call."
+          "description": "Maximum number of files to analyse in a project run. Small files share bounded CLI calls."
         }
       }
     }

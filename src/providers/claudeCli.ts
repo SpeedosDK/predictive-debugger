@@ -81,19 +81,32 @@ export class ClaudeCliProvider implements CliProvider {
             "json",
             // Pure text in, text out: no file reads, no bash, no web access.
             "--tools",
-            ""
+            "",
+            // The child otherwise inherits the user's session: skills, MCP servers
+            // and session files. None of it is used, and the skill listing alone
+            // roughly doubled the tokens sent with each file.
+            "--no-session-persistence",
+            "--disable-slash-commands",
+            "--strict-mcp-config"
         ];
         if (options.model) {
             args.push("--model", options.model);
         }
 
+        // The prompt stays whole on stdin rather than moving its fixed instructions
+        // into `--system-prompt` for cross-file caching: there, Sonnet scored the
+        // same defects ~0.1 lower, under the 0.70 gate. See bench/CACHE-CHECKPOINT.md.
         const result = await runProcess({
             file: location.file,
             args,
             input: options.prompt,
             cwd: options.cwd,
             timeoutMs: options.timeoutMs,
-            signal: options.signal
+            signal: options.signal,
+            // Without this, every call also sends the whole prompt uncached to a
+            // small model for ~10 tokens of session metadata. In the v0.8.0
+            // benchmark that was 317k of the 322k uncached input tokens.
+            env: { ...process.env, CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC: "1" }
         });
 
         const parsed = parsePrintResult(result.stdout);

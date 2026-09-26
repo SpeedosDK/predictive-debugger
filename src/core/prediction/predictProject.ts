@@ -4,7 +4,7 @@ import { PredictOptions } from "./predictFile";
 import { DEFAULT_CONCURRENCY, predictFiles } from "./predictFiles";
 
 export interface PredictProjectOptions extends PredictOptions {
-    /** Stop after this many files. Each file costs one model call. */
+    /** Stop after this many files. Small files share bounded model calls. */
     maxFiles?: number;
     /** Provider calls in flight at once (default {@link DEFAULT_CONCURRENCY}). */
     concurrency?: number;

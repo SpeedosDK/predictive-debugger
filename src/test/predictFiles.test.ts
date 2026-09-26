@@ -5,6 +5,7 @@ import path from "node:path";
 import { after, before, describe, it } from "node:test";
 import { CliLocation, CliProvider, CompleteOptions } from "../providers/types";
 import { DEFAULT_CONCURRENCY, predictFiles } from "../core/prediction/predictFiles";
+import { MAX_BATCH_FILES } from "../core/prediction/predictBug";
 
 let dir = "";
 
@@ -17,6 +18,16 @@ after(async () => {
 });
 
 describe("predictFiles", () => {
+    it("shares one provider call across eight files for every provider", async () => {
+        const files = await write(Array.from({ length: 8 }, (_, i) => `batch-${i}.js`));
+        for (const id of ["claude", "codex", "copilot"] as const) {
+            const provider = fakeProvider({ delayFor: () => 0 });
+            const result = await predictFiles(files, base({ ...provider, id }));
+            assert.equal(provider.calls, 1);
+            assert.equal(result.results.length, files.length);
+            assert.ok(result.results.every(r => r.ai.findings[0].pattern === "none"));
+        }
+    });
     it("rejects oversized sources without calling the provider and preserves other results", async () => {
         const oversized = path.join(dir, "oversized.js");
         const handle = await fs.open(oversized, "w");
@@ -52,22 +63,21 @@ describe("predictFiles", () => {
     });
 
     it("returns results in the order the paths were given, not completion order", async () => {
-        // Reversed delays, so completion order is the exact opposite of input
-        // order. If the pool ever returns results as they land, this fails.
-        const files = await write(["a.js", "b.js", "c.js", "d.js"]);
-        const provider = fakeProvider({ delayFor: (file) => (file.includes("a.js") ? 40 : 1) });
+        // Delay the first group so later groups finish before it.
+        const files = await write(Array.from({ length: 25 }, (_, i) => `concurrent-${i}.js`));
+        const provider = fakeProvider({ delayFor: (prompt) => (prompt.includes("marker-concurrent-0") ? 40 : 1) });
 
         const { results, failures } = await predictFiles(files, base(provider));
 
         assert.deepEqual(failures, []);
         assert.deepEqual(
             results.map((r) => path.basename(r.file)),
-            ["a.js", "b.js", "c.js", "d.js"]
+            files.map(file => path.basename(file))
         );
     });
 
     it("runs concurrently rather than one after another", async () => {
-        const files = await write(["a.js", "b.js", "c.js", "d.js"]);
+        const files = await write(Array.from({ length: 25 }, (_, i) => `parallel-${i}.js`));
         const provider = fakeProvider({ delayFor: () => 60 });
 
         const started = Date.now();
@@ -83,7 +93,7 @@ describe("predictFiles", () => {
     });
 
     it("never exceeds the concurrency bound", async () => {
-        const files = await write(["a.js", "b.js", "c.js", "d.js", "e.js", "f.js"]);
+        const files = await write(Array.from({ length: 41 }, (_, i) => `bounded-${i}.js`));
         const provider = fakeProvider({ delayFor: () => 20 });
 
         await predictFiles(files, { ...base(provider), concurrency: 2 });
@@ -93,12 +103,22 @@ describe("predictFiles", () => {
     });
 
     it("defaults to DEFAULT_CONCURRENCY", async () => {
-        const files = await write(Array.from({ length: 8 }, (_, i) => `f${i}.js`));
+        const files = await write(Array.from({ length: MAX_BATCH_FILES * DEFAULT_CONCURRENCY + 1 }, (_, i) => `f${i}.js`));
         const provider = fakeProvider({ delayFor: () => 20 });
 
         await predictFiles(files, base(provider));
 
         assert.equal(provider.maxInFlight, DEFAULT_CONCURRENCY);
+    });
+
+    it("keeps large singleton calls concurrent after prompt-size splitting", async () => {
+        const files = await write(Array.from({ length: 8 }, (_, i) => `large-${i}.js`));
+        await Promise.all(files.map(file => fs.writeFile(file, `// ${"x".repeat(118_000)}`)));
+        const provider = fakeProvider({ delayFor: () => 20 });
+        const result = await predictFiles(files, { ...base(provider), concurrency: 4 });
+        assert.equal(provider.calls, 8);
+        assert.equal(provider.maxInFlight, 4);
+        assert.equal(result.results.length, 8);
     });
 
     it("never starts more calls than there are files", async () => {
@@ -111,21 +131,22 @@ describe("predictFiles", () => {
         assert.equal(provider.calls, 1);
     });
 
-    it("isolates a failing file instead of discarding the batch", async () => {
-        const files = await write(["a.js", "b.js", "c.js"]);
+    it("preserves successful groups and does not retry a failed provider call", async () => {
+        const files = await write(Array.from({ length: 9 }, (_, i) => `failure-${i}.js`));
         const provider = fakeProvider({
             delayFor: () => 1,
-            failOn: (prompt) => prompt.includes("// marker-b")
+            failOn: (prompt) => prompt.includes("// marker-failure-0")
         });
 
         const { results, failures } = await predictFiles(files, base(provider));
 
         assert.deepEqual(
             results.map((r) => path.basename(r.file)),
-            ["a.js", "c.js"]
+            ["failure-8.js"]
         );
-        assert.equal(failures.length, 1);
-        assert.equal(path.basename(failures[0].file), "b.js");
+        assert.equal(failures.length, 8);
+        assert.equal(provider.calls, 2);
+        assert.equal(path.basename(failures[0].file), "failure-0.js");
         assert.match(failures[0].reason, /provider exploded/);
     });
 
@@ -144,7 +165,7 @@ describe("predictFiles", () => {
     });
 
     it("returns the files that finished when the signal aborts mid-batch", async () => {
-        const files = await write(["a.js", "b.js", "c.js", "d.js"]);
+        const files = await write(Array.from({ length: 20 }, (_, i) => `cancel-${i}.js`));
         const controller = new AbortController();
         const provider = fakeProvider({
             delayFor: () => 10,
@@ -231,10 +252,24 @@ function fakeProvider(options: {
                 if (options.failOn?.(opts.prompt)) {
                     throw new Error("provider exploded");
                 }
-                return '{"pattern":"none","score":0,"reason":"fine"}';
+                const ids = [...opts.prompt.matchAll(/^REVIEW ID: (\d+)$/gm)].map(match => Number(match[1]));
+                return ids.length ? JSON.stringify({ results: ids.map(id => ({ id, pattern: "none", score: 0, reason: "fine" })) })
+                    : '{"pattern":"none","score":0,"reason":"fine"}';
             } finally {
                 inFlight -= 1;
             }
         }
     };
 }
+
+describe("predictFiles source restriction", () => {
+    it("never sends a non-source file to the provider", async () => {
+        const secret = path.join(dir, ".env");
+        await fs.writeFile(secret, "AWS_SECRET=abc123\n");
+        const provider = fakeProvider({ delayFor: () => 0 });
+        const { results, failures } = await predictFiles([secret], base(provider));
+        assert.equal(provider.calls, 0);
+        assert.equal(results.length, 0);
+        assert.match(failures[0].reason, /only source files are sent/);
+    });
+});

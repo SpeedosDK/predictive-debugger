@@ -10,14 +10,19 @@ process.stdin.on('end', async () => {
     try {
         const env = { ...process.env };
         delete env.CLAUDECODE;
+        // Read before the provider deletes it. Recombined as fullPrompt does, so the
+        // hash matches records captured when everything went over stdin.
+        const systemAt = process.argv.indexOf('--system-prompt-file');
+        const prompt = systemAt === -1 ? input
+            : `${fs.readFileSync(process.argv[systemAt + 1], 'utf8')}\n\n${input}`;
         const result = await runProcess({ file: env.BENCH_REAL_CLAUDE, args: process.argv.slice(2),
             input, cwd: process.cwd(), env, timeoutMs: 240_000 });
         if (!process.argv.includes('--version')) {
             let report;
             try { report = JSON.parse(result.stdout.trim()); } catch { report = { parseError: true }; }
             fs.writeFileSync(path.join(env.BENCH_USAGE_DIR, `${randomUUID()}.json`), JSON.stringify({
-                promptHash: createHash('sha256').update(input).digest('hex'),
-                prompt: input, code: result.code, report
+                promptHash: createHash('sha256').update(prompt).digest('hex'),
+                prompt, code: result.code, report
             }));
         }
         process.stdout.write(result.stdout);

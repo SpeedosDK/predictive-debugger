@@ -1,0 +1,1242 @@
+{
+  "copilot/67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169/3440219cfc1d5ab42b0c320868d844a8d29be31cc63b4f78283a393f6aeeda3f/corpus/src/services/pricingService.js": {
+    "sourceHash": "c8b67a8be15f8a09c3c3d5a902fc33999f902f46b7b23cbcfef8aa1e7cff1614",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "3440219cfc1d5ab42b0c320868d844a8d29be31cc63b4f78283a393f6aeeda3f",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169/3440219cfc1d5ab42b0c320868d844a8d29be31cc63b4f78283a393f6aeeda3f/corpus/src/services/inventoryService.js": {
+    "sourceHash": "d38ac20410e079ba47c3eef0b10eeda28129bd39b3579f3be7b3a8ebb53d6245",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "3440219cfc1d5ab42b0c320868d844a8d29be31cc63b4f78283a393f6aeeda3f",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169/3440219cfc1d5ab42b0c320868d844a8d29be31cc63b4f78283a393f6aeeda3f/corpus/src/models/cartTotals.js": {
+    "sourceHash": "6eaa471ab94bf8ba1218f229e8822656e21a0ffa6e615fcec47033cadd6d6747",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "3440219cfc1d5ab42b0c320868d844a8d29be31cc63b4f78283a393f6aeeda3f",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169/3440219cfc1d5ab42b0c320868d844a8d29be31cc63b4f78283a393f6aeeda3f/corpus/src/lib/retry.js": {
+    "sourceHash": "4c54b5e486ee9f5ba09a38fc6bfb55285d00ebe53c3c83d8894f1eb51463d698",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "3440219cfc1d5ab42b0c320868d844a8d29be31cc63b4f78283a393f6aeeda3f",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169/3440219cfc1d5ab42b0c320868d844a8d29be31cc63b4f78283a393f6aeeda3f/corpus-ts/src/services/cache.service.ts": {
+    "sourceHash": "b8bc7008d22e2c43d03ba04aa3d60bec764295eeaab1eb8e3f08c673eab35ab5",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "3440219cfc1d5ab42b0c320868d844a8d29be31cc63b4f78283a393f6aeeda3f",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169/3440219cfc1d5ab42b0c320868d844a8d29be31cc63b4f78283a393f6aeeda3f/corpus-ts/src/services/supplier.service.ts": {
+    "sourceHash": "47b4fbf4dcb69a3ddd79a0b20105aa6dc68ff06c72684307622cb366ad4f62b4",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "3440219cfc1d5ab42b0c320868d844a8d29be31cc63b4f78283a393f6aeeda3f",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169/3440219cfc1d5ab42b0c320868d844a8d29be31cc63b4f78283a393f6aeeda3f/corpus-ts/src/models/cart.model.ts": {
+    "sourceHash": "fe46d6c7b29ed71cd33dd37f9f9eb7a11004312c8d9f16e677ed97f544dafaaf",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "3440219cfc1d5ab42b0c320868d844a8d29be31cc63b4f78283a393f6aeeda3f",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169/3440219cfc1d5ab42b0c320868d844a8d29be31cc63b4f78283a393f6aeeda3f/corpus-ts/src/lib/paginate.mts": {
+    "sourceHash": "ffc281da0bab5cfcf9f5d2c6592c2bb6f5c184b2d151b901cc45bc502bda0ef4",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "3440219cfc1d5ab42b0c320868d844a8d29be31cc63b4f78283a393f6aeeda3f",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169/3440219cfc1d5ab42b0c320868d844a8d29be31cc63b4f78283a393f6aeeda3f/corpus-ts/src/services/sync.service.ts": {
+    "sourceHash": "bc3d7907f200e11d7e0da9778eb941fb388eb7f5ced1c03e8af55605563f97b2",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "3440219cfc1d5ab42b0c320868d844a8d29be31cc63b4f78283a393f6aeeda3f",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169/3440219cfc1d5ab42b0c320868d844a8d29be31cc63b4f78283a393f6aeeda3f/corpus/src/accuracy/discount.ts": {
+    "sourceHash": "06c2ffaf47268ba297773e4951e85c3c3b64cd15a2b8520a584435ef77fc4a65",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "3440219cfc1d5ab42b0c320868d844a8d29be31cc63b4f78283a393f6aeeda3f",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169/3440219cfc1d5ab42b0c320868d844a8d29be31cc63b4f78283a393f6aeeda3f/corpus/src/accuracy/late-member.ts": {
+    "sourceHash": "e1c168da3505c5abc0d8a5dd5c68cea048aa94e0679492438c899dbb1506d25c",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "3440219cfc1d5ab42b0c320868d844a8d29be31cc63b4f78283a393f6aeeda3f",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169/3440219cfc1d5ab42b0c320868d844a8d29be31cc63b4f78283a393f6aeeda3f/corpus/src/accuracy/wildcard-discount.ts": {
+    "sourceHash": "9dbcff59e710be827be727cb75e5f6bd7c7cf40d2a3a237bcb3d4730e1e2bd66",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "3440219cfc1d5ab42b0c320868d844a8d29be31cc63b4f78283a393f6aeeda3f",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169/3440219cfc1d5ab42b0c320868d844a8d29be31cc63b4f78283a393f6aeeda3f/corpus/src/accuracy/forwarded-coupon.ts": {
+    "sourceHash": "bac2a9673d197bdff07ca8127d2f3c2fca6c0486c332b309545330a9ebeb128a",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "3440219cfc1d5ab42b0c320868d844a8d29be31cc63b4f78283a393f6aeeda3f",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169/3440219cfc1d5ab42b0c320868d844a8d29be31cc63b4f78283a393f6aeeda3f/corpus/src/accuracy/constructed-reading.ts": {
+    "sourceHash": "468050c90c52a0959c209527182c81e0b589ffa338e975cefe248bac78df7633",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "3440219cfc1d5ab42b0c320868d844a8d29be31cc63b4f78283a393f6aeeda3f",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/b381f66a15e33fd89bd7654e3aa09542e9e71479310586acb6d096faf3935dc3/corpus/src/services/pricingService.js": {
+    "sourceHash": "c8b67a8be15f8a09c3c3d5a902fc33999f902f46b7b23cbcfef8aa1e7cff1614",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "b381f66a15e33fd89bd7654e3aa09542e9e71479310586acb6d096faf3935dc3",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/b381f66a15e33fd89bd7654e3aa09542e9e71479310586acb6d096faf3935dc3/corpus/src/workers/reconciliationWorker.js": {
+    "sourceHash": "898eb9ee68e1b07d1b167d88d03a5ff395db82c0727442058d53a100e06929af",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "b381f66a15e33fd89bd7654e3aa09542e9e71479310586acb6d096faf3935dc3",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/b381f66a15e33fd89bd7654e3aa09542e9e71479310586acb6d096faf3935dc3/corpus/src/services/inventoryService.js": {
+    "sourceHash": "d38ac20410e079ba47c3eef0b10eeda28129bd39b3579f3be7b3a8ebb53d6245",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "b381f66a15e33fd89bd7654e3aa09542e9e71479310586acb6d096faf3935dc3",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/b381f66a15e33fd89bd7654e3aa09542e9e71479310586acb6d096faf3935dc3/corpus/src/lib/dateWindow.js": {
+    "sourceHash": "0a8530dd6c81bda7560c42e74c6bfbc3b064e82d90cfe16a9e0bfe3f22953351",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "b381f66a15e33fd89bd7654e3aa09542e9e71479310586acb6d096faf3935dc3",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/b381f66a15e33fd89bd7654e3aa09542e9e71479310586acb6d096faf3935dc3/corpus/src/models/cartTotals.js": {
+    "sourceHash": "6eaa471ab94bf8ba1218f229e8822656e21a0ffa6e615fcec47033cadd6d6747",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "b381f66a15e33fd89bd7654e3aa09542e9e71479310586acb6d096faf3935dc3",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/b381f66a15e33fd89bd7654e3aa09542e9e71479310586acb6d096faf3935dc3/corpus/src/lib/retry.js": {
+    "sourceHash": "4c54b5e486ee9f5ba09a38fc6bfb55285d00ebe53c3c83d8894f1eb51463d698",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "b381f66a15e33fd89bd7654e3aa09542e9e71479310586acb6d096faf3935dc3",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/b381f66a15e33fd89bd7654e3aa09542e9e71479310586acb6d096faf3935dc3/corpus-ts/src/models/invoice.entity.ts": {
+    "sourceHash": "6b487221075627c66b376ca3a81c853c2eb5538416f14e0f8b7d539fd0af2601",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "b381f66a15e33fd89bd7654e3aa09542e9e71479310586acb6d096faf3935dc3",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/b381f66a15e33fd89bd7654e3aa09542e9e71479310586acb6d096faf3935dc3/corpus-ts/src/services/cache.service.ts": {
+    "sourceHash": "b8bc7008d22e2c43d03ba04aa3d60bec764295eeaab1eb8e3f08c673eab35ab5",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "b381f66a15e33fd89bd7654e3aa09542e9e71479310586acb6d096faf3935dc3",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/b381f66a15e33fd89bd7654e3aa09542e9e71479310586acb6d096faf3935dc3/corpus-ts/src/services/supplier.service.ts": {
+    "sourceHash": "47b4fbf4dcb69a3ddd79a0b20105aa6dc68ff06c72684307622cb366ad4f62b4",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "b381f66a15e33fd89bd7654e3aa09542e9e71479310586acb6d096faf3935dc3",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/b381f66a15e33fd89bd7654e3aa09542e9e71479310586acb6d096faf3935dc3/corpus-ts/src/models/cart.model.ts": {
+    "sourceHash": "fe46d6c7b29ed71cd33dd37f9f9eb7a11004312c8d9f16e677ed97f544dafaaf",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "b381f66a15e33fd89bd7654e3aa09542e9e71479310586acb6d096faf3935dc3",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/b381f66a15e33fd89bd7654e3aa09542e9e71479310586acb6d096faf3935dc3/corpus-ts/src/lib/paginate.mts": {
+    "sourceHash": "ffc281da0bab5cfcf9f5d2c6592c2bb6f5c184b2d151b901cc45bc502bda0ef4",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "b381f66a15e33fd89bd7654e3aa09542e9e71479310586acb6d096faf3935dc3",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/b381f66a15e33fd89bd7654e3aa09542e9e71479310586acb6d096faf3935dc3/corpus-ts/src/services/sync.service.ts": {
+    "sourceHash": "bc3d7907f200e11d7e0da9778eb941fb388eb7f5ced1c03e8af55605563f97b2",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "b381f66a15e33fd89bd7654e3aa09542e9e71479310586acb6d096faf3935dc3",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/b381f66a15e33fd89bd7654e3aa09542e9e71479310586acb6d096faf3935dc3/corpus/src/accuracy/discount.ts": {
+    "sourceHash": "06c2ffaf47268ba297773e4951e85c3c3b64cd15a2b8520a584435ef77fc4a65",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "b381f66a15e33fd89bd7654e3aa09542e9e71479310586acb6d096faf3935dc3",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/b381f66a15e33fd89bd7654e3aa09542e9e71479310586acb6d096faf3935dc3/corpus/src/accuracy/late-member.ts": {
+    "sourceHash": "e1c168da3505c5abc0d8a5dd5c68cea048aa94e0679492438c899dbb1506d25c",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "b381f66a15e33fd89bd7654e3aa09542e9e71479310586acb6d096faf3935dc3",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/b381f66a15e33fd89bd7654e3aa09542e9e71479310586acb6d096faf3935dc3/corpus/src/accuracy/wildcard-discount.ts": {
+    "sourceHash": "9dbcff59e710be827be727cb75e5f6bd7c7cf40d2a3a237bcb3d4730e1e2bd66",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "b381f66a15e33fd89bd7654e3aa09542e9e71479310586acb6d096faf3935dc3",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/b381f66a15e33fd89bd7654e3aa09542e9e71479310586acb6d096faf3935dc3/corpus/src/accuracy/forwarded-coupon.ts": {
+    "sourceHash": "bac2a9673d197bdff07ca8127d2f3c2fca6c0486c332b309545330a9ebeb128a",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "b381f66a15e33fd89bd7654e3aa09542e9e71479310586acb6d096faf3935dc3",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/b381f66a15e33fd89bd7654e3aa09542e9e71479310586acb6d096faf3935dc3/corpus/src/accuracy/constructed-reading.ts": {
+    "sourceHash": "468050c90c52a0959c209527182c81e0b589ffa338e975cefe248bac78df7633",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "b381f66a15e33fd89bd7654e3aa09542e9e71479310586acb6d096faf3935dc3",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/598a8bfe1b3402323e0441dd294205237ff5c297372431a3475ece4b4f650ad5/corpus/src/services/pricingService.js": {
+    "sourceHash": "c8b67a8be15f8a09c3c3d5a902fc33999f902f46b7b23cbcfef8aa1e7cff1614",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "598a8bfe1b3402323e0441dd294205237ff5c297372431a3475ece4b4f650ad5",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/598a8bfe1b3402323e0441dd294205237ff5c297372431a3475ece4b4f650ad5/corpus/src/services/inventoryService.js": {
+    "sourceHash": "d38ac20410e079ba47c3eef0b10eeda28129bd39b3579f3be7b3a8ebb53d6245",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "598a8bfe1b3402323e0441dd294205237ff5c297372431a3475ece4b4f650ad5",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/598a8bfe1b3402323e0441dd294205237ff5c297372431a3475ece4b4f650ad5/corpus/src/models/cartTotals.js": {
+    "sourceHash": "6eaa471ab94bf8ba1218f229e8822656e21a0ffa6e615fcec47033cadd6d6747",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "598a8bfe1b3402323e0441dd294205237ff5c297372431a3475ece4b4f650ad5",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/598a8bfe1b3402323e0441dd294205237ff5c297372431a3475ece4b4f650ad5/corpus/src/lib/retry.js": {
+    "sourceHash": "4c54b5e486ee9f5ba09a38fc6bfb55285d00ebe53c3c83d8894f1eb51463d698",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "598a8bfe1b3402323e0441dd294205237ff5c297372431a3475ece4b4f650ad5",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/598a8bfe1b3402323e0441dd294205237ff5c297372431a3475ece4b4f650ad5/corpus-ts/src/models/invoice.entity.ts": {
+    "sourceHash": "6b487221075627c66b376ca3a81c853c2eb5538416f14e0f8b7d539fd0af2601",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "598a8bfe1b3402323e0441dd294205237ff5c297372431a3475ece4b4f650ad5",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/598a8bfe1b3402323e0441dd294205237ff5c297372431a3475ece4b4f650ad5/corpus-ts/src/services/cache.service.ts": {
+    "sourceHash": "b8bc7008d22e2c43d03ba04aa3d60bec764295eeaab1eb8e3f08c673eab35ab5",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "598a8bfe1b3402323e0441dd294205237ff5c297372431a3475ece4b4f650ad5",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/598a8bfe1b3402323e0441dd294205237ff5c297372431a3475ece4b4f650ad5/corpus-ts/src/services/supplier.service.ts": {
+    "sourceHash": "47b4fbf4dcb69a3ddd79a0b20105aa6dc68ff06c72684307622cb366ad4f62b4",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "598a8bfe1b3402323e0441dd294205237ff5c297372431a3475ece4b4f650ad5",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/598a8bfe1b3402323e0441dd294205237ff5c297372431a3475ece4b4f650ad5/corpus-ts/src/models/cart.model.ts": {
+    "sourceHash": "fe46d6c7b29ed71cd33dd37f9f9eb7a11004312c8d9f16e677ed97f544dafaaf",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "598a8bfe1b3402323e0441dd294205237ff5c297372431a3475ece4b4f650ad5",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/598a8bfe1b3402323e0441dd294205237ff5c297372431a3475ece4b4f650ad5/corpus-ts/src/lib/paginate.mts": {
+    "sourceHash": "ffc281da0bab5cfcf9f5d2c6592c2bb6f5c184b2d151b901cc45bc502bda0ef4",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "598a8bfe1b3402323e0441dd294205237ff5c297372431a3475ece4b4f650ad5",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/598a8bfe1b3402323e0441dd294205237ff5c297372431a3475ece4b4f650ad5/corpus-ts/src/api/order.controller.ts": {
+    "sourceHash": "dacdad98d455b682c2277814f280c55f093345f54e4e4202fbc8dbdf61a6e8ef",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "598a8bfe1b3402323e0441dd294205237ff5c297372431a3475ece4b4f650ad5",
+    "matchesDefect": false,
+    "validDefect": false,
+    "note": "Unsupported claim about an optional field or a type mismatch without a demonstrated runtime use."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/598a8bfe1b3402323e0441dd294205237ff5c297372431a3475ece4b4f650ad5/corpus/src/accuracy/discount.ts": {
+    "sourceHash": "06c2ffaf47268ba297773e4951e85c3c3b64cd15a2b8520a584435ef77fc4a65",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "598a8bfe1b3402323e0441dd294205237ff5c297372431a3475ece4b4f650ad5",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/598a8bfe1b3402323e0441dd294205237ff5c297372431a3475ece4b4f650ad5/corpus/src/accuracy/late-member.ts": {
+    "sourceHash": "e1c168da3505c5abc0d8a5dd5c68cea048aa94e0679492438c899dbb1506d25c",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "598a8bfe1b3402323e0441dd294205237ff5c297372431a3475ece4b4f650ad5",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/598a8bfe1b3402323e0441dd294205237ff5c297372431a3475ece4b4f650ad5/corpus/src/accuracy/wildcard-discount.ts": {
+    "sourceHash": "9dbcff59e710be827be727cb75e5f6bd7c7cf40d2a3a237bcb3d4730e1e2bd66",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "598a8bfe1b3402323e0441dd294205237ff5c297372431a3475ece4b4f650ad5",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/598a8bfe1b3402323e0441dd294205237ff5c297372431a3475ece4b4f650ad5/corpus/src/accuracy/forwarded-coupon.ts": {
+    "sourceHash": "bac2a9673d197bdff07ca8127d2f3c2fca6c0486c332b309545330a9ebeb128a",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "598a8bfe1b3402323e0441dd294205237ff5c297372431a3475ece4b4f650ad5",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/598a8bfe1b3402323e0441dd294205237ff5c297372431a3475ece4b4f650ad5/corpus/src/accuracy/constructed-reading.ts": {
+    "sourceHash": "468050c90c52a0959c209527182c81e0b589ffa338e975cefe248bac78df7633",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "598a8bfe1b3402323e0441dd294205237ff5c297372431a3475ece4b4f650ad5",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/29b74c63f3a0c2f7315080e59530091666e90aea8e9e3877c5b89c8ae22b5ab7/corpus/src/services/pricingService.js": {
+    "sourceHash": "c8b67a8be15f8a09c3c3d5a902fc33999f902f46b7b23cbcfef8aa1e7cff1614",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "29b74c63f3a0c2f7315080e59530091666e90aea8e9e3877c5b89c8ae22b5ab7",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/29b74c63f3a0c2f7315080e59530091666e90aea8e9e3877c5b89c8ae22b5ab7/corpus/src/services/inventoryService.js": {
+    "sourceHash": "d38ac20410e079ba47c3eef0b10eeda28129bd39b3579f3be7b3a8ebb53d6245",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "29b74c63f3a0c2f7315080e59530091666e90aea8e9e3877c5b89c8ae22b5ab7",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/29b74c63f3a0c2f7315080e59530091666e90aea8e9e3877c5b89c8ae22b5ab7/corpus/src/lib/dateWindow.js": {
+    "sourceHash": "0a8530dd6c81bda7560c42e74c6bfbc3b064e82d90cfe16a9e0bfe3f22953351",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "29b74c63f3a0c2f7315080e59530091666e90aea8e9e3877c5b89c8ae22b5ab7",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/29b74c63f3a0c2f7315080e59530091666e90aea8e9e3877c5b89c8ae22b5ab7/corpus/src/lib/retry.js": {
+    "sourceHash": "4c54b5e486ee9f5ba09a38fc6bfb55285d00ebe53c3c83d8894f1eb51463d698",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "29b74c63f3a0c2f7315080e59530091666e90aea8e9e3877c5b89c8ae22b5ab7",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/29b74c63f3a0c2f7315080e59530091666e90aea8e9e3877c5b89c8ae22b5ab7/corpus-ts/src/models/invoice.entity.ts": {
+    "sourceHash": "6b487221075627c66b376ca3a81c853c2eb5538416f14e0f8b7d539fd0af2601",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "29b74c63f3a0c2f7315080e59530091666e90aea8e9e3877c5b89c8ae22b5ab7",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/29b74c63f3a0c2f7315080e59530091666e90aea8e9e3877c5b89c8ae22b5ab7/corpus-ts/src/services/cache.service.ts": {
+    "sourceHash": "b8bc7008d22e2c43d03ba04aa3d60bec764295eeaab1eb8e3f08c673eab35ab5",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "29b74c63f3a0c2f7315080e59530091666e90aea8e9e3877c5b89c8ae22b5ab7",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/29b74c63f3a0c2f7315080e59530091666e90aea8e9e3877c5b89c8ae22b5ab7/corpus-ts/src/services/supplier.service.ts": {
+    "sourceHash": "47b4fbf4dcb69a3ddd79a0b20105aa6dc68ff06c72684307622cb366ad4f62b4",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "29b74c63f3a0c2f7315080e59530091666e90aea8e9e3877c5b89c8ae22b5ab7",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/29b74c63f3a0c2f7315080e59530091666e90aea8e9e3877c5b89c8ae22b5ab7/corpus-ts/src/models/cart.model.ts": {
+    "sourceHash": "fe46d6c7b29ed71cd33dd37f9f9eb7a11004312c8d9f16e677ed97f544dafaaf",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "29b74c63f3a0c2f7315080e59530091666e90aea8e9e3877c5b89c8ae22b5ab7",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/29b74c63f3a0c2f7315080e59530091666e90aea8e9e3877c5b89c8ae22b5ab7/corpus-ts/src/lib/paginate.mts": {
+    "sourceHash": "ffc281da0bab5cfcf9f5d2c6592c2bb6f5c184b2d151b901cc45bc502bda0ef4",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "29b74c63f3a0c2f7315080e59530091666e90aea8e9e3877c5b89c8ae22b5ab7",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/29b74c63f3a0c2f7315080e59530091666e90aea8e9e3877c5b89c8ae22b5ab7/corpus/src/accuracy/discount.ts": {
+    "sourceHash": "06c2ffaf47268ba297773e4951e85c3c3b64cd15a2b8520a584435ef77fc4a65",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "29b74c63f3a0c2f7315080e59530091666e90aea8e9e3877c5b89c8ae22b5ab7",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/29b74c63f3a0c2f7315080e59530091666e90aea8e9e3877c5b89c8ae22b5ab7/corpus/src/accuracy/late-member.ts": {
+    "sourceHash": "e1c168da3505c5abc0d8a5dd5c68cea048aa94e0679492438c899dbb1506d25c",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "29b74c63f3a0c2f7315080e59530091666e90aea8e9e3877c5b89c8ae22b5ab7",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/29b74c63f3a0c2f7315080e59530091666e90aea8e9e3877c5b89c8ae22b5ab7/corpus/src/accuracy/wildcard-discount.ts": {
+    "sourceHash": "9dbcff59e710be827be727cb75e5f6bd7c7cf40d2a3a237bcb3d4730e1e2bd66",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "29b74c63f3a0c2f7315080e59530091666e90aea8e9e3877c5b89c8ae22b5ab7",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/29b74c63f3a0c2f7315080e59530091666e90aea8e9e3877c5b89c8ae22b5ab7/corpus/src/accuracy/forwarded-coupon.ts": {
+    "sourceHash": "bac2a9673d197bdff07ca8127d2f3c2fca6c0486c332b309545330a9ebeb128a",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "29b74c63f3a0c2f7315080e59530091666e90aea8e9e3877c5b89c8ae22b5ab7",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/9de03a6c08e992a4b80b495b7e34baee7fbe82c74cfcfa9b69b045f414405f49/corpus/src/services/pricingService.js": {
+    "sourceHash": "c8b67a8be15f8a09c3c3d5a902fc33999f902f46b7b23cbcfef8aa1e7cff1614",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "9de03a6c08e992a4b80b495b7e34baee7fbe82c74cfcfa9b69b045f414405f49",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/9de03a6c08e992a4b80b495b7e34baee7fbe82c74cfcfa9b69b045f414405f49/corpus/src/workers/reconciliationWorker.js": {
+    "sourceHash": "898eb9ee68e1b07d1b167d88d03a5ff395db82c0727442058d53a100e06929af",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "9de03a6c08e992a4b80b495b7e34baee7fbe82c74cfcfa9b69b045f414405f49",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/9de03a6c08e992a4b80b495b7e34baee7fbe82c74cfcfa9b69b045f414405f49/corpus/src/services/inventoryService.js": {
+    "sourceHash": "d38ac20410e079ba47c3eef0b10eeda28129bd39b3579f3be7b3a8ebb53d6245",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "9de03a6c08e992a4b80b495b7e34baee7fbe82c74cfcfa9b69b045f414405f49",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/9de03a6c08e992a4b80b495b7e34baee7fbe82c74cfcfa9b69b045f414405f49/corpus/src/lib/retry.js": {
+    "sourceHash": "4c54b5e486ee9f5ba09a38fc6bfb55285d00ebe53c3c83d8894f1eb51463d698",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "9de03a6c08e992a4b80b495b7e34baee7fbe82c74cfcfa9b69b045f414405f49",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/9de03a6c08e992a4b80b495b7e34baee7fbe82c74cfcfa9b69b045f414405f49/corpus-ts/src/models/invoice.entity.ts": {
+    "sourceHash": "6b487221075627c66b376ca3a81c853c2eb5538416f14e0f8b7d539fd0af2601",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "9de03a6c08e992a4b80b495b7e34baee7fbe82c74cfcfa9b69b045f414405f49",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/9de03a6c08e992a4b80b495b7e34baee7fbe82c74cfcfa9b69b045f414405f49/corpus-ts/src/services/cache.service.ts": {
+    "sourceHash": "b8bc7008d22e2c43d03ba04aa3d60bec764295eeaab1eb8e3f08c673eab35ab5",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "9de03a6c08e992a4b80b495b7e34baee7fbe82c74cfcfa9b69b045f414405f49",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/9de03a6c08e992a4b80b495b7e34baee7fbe82c74cfcfa9b69b045f414405f49/corpus-ts/src/services/supplier.service.ts": {
+    "sourceHash": "47b4fbf4dcb69a3ddd79a0b20105aa6dc68ff06c72684307622cb366ad4f62b4",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "9de03a6c08e992a4b80b495b7e34baee7fbe82c74cfcfa9b69b045f414405f49",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/9de03a6c08e992a4b80b495b7e34baee7fbe82c74cfcfa9b69b045f414405f49/corpus-ts/src/models/cart.model.ts": {
+    "sourceHash": "fe46d6c7b29ed71cd33dd37f9f9eb7a11004312c8d9f16e677ed97f544dafaaf",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "9de03a6c08e992a4b80b495b7e34baee7fbe82c74cfcfa9b69b045f414405f49",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/9de03a6c08e992a4b80b495b7e34baee7fbe82c74cfcfa9b69b045f414405f49/corpus-ts/src/lib/paginate.mts": {
+    "sourceHash": "ffc281da0bab5cfcf9f5d2c6592c2bb6f5c184b2d151b901cc45bc502bda0ef4",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "9de03a6c08e992a4b80b495b7e34baee7fbe82c74cfcfa9b69b045f414405f49",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/9de03a6c08e992a4b80b495b7e34baee7fbe82c74cfcfa9b69b045f414405f49/corpus-ts/src/services/sync.service.ts": {
+    "sourceHash": "bc3d7907f200e11d7e0da9778eb941fb388eb7f5ced1c03e8af55605563f97b2",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "9de03a6c08e992a4b80b495b7e34baee7fbe82c74cfcfa9b69b045f414405f49",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/9de03a6c08e992a4b80b495b7e34baee7fbe82c74cfcfa9b69b045f414405f49/corpus/src/accuracy/discount.ts": {
+    "sourceHash": "06c2ffaf47268ba297773e4951e85c3c3b64cd15a2b8520a584435ef77fc4a65",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "9de03a6c08e992a4b80b495b7e34baee7fbe82c74cfcfa9b69b045f414405f49",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/9de03a6c08e992a4b80b495b7e34baee7fbe82c74cfcfa9b69b045f414405f49/corpus/src/accuracy/late-member.ts": {
+    "sourceHash": "e1c168da3505c5abc0d8a5dd5c68cea048aa94e0679492438c899dbb1506d25c",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "9de03a6c08e992a4b80b495b7e34baee7fbe82c74cfcfa9b69b045f414405f49",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/9de03a6c08e992a4b80b495b7e34baee7fbe82c74cfcfa9b69b045f414405f49/corpus/src/accuracy/wildcard-discount.ts": {
+    "sourceHash": "9dbcff59e710be827be727cb75e5f6bd7c7cf40d2a3a237bcb3d4730e1e2bd66",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "9de03a6c08e992a4b80b495b7e34baee7fbe82c74cfcfa9b69b045f414405f49",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/9de03a6c08e992a4b80b495b7e34baee7fbe82c74cfcfa9b69b045f414405f49/corpus/src/accuracy/forwarded-coupon.ts": {
+    "sourceHash": "bac2a9673d197bdff07ca8127d2f3c2fca6c0486c332b309545330a9ebeb128a",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "9de03a6c08e992a4b80b495b7e34baee7fbe82c74cfcfa9b69b045f414405f49",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/9de03a6c08e992a4b80b495b7e34baee7fbe82c74cfcfa9b69b045f414405f49/corpus/src/accuracy/constructed-reading.ts": {
+    "sourceHash": "468050c90c52a0959c209527182c81e0b589ffa338e975cefe248bac78df7633",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "9de03a6c08e992a4b80b495b7e34baee7fbe82c74cfcfa9b69b045f414405f49",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "codex/67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169/abd53a663622c4aee951fc5f6cabb28c5bc98e077bb57d8ca9d6c2a83e08b870/corpus/src/services/pricingService.js": {
+    "sourceHash": "c8b67a8be15f8a09c3c3d5a902fc33999f902f46b7b23cbcfef8aa1e7cff1614",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "abd53a663622c4aee951fc5f6cabb28c5bc98e077bb57d8ca9d6c2a83e08b870",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "codex/67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169/abd53a663622c4aee951fc5f6cabb28c5bc98e077bb57d8ca9d6c2a83e08b870/corpus/src/workers/reconciliationWorker.js": {
+    "sourceHash": "898eb9ee68e1b07d1b167d88d03a5ff395db82c0727442058d53a100e06929af",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "abd53a663622c4aee951fc5f6cabb28c5bc98e077bb57d8ca9d6c2a83e08b870",
+    "matchesDefect": false,
+    "validDefect": true,
+    "note": "Different defect: partial backfill discards opening balance. Reproduced in batching-counterexamples.test.mjs."
+  },
+  "codex/67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169/abd53a663622c4aee951fc5f6cabb28c5bc98e077bb57d8ca9d6c2a83e08b870/corpus/src/services/inventoryService.js": {
+    "sourceHash": "d38ac20410e079ba47c3eef0b10eeda28129bd39b3579f3be7b3a8ebb53d6245",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "abd53a663622c4aee951fc5f6cabb28c5bc98e077bb57d8ca9d6c2a83e08b870",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "codex/67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169/abd53a663622c4aee951fc5f6cabb28c5bc98e077bb57d8ca9d6c2a83e08b870/corpus/src/lib/dateWindow.js": {
+    "sourceHash": "0a8530dd6c81bda7560c42e74c6bfbc3b064e82d90cfe16a9e0bfe3f22953351",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "abd53a663622c4aee951fc5f6cabb28c5bc98e077bb57d8ca9d6c2a83e08b870",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "codex/67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169/abd53a663622c4aee951fc5f6cabb28c5bc98e077bb57d8ca9d6c2a83e08b870/corpus/src/models/cartTotals.js": {
+    "sourceHash": "6eaa471ab94bf8ba1218f229e8822656e21a0ffa6e615fcec47033cadd6d6747",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "abd53a663622c4aee951fc5f6cabb28c5bc98e077bb57d8ca9d6c2a83e08b870",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "codex/67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169/abd53a663622c4aee951fc5f6cabb28c5bc98e077bb57d8ca9d6c2a83e08b870/corpus/src/lib/retry.js": {
+    "sourceHash": "4c54b5e486ee9f5ba09a38fc6bfb55285d00ebe53c3c83d8894f1eb51463d698",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "abd53a663622c4aee951fc5f6cabb28c5bc98e077bb57d8ca9d6c2a83e08b870",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "codex/67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169/abd53a663622c4aee951fc5f6cabb28c5bc98e077bb57d8ca9d6c2a83e08b870/corpus-ts/src/models/invoice.entity.ts": {
+    "sourceHash": "6b487221075627c66b376ca3a81c853c2eb5538416f14e0f8b7d539fd0af2601",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "abd53a663622c4aee951fc5f6cabb28c5bc98e077bb57d8ca9d6c2a83e08b870",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "codex/67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169/abd53a663622c4aee951fc5f6cabb28c5bc98e077bb57d8ca9d6c2a83e08b870/corpus-ts/src/services/cache.service.ts": {
+    "sourceHash": "b8bc7008d22e2c43d03ba04aa3d60bec764295eeaab1eb8e3f08c673eab35ab5",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "abd53a663622c4aee951fc5f6cabb28c5bc98e077bb57d8ca9d6c2a83e08b870",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "codex/67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169/abd53a663622c4aee951fc5f6cabb28c5bc98e077bb57d8ca9d6c2a83e08b870/corpus-ts/src/services/supplier.service.ts": {
+    "sourceHash": "47b4fbf4dcb69a3ddd79a0b20105aa6dc68ff06c72684307622cb366ad4f62b4",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "abd53a663622c4aee951fc5f6cabb28c5bc98e077bb57d8ca9d6c2a83e08b870",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "codex/67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169/abd53a663622c4aee951fc5f6cabb28c5bc98e077bb57d8ca9d6c2a83e08b870/corpus-ts/src/models/cart.model.ts": {
+    "sourceHash": "fe46d6c7b29ed71cd33dd37f9f9eb7a11004312c8d9f16e677ed97f544dafaaf",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "abd53a663622c4aee951fc5f6cabb28c5bc98e077bb57d8ca9d6c2a83e08b870",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "codex/67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169/abd53a663622c4aee951fc5f6cabb28c5bc98e077bb57d8ca9d6c2a83e08b870/corpus-ts/src/lib/paginate.mts": {
+    "sourceHash": "ffc281da0bab5cfcf9f5d2c6592c2bb6f5c184b2d151b901cc45bc502bda0ef4",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "abd53a663622c4aee951fc5f6cabb28c5bc98e077bb57d8ca9d6c2a83e08b870",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "codex/67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169/abd53a663622c4aee951fc5f6cabb28c5bc98e077bb57d8ca9d6c2a83e08b870/corpus-ts/src/services/sync.service.ts": {
+    "sourceHash": "bc3d7907f200e11d7e0da9778eb941fb388eb7f5ced1c03e8af55605563f97b2",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "abd53a663622c4aee951fc5f6cabb28c5bc98e077bb57d8ca9d6c2a83e08b870",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "codex/67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169/abd53a663622c4aee951fc5f6cabb28c5bc98e077bb57d8ca9d6c2a83e08b870/corpus/src/accuracy/discount.ts": {
+    "sourceHash": "06c2ffaf47268ba297773e4951e85c3c3b64cd15a2b8520a584435ef77fc4a65",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "abd53a663622c4aee951fc5f6cabb28c5bc98e077bb57d8ca9d6c2a83e08b870",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "codex/67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169/abd53a663622c4aee951fc5f6cabb28c5bc98e077bb57d8ca9d6c2a83e08b870/corpus/src/accuracy/late-member.ts": {
+    "sourceHash": "e1c168da3505c5abc0d8a5dd5c68cea048aa94e0679492438c899dbb1506d25c",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "abd53a663622c4aee951fc5f6cabb28c5bc98e077bb57d8ca9d6c2a83e08b870",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "codex/67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169/abd53a663622c4aee951fc5f6cabb28c5bc98e077bb57d8ca9d6c2a83e08b870/corpus/src/accuracy/wildcard-discount.ts": {
+    "sourceHash": "9dbcff59e710be827be727cb75e5f6bd7c7cf40d2a3a237bcb3d4730e1e2bd66",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "abd53a663622c4aee951fc5f6cabb28c5bc98e077bb57d8ca9d6c2a83e08b870",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "codex/67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169/abd53a663622c4aee951fc5f6cabb28c5bc98e077bb57d8ca9d6c2a83e08b870/corpus/src/accuracy/forwarded-coupon.ts": {
+    "sourceHash": "bac2a9673d197bdff07ca8127d2f3c2fca6c0486c332b309545330a9ebeb128a",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "abd53a663622c4aee951fc5f6cabb28c5bc98e077bb57d8ca9d6c2a83e08b870",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "codex/67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169/abd53a663622c4aee951fc5f6cabb28c5bc98e077bb57d8ca9d6c2a83e08b870/corpus/src/accuracy/constructed-reading.ts": {
+    "sourceHash": "468050c90c52a0959c209527182c81e0b589ffa338e975cefe248bac78df7633",
+    "promptHash": "67f2a42288e0ac5ae00314b768d6b5a45fc8b633e3616ea21fe2dbdacfac6169",
+    "responseHash": "abd53a663622c4aee951fc5f6cabb28c5bc98e077bb57d8ca9d6c2a83e08b870",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "codex/0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9/a57d0321dc48a0fade4e5487ebf4e735df2b82dc50c81dc08b923e87d25ed4f3/corpus/src/services/pricingService.js": {
+    "sourceHash": "c8b67a8be15f8a09c3c3d5a902fc33999f902f46b7b23cbcfef8aa1e7cff1614",
+    "promptHash": "0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9",
+    "responseHash": "a57d0321dc48a0fade4e5487ebf4e735df2b82dc50c81dc08b923e87d25ed4f3",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "codex/0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9/a57d0321dc48a0fade4e5487ebf4e735df2b82dc50c81dc08b923e87d25ed4f3/corpus/src/workers/reconciliationWorker.js": {
+    "sourceHash": "898eb9ee68e1b07d1b167d88d03a5ff395db82c0727442058d53a100e06929af",
+    "promptHash": "0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9",
+    "responseHash": "a57d0321dc48a0fade4e5487ebf4e735df2b82dc50c81dc08b923e87d25ed4f3",
+    "matchesDefect": false,
+    "validDefect": true,
+    "note": "Different defect: watermark skips arrivals during an await. Reproduced in batching-counterexamples.test.mjs."
+  },
+  "codex/0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9/a57d0321dc48a0fade4e5487ebf4e735df2b82dc50c81dc08b923e87d25ed4f3/corpus/src/services/inventoryService.js": {
+    "sourceHash": "d38ac20410e079ba47c3eef0b10eeda28129bd39b3579f3be7b3a8ebb53d6245",
+    "promptHash": "0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9",
+    "responseHash": "a57d0321dc48a0fade4e5487ebf4e735df2b82dc50c81dc08b923e87d25ed4f3",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "codex/0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9/a57d0321dc48a0fade4e5487ebf4e735df2b82dc50c81dc08b923e87d25ed4f3/corpus/src/lib/dateWindow.js": {
+    "sourceHash": "0a8530dd6c81bda7560c42e74c6bfbc3b064e82d90cfe16a9e0bfe3f22953351",
+    "promptHash": "0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9",
+    "responseHash": "a57d0321dc48a0fade4e5487ebf4e735df2b82dc50c81dc08b923e87d25ed4f3",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "codex/0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9/a57d0321dc48a0fade4e5487ebf4e735df2b82dc50c81dc08b923e87d25ed4f3/corpus/src/lib/retry.js": {
+    "sourceHash": "4c54b5e486ee9f5ba09a38fc6bfb55285d00ebe53c3c83d8894f1eb51463d698",
+    "promptHash": "0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9",
+    "responseHash": "a57d0321dc48a0fade4e5487ebf4e735df2b82dc50c81dc08b923e87d25ed4f3",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "codex/0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9/a57d0321dc48a0fade4e5487ebf4e735df2b82dc50c81dc08b923e87d25ed4f3/corpus-ts/src/models/invoice.entity.ts": {
+    "sourceHash": "6b487221075627c66b376ca3a81c853c2eb5538416f14e0f8b7d539fd0af2601",
+    "promptHash": "0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9",
+    "responseHash": "a57d0321dc48a0fade4e5487ebf4e735df2b82dc50c81dc08b923e87d25ed4f3",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "codex/0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9/a57d0321dc48a0fade4e5487ebf4e735df2b82dc50c81dc08b923e87d25ed4f3/corpus-ts/src/services/cache.service.ts": {
+    "sourceHash": "b8bc7008d22e2c43d03ba04aa3d60bec764295eeaab1eb8e3f08c673eab35ab5",
+    "promptHash": "0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9",
+    "responseHash": "a57d0321dc48a0fade4e5487ebf4e735df2b82dc50c81dc08b923e87d25ed4f3",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "codex/0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9/a57d0321dc48a0fade4e5487ebf4e735df2b82dc50c81dc08b923e87d25ed4f3/corpus-ts/src/services/supplier.service.ts": {
+    "sourceHash": "47b4fbf4dcb69a3ddd79a0b20105aa6dc68ff06c72684307622cb366ad4f62b4",
+    "promptHash": "0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9",
+    "responseHash": "a57d0321dc48a0fade4e5487ebf4e735df2b82dc50c81dc08b923e87d25ed4f3",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "codex/0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9/a57d0321dc48a0fade4e5487ebf4e735df2b82dc50c81dc08b923e87d25ed4f3/corpus-ts/src/models/cart.model.ts": {
+    "sourceHash": "fe46d6c7b29ed71cd33dd37f9f9eb7a11004312c8d9f16e677ed97f544dafaaf",
+    "promptHash": "0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9",
+    "responseHash": "a57d0321dc48a0fade4e5487ebf4e735df2b82dc50c81dc08b923e87d25ed4f3",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "codex/0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9/a57d0321dc48a0fade4e5487ebf4e735df2b82dc50c81dc08b923e87d25ed4f3/corpus-ts/src/lib/paginate.mts": {
+    "sourceHash": "ffc281da0bab5cfcf9f5d2c6592c2bb6f5c184b2d151b901cc45bc502bda0ef4",
+    "promptHash": "0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9",
+    "responseHash": "a57d0321dc48a0fade4e5487ebf4e735df2b82dc50c81dc08b923e87d25ed4f3",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "codex/0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9/a57d0321dc48a0fade4e5487ebf4e735df2b82dc50c81dc08b923e87d25ed4f3/corpus-ts/src/services/sync.service.ts": {
+    "sourceHash": "bc3d7907f200e11d7e0da9778eb941fb388eb7f5ced1c03e8af55605563f97b2",
+    "promptHash": "0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9",
+    "responseHash": "a57d0321dc48a0fade4e5487ebf4e735df2b82dc50c81dc08b923e87d25ed4f3",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "codex/0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9/a57d0321dc48a0fade4e5487ebf4e735df2b82dc50c81dc08b923e87d25ed4f3/corpus-ts/src/models/receipt.entity.ts": {
+    "sourceHash": "c6eb45aa18fdad8ac1b24a09edda934f94db3714c3757699da7b1109bce9e4fd",
+    "promptHash": "0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9",
+    "responseHash": "a57d0321dc48a0fade4e5487ebf4e735df2b82dc50c81dc08b923e87d25ed4f3",
+    "matchesDefect": false,
+    "validDefect": false,
+    "note": "Unsupported claim about an optional field or a type mismatch without a demonstrated runtime use."
+  },
+  "codex/0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9/a57d0321dc48a0fade4e5487ebf4e735df2b82dc50c81dc08b923e87d25ed4f3/corpus-ts/src/lib/money.ts": {
+    "sourceHash": "aa4aa565410d6d22bfd96009a1b5e490dfb65fc309725946cb020d7329ed656a",
+    "promptHash": "0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9",
+    "responseHash": "a57d0321dc48a0fade4e5487ebf4e735df2b82dc50c81dc08b923e87d25ed4f3",
+    "matchesDefect": false,
+    "validDefect": true,
+    "note": "Additional finding in a nominal control: decimal half-cent rounding is reproducibly incorrect. Keep the original control count and report this separately."
+  },
+  "codex/0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9/a57d0321dc48a0fade4e5487ebf4e735df2b82dc50c81dc08b923e87d25ed4f3/corpus/src/accuracy/discount.ts": {
+    "sourceHash": "06c2ffaf47268ba297773e4951e85c3c3b64cd15a2b8520a584435ef77fc4a65",
+    "promptHash": "0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9",
+    "responseHash": "a57d0321dc48a0fade4e5487ebf4e735df2b82dc50c81dc08b923e87d25ed4f3",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "codex/0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9/a57d0321dc48a0fade4e5487ebf4e735df2b82dc50c81dc08b923e87d25ed4f3/corpus/src/accuracy/late-member.ts": {
+    "sourceHash": "e1c168da3505c5abc0d8a5dd5c68cea048aa94e0679492438c899dbb1506d25c",
+    "promptHash": "0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9",
+    "responseHash": "a57d0321dc48a0fade4e5487ebf4e735df2b82dc50c81dc08b923e87d25ed4f3",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "codex/0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9/a57d0321dc48a0fade4e5487ebf4e735df2b82dc50c81dc08b923e87d25ed4f3/corpus/src/accuracy/wildcard-discount.ts": {
+    "sourceHash": "9dbcff59e710be827be727cb75e5f6bd7c7cf40d2a3a237bcb3d4730e1e2bd66",
+    "promptHash": "0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9",
+    "responseHash": "a57d0321dc48a0fade4e5487ebf4e735df2b82dc50c81dc08b923e87d25ed4f3",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "codex/0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9/a57d0321dc48a0fade4e5487ebf4e735df2b82dc50c81dc08b923e87d25ed4f3/corpus/src/accuracy/forwarded-coupon.ts": {
+    "sourceHash": "bac2a9673d197bdff07ca8127d2f3c2fca6c0486c332b309545330a9ebeb128a",
+    "promptHash": "0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9",
+    "responseHash": "a57d0321dc48a0fade4e5487ebf4e735df2b82dc50c81dc08b923e87d25ed4f3",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "codex/0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9/a57d0321dc48a0fade4e5487ebf4e735df2b82dc50c81dc08b923e87d25ed4f3/corpus/src/accuracy/constructed-reading.ts": {
+    "sourceHash": "468050c90c52a0959c209527182c81e0b589ffa338e975cefe248bac78df7633",
+    "promptHash": "0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9",
+    "responseHash": "a57d0321dc48a0fade4e5487ebf4e735df2b82dc50c81dc08b923e87d25ed4f3",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/f641d6f50776bc5b2792ec04294a0c2f36a86ddcc4b66507f452aae90a4a4a62/corpus/src/services/pricingService.js": {
+    "sourceHash": "c8b67a8be15f8a09c3c3d5a902fc33999f902f46b7b23cbcfef8aa1e7cff1614",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "f641d6f50776bc5b2792ec04294a0c2f36a86ddcc4b66507f452aae90a4a4a62",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/f641d6f50776bc5b2792ec04294a0c2f36a86ddcc4b66507f452aae90a4a4a62/corpus/src/services/inventoryService.js": {
+    "sourceHash": "d38ac20410e079ba47c3eef0b10eeda28129bd39b3579f3be7b3a8ebb53d6245",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "f641d6f50776bc5b2792ec04294a0c2f36a86ddcc4b66507f452aae90a4a4a62",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/f641d6f50776bc5b2792ec04294a0c2f36a86ddcc4b66507f452aae90a4a4a62/corpus/src/lib/retry.js": {
+    "sourceHash": "4c54b5e486ee9f5ba09a38fc6bfb55285d00ebe53c3c83d8894f1eb51463d698",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "f641d6f50776bc5b2792ec04294a0c2f36a86ddcc4b66507f452aae90a4a4a62",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/f641d6f50776bc5b2792ec04294a0c2f36a86ddcc4b66507f452aae90a4a4a62/corpus-ts/src/models/invoice.entity.ts": {
+    "sourceHash": "6b487221075627c66b376ca3a81c853c2eb5538416f14e0f8b7d539fd0af2601",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "f641d6f50776bc5b2792ec04294a0c2f36a86ddcc4b66507f452aae90a4a4a62",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/f641d6f50776bc5b2792ec04294a0c2f36a86ddcc4b66507f452aae90a4a4a62/corpus-ts/src/services/cache.service.ts": {
+    "sourceHash": "b8bc7008d22e2c43d03ba04aa3d60bec764295eeaab1eb8e3f08c673eab35ab5",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "f641d6f50776bc5b2792ec04294a0c2f36a86ddcc4b66507f452aae90a4a4a62",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/f641d6f50776bc5b2792ec04294a0c2f36a86ddcc4b66507f452aae90a4a4a62/corpus-ts/src/services/supplier.service.ts": {
+    "sourceHash": "47b4fbf4dcb69a3ddd79a0b20105aa6dc68ff06c72684307622cb366ad4f62b4",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "f641d6f50776bc5b2792ec04294a0c2f36a86ddcc4b66507f452aae90a4a4a62",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/f641d6f50776bc5b2792ec04294a0c2f36a86ddcc4b66507f452aae90a4a4a62/corpus-ts/src/models/cart.model.ts": {
+    "sourceHash": "fe46d6c7b29ed71cd33dd37f9f9eb7a11004312c8d9f16e677ed97f544dafaaf",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "f641d6f50776bc5b2792ec04294a0c2f36a86ddcc4b66507f452aae90a4a4a62",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/f641d6f50776bc5b2792ec04294a0c2f36a86ddcc4b66507f452aae90a4a4a62/corpus-ts/src/lib/paginate.mts": {
+    "sourceHash": "ffc281da0bab5cfcf9f5d2c6592c2bb6f5c184b2d151b901cc45bc502bda0ef4",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "f641d6f50776bc5b2792ec04294a0c2f36a86ddcc4b66507f452aae90a4a4a62",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/f641d6f50776bc5b2792ec04294a0c2f36a86ddcc4b66507f452aae90a4a4a62/corpus-ts/src/api/order.controller.ts": {
+    "sourceHash": "dacdad98d455b682c2277814f280c55f093345f54e4e4202fbc8dbdf61a6e8ef",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "f641d6f50776bc5b2792ec04294a0c2f36a86ddcc4b66507f452aae90a4a4a62",
+    "matchesDefect": false,
+    "validDefect": false,
+    "note": "Optional chaining on the order does not establish that lines is optional on a present order."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/f641d6f50776bc5b2792ec04294a0c2f36a86ddcc4b66507f452aae90a4a4a62/corpus/src/accuracy/discount.ts": {
+    "sourceHash": "06c2ffaf47268ba297773e4951e85c3c3b64cd15a2b8520a584435ef77fc4a65",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "f641d6f50776bc5b2792ec04294a0c2f36a86ddcc4b66507f452aae90a4a4a62",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/f641d6f50776bc5b2792ec04294a0c2f36a86ddcc4b66507f452aae90a4a4a62/corpus/src/accuracy/late-member.ts": {
+    "sourceHash": "e1c168da3505c5abc0d8a5dd5c68cea048aa94e0679492438c899dbb1506d25c",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "f641d6f50776bc5b2792ec04294a0c2f36a86ddcc4b66507f452aae90a4a4a62",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/f641d6f50776bc5b2792ec04294a0c2f36a86ddcc4b66507f452aae90a4a4a62/corpus/src/accuracy/wildcard-discount.ts": {
+    "sourceHash": "9dbcff59e710be827be727cb75e5f6bd7c7cf40d2a3a237bcb3d4730e1e2bd66",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "f641d6f50776bc5b2792ec04294a0c2f36a86ddcc4b66507f452aae90a4a4a62",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/f641d6f50776bc5b2792ec04294a0c2f36a86ddcc4b66507f452aae90a4a4a62/corpus/src/accuracy/forwarded-coupon.ts": {
+    "sourceHash": "bac2a9673d197bdff07ca8127d2f3c2fca6c0486c332b309545330a9ebeb128a",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "f641d6f50776bc5b2792ec04294a0c2f36a86ddcc4b66507f452aae90a4a4a62",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "copilot/6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841/f641d6f50776bc5b2792ec04294a0c2f36a86ddcc4b66507f452aae90a4a4a62/corpus/src/accuracy/constructed-reading.ts": {
+    "sourceHash": "468050c90c52a0959c209527182c81e0b589ffa338e975cefe248bac78df7633",
+    "promptHash": "6dd83c1aba2768574cb3bb9f7134091bce520a241749f2bce531cba13f684841",
+    "responseHash": "f641d6f50776bc5b2792ec04294a0c2f36a86ddcc4b66507f452aae90a4a4a62",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "codex/0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9/7bc6b54f12e401dc72e1d481bdda1c114d934ec9edc3e1d2799d1f6d3e1becf4/corpus/src/services/pricingService.js": {
+    "sourceHash": "c8b67a8be15f8a09c3c3d5a902fc33999f902f46b7b23cbcfef8aa1e7cff1614",
+    "promptHash": "0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9",
+    "responseHash": "7bc6b54f12e401dc72e1d481bdda1c114d934ec9edc3e1d2799d1f6d3e1becf4",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "codex/0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9/7bc6b54f12e401dc72e1d481bdda1c114d934ec9edc3e1d2799d1f6d3e1becf4/corpus/src/workers/reconciliationWorker.js": {
+    "sourceHash": "898eb9ee68e1b07d1b167d88d03a5ff395db82c0727442058d53a100e06929af",
+    "promptHash": "0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9",
+    "responseHash": "7bc6b54f12e401dc72e1d481bdda1c114d934ec9edc3e1d2799d1f6d3e1becf4",
+    "matchesDefect": false,
+    "validDefect": true,
+    "note": "Different defect: settlement applied twice between balance write and cursor update. Reproduced in batching-counterexamples.test.mjs."
+  },
+  "codex/0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9/7bc6b54f12e401dc72e1d481bdda1c114d934ec9edc3e1d2799d1f6d3e1becf4/corpus/src/services/inventoryService.js": {
+    "sourceHash": "d38ac20410e079ba47c3eef0b10eeda28129bd39b3579f3be7b3a8ebb53d6245",
+    "promptHash": "0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9",
+    "responseHash": "7bc6b54f12e401dc72e1d481bdda1c114d934ec9edc3e1d2799d1f6d3e1becf4",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "codex/0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9/7bc6b54f12e401dc72e1d481bdda1c114d934ec9edc3e1d2799d1f6d3e1becf4/corpus/src/lib/dateWindow.js": {
+    "sourceHash": "0a8530dd6c81bda7560c42e74c6bfbc3b064e82d90cfe16a9e0bfe3f22953351",
+    "promptHash": "0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9",
+    "responseHash": "7bc6b54f12e401dc72e1d481bdda1c114d934ec9edc3e1d2799d1f6d3e1becf4",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "codex/0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9/7bc6b54f12e401dc72e1d481bdda1c114d934ec9edc3e1d2799d1f6d3e1becf4/corpus/src/lib/retry.js": {
+    "sourceHash": "4c54b5e486ee9f5ba09a38fc6bfb55285d00ebe53c3c83d8894f1eb51463d698",
+    "promptHash": "0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9",
+    "responseHash": "7bc6b54f12e401dc72e1d481bdda1c114d934ec9edc3e1d2799d1f6d3e1becf4",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "codex/0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9/7bc6b54f12e401dc72e1d481bdda1c114d934ec9edc3e1d2799d1f6d3e1becf4/corpus-ts/src/models/invoice.entity.ts": {
+    "sourceHash": "6b487221075627c66b376ca3a81c853c2eb5538416f14e0f8b7d539fd0af2601",
+    "promptHash": "0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9",
+    "responseHash": "7bc6b54f12e401dc72e1d481bdda1c114d934ec9edc3e1d2799d1f6d3e1becf4",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "codex/0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9/7bc6b54f12e401dc72e1d481bdda1c114d934ec9edc3e1d2799d1f6d3e1becf4/corpus-ts/src/services/cache.service.ts": {
+    "sourceHash": "b8bc7008d22e2c43d03ba04aa3d60bec764295eeaab1eb8e3f08c673eab35ab5",
+    "promptHash": "0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9",
+    "responseHash": "7bc6b54f12e401dc72e1d481bdda1c114d934ec9edc3e1d2799d1f6d3e1becf4",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "codex/0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9/7bc6b54f12e401dc72e1d481bdda1c114d934ec9edc3e1d2799d1f6d3e1becf4/corpus-ts/src/services/supplier.service.ts": {
+    "sourceHash": "47b4fbf4dcb69a3ddd79a0b20105aa6dc68ff06c72684307622cb366ad4f62b4",
+    "promptHash": "0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9",
+    "responseHash": "7bc6b54f12e401dc72e1d481bdda1c114d934ec9edc3e1d2799d1f6d3e1becf4",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "codex/0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9/7bc6b54f12e401dc72e1d481bdda1c114d934ec9edc3e1d2799d1f6d3e1becf4/corpus-ts/src/models/cart.model.ts": {
+    "sourceHash": "fe46d6c7b29ed71cd33dd37f9f9eb7a11004312c8d9f16e677ed97f544dafaaf",
+    "promptHash": "0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9",
+    "responseHash": "7bc6b54f12e401dc72e1d481bdda1c114d934ec9edc3e1d2799d1f6d3e1becf4",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "codex/0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9/7bc6b54f12e401dc72e1d481bdda1c114d934ec9edc3e1d2799d1f6d3e1becf4/corpus-ts/src/lib/paginate.mts": {
+    "sourceHash": "ffc281da0bab5cfcf9f5d2c6592c2bb6f5c184b2d151b901cc45bc502bda0ef4",
+    "promptHash": "0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9",
+    "responseHash": "7bc6b54f12e401dc72e1d481bdda1c114d934ec9edc3e1d2799d1f6d3e1becf4",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "codex/0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9/7bc6b54f12e401dc72e1d481bdda1c114d934ec9edc3e1d2799d1f6d3e1becf4/corpus-ts/src/services/sync.service.ts": {
+    "sourceHash": "bc3d7907f200e11d7e0da9778eb941fb388eb7f5ced1c03e8af55605563f97b2",
+    "promptHash": "0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9",
+    "responseHash": "7bc6b54f12e401dc72e1d481bdda1c114d934ec9edc3e1d2799d1f6d3e1becf4",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "codex/0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9/7bc6b54f12e401dc72e1d481bdda1c114d934ec9edc3e1d2799d1f6d3e1becf4/corpus-ts/src/lib/money.ts": {
+    "sourceHash": "aa4aa565410d6d22bfd96009a1b5e490dfb65fc309725946cb020d7329ed656a",
+    "promptHash": "0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9",
+    "responseHash": "7bc6b54f12e401dc72e1d481bdda1c114d934ec9edc3e1d2799d1f6d3e1becf4",
+    "matchesDefect": false,
+    "validDefect": true,
+    "note": "Additional reproducible defect in a nominal control. See batching-counterexamples.test.mjs. Keep the original control count and report additional findings separately."
+  },
+  "codex/0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9/7bc6b54f12e401dc72e1d481bdda1c114d934ec9edc3e1d2799d1f6d3e1becf4/corpus-ts/src/lib/headers.mts": {
+    "sourceHash": "79a7b877e0d50a921aec0fa91208cb5da2b4aeb617bb32b5d136c463f1f0baa3",
+    "promptHash": "0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9",
+    "responseHash": "7bc6b54f12e401dc72e1d481bdda1c114d934ec9edc3e1d2799d1f6d3e1becf4",
+    "matchesDefect": false,
+    "validDefect": true,
+    "note": "Additional reproducible defect in a nominal control. See batching-counterexamples.test.mjs. Keep the original control count and report additional findings separately."
+  },
+  "codex/0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9/7bc6b54f12e401dc72e1d481bdda1c114d934ec9edc3e1d2799d1f6d3e1becf4/corpus/src/accuracy/discount.ts": {
+    "sourceHash": "06c2ffaf47268ba297773e4951e85c3c3b64cd15a2b8520a584435ef77fc4a65",
+    "promptHash": "0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9",
+    "responseHash": "7bc6b54f12e401dc72e1d481bdda1c114d934ec9edc3e1d2799d1f6d3e1becf4",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "codex/0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9/7bc6b54f12e401dc72e1d481bdda1c114d934ec9edc3e1d2799d1f6d3e1becf4/corpus/src/accuracy/late-member.ts": {
+    "sourceHash": "e1c168da3505c5abc0d8a5dd5c68cea048aa94e0679492438c899dbb1506d25c",
+    "promptHash": "0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9",
+    "responseHash": "7bc6b54f12e401dc72e1d481bdda1c114d934ec9edc3e1d2799d1f6d3e1becf4",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "codex/0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9/7bc6b54f12e401dc72e1d481bdda1c114d934ec9edc3e1d2799d1f6d3e1becf4/corpus/src/accuracy/wildcard-discount.ts": {
+    "sourceHash": "9dbcff59e710be827be727cb75e5f6bd7c7cf40d2a3a237bcb3d4730e1e2bd66",
+    "promptHash": "0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9",
+    "responseHash": "7bc6b54f12e401dc72e1d481bdda1c114d934ec9edc3e1d2799d1f6d3e1becf4",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "codex/0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9/7bc6b54f12e401dc72e1d481bdda1c114d934ec9edc3e1d2799d1f6d3e1becf4/corpus/src/accuracy/forwarded-coupon.ts": {
+    "sourceHash": "bac2a9673d197bdff07ca8127d2f3c2fca6c0486c332b309545330a9ebeb128a",
+    "promptHash": "0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9",
+    "responseHash": "7bc6b54f12e401dc72e1d481bdda1c114d934ec9edc3e1d2799d1f6d3e1becf4",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "codex/0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9/7bc6b54f12e401dc72e1d481bdda1c114d934ec9edc3e1d2799d1f6d3e1becf4/corpus/src/accuracy/constructed-reading.ts": {
+    "sourceHash": "468050c90c52a0959c209527182c81e0b589ffa338e975cefe248bac78df7633",
+    "promptHash": "0a68e7f30e8d4bc9201eddff60717286df1d78d8585fdf07058abe4aa02293f9",
+    "responseHash": "7bc6b54f12e401dc72e1d481bdda1c114d934ec9edc3e1d2799d1f6d3e1becf4",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "claude/d9f24ccb2e922af18d9574e98d2e5cafd28ccc42f44e241ca012893495d5a891/1bdac65d635bac2586b53e6ce070c577d9170e5c4865a5fe8c26a710166bb150/corpus/src/services/pricingService.js": {
+    "sourceHash": "c8b67a8be15f8a09c3c3d5a902fc33999f902f46b7b23cbcfef8aa1e7cff1614",
+    "promptHash": "d9f24ccb2e922af18d9574e98d2e5cafd28ccc42f44e241ca012893495d5a891",
+    "responseHash": "1bdac65d635bac2586b53e6ce070c577d9170e5c4865a5fe8c26a710166bb150",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "claude/d9f24ccb2e922af18d9574e98d2e5cafd28ccc42f44e241ca012893495d5a891/1bdac65d635bac2586b53e6ce070c577d9170e5c4865a5fe8c26a710166bb150/corpus/src/services/inventoryService.js": {
+    "sourceHash": "d38ac20410e079ba47c3eef0b10eeda28129bd39b3579f3be7b3a8ebb53d6245",
+    "promptHash": "d9f24ccb2e922af18d9574e98d2e5cafd28ccc42f44e241ca012893495d5a891",
+    "responseHash": "1bdac65d635bac2586b53e6ce070c577d9170e5c4865a5fe8c26a710166bb150",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "claude/d9f24ccb2e922af18d9574e98d2e5cafd28ccc42f44e241ca012893495d5a891/1bdac65d635bac2586b53e6ce070c577d9170e5c4865a5fe8c26a710166bb150/corpus/src/lib/dateWindow.js": {
+    "sourceHash": "0a8530dd6c81bda7560c42e74c6bfbc3b064e82d90cfe16a9e0bfe3f22953351",
+    "promptHash": "d9f24ccb2e922af18d9574e98d2e5cafd28ccc42f44e241ca012893495d5a891",
+    "responseHash": "1bdac65d635bac2586b53e6ce070c577d9170e5c4865a5fe8c26a710166bb150",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "claude/d9f24ccb2e922af18d9574e98d2e5cafd28ccc42f44e241ca012893495d5a891/1bdac65d635bac2586b53e6ce070c577d9170e5c4865a5fe8c26a710166bb150/corpus/src/lib/retry.js": {
+    "sourceHash": "4c54b5e486ee9f5ba09a38fc6bfb55285d00ebe53c3c83d8894f1eb51463d698",
+    "promptHash": "d9f24ccb2e922af18d9574e98d2e5cafd28ccc42f44e241ca012893495d5a891",
+    "responseHash": "1bdac65d635bac2586b53e6ce070c577d9170e5c4865a5fe8c26a710166bb150",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "claude/d9f24ccb2e922af18d9574e98d2e5cafd28ccc42f44e241ca012893495d5a891/1bdac65d635bac2586b53e6ce070c577d9170e5c4865a5fe8c26a710166bb150/corpus-ts/src/services/cache.service.ts": {
+    "sourceHash": "b8bc7008d22e2c43d03ba04aa3d60bec764295eeaab1eb8e3f08c673eab35ab5",
+    "promptHash": "d9f24ccb2e922af18d9574e98d2e5cafd28ccc42f44e241ca012893495d5a891",
+    "responseHash": "1bdac65d635bac2586b53e6ce070c577d9170e5c4865a5fe8c26a710166bb150",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "claude/d9f24ccb2e922af18d9574e98d2e5cafd28ccc42f44e241ca012893495d5a891/1bdac65d635bac2586b53e6ce070c577d9170e5c4865a5fe8c26a710166bb150/corpus-ts/src/services/supplier.service.ts": {
+    "sourceHash": "47b4fbf4dcb69a3ddd79a0b20105aa6dc68ff06c72684307622cb366ad4f62b4",
+    "promptHash": "d9f24ccb2e922af18d9574e98d2e5cafd28ccc42f44e241ca012893495d5a891",
+    "responseHash": "1bdac65d635bac2586b53e6ce070c577d9170e5c4865a5fe8c26a710166bb150",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "claude/d9f24ccb2e922af18d9574e98d2e5cafd28ccc42f44e241ca012893495d5a891/1bdac65d635bac2586b53e6ce070c577d9170e5c4865a5fe8c26a710166bb150/corpus-ts/src/models/cart.model.ts": {
+    "sourceHash": "fe46d6c7b29ed71cd33dd37f9f9eb7a11004312c8d9f16e677ed97f544dafaaf",
+    "promptHash": "d9f24ccb2e922af18d9574e98d2e5cafd28ccc42f44e241ca012893495d5a891",
+    "responseHash": "1bdac65d635bac2586b53e6ce070c577d9170e5c4865a5fe8c26a710166bb150",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "claude/d9f24ccb2e922af18d9574e98d2e5cafd28ccc42f44e241ca012893495d5a891/1bdac65d635bac2586b53e6ce070c577d9170e5c4865a5fe8c26a710166bb150/corpus-ts/src/lib/paginate.mts": {
+    "sourceHash": "ffc281da0bab5cfcf9f5d2c6592c2bb6f5c184b2d151b901cc45bc502bda0ef4",
+    "promptHash": "d9f24ccb2e922af18d9574e98d2e5cafd28ccc42f44e241ca012893495d5a891",
+    "responseHash": "1bdac65d635bac2586b53e6ce070c577d9170e5c4865a5fe8c26a710166bb150",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "claude/d9f24ccb2e922af18d9574e98d2e5cafd28ccc42f44e241ca012893495d5a891/1bdac65d635bac2586b53e6ce070c577d9170e5c4865a5fe8c26a710166bb150/corpus-ts/src/services/sync.service.ts": {
+    "sourceHash": "bc3d7907f200e11d7e0da9778eb941fb388eb7f5ced1c03e8af55605563f97b2",
+    "promptHash": "d9f24ccb2e922af18d9574e98d2e5cafd28ccc42f44e241ca012893495d5a891",
+    "responseHash": "1bdac65d635bac2586b53e6ce070c577d9170e5c4865a5fe8c26a710166bb150",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "claude/d9f24ccb2e922af18d9574e98d2e5cafd28ccc42f44e241ca012893495d5a891/1bdac65d635bac2586b53e6ce070c577d9170e5c4865a5fe8c26a710166bb150/corpus/src/accuracy/discount.ts": {
+    "sourceHash": "06c2ffaf47268ba297773e4951e85c3c3b64cd15a2b8520a584435ef77fc4a65",
+    "promptHash": "d9f24ccb2e922af18d9574e98d2e5cafd28ccc42f44e241ca012893495d5a891",
+    "responseHash": "1bdac65d635bac2586b53e6ce070c577d9170e5c4865a5fe8c26a710166bb150",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "claude/d9f24ccb2e922af18d9574e98d2e5cafd28ccc42f44e241ca012893495d5a891/1bdac65d635bac2586b53e6ce070c577d9170e5c4865a5fe8c26a710166bb150/corpus/src/accuracy/late-member.ts": {
+    "sourceHash": "e1c168da3505c5abc0d8a5dd5c68cea048aa94e0679492438c899dbb1506d25c",
+    "promptHash": "d9f24ccb2e922af18d9574e98d2e5cafd28ccc42f44e241ca012893495d5a891",
+    "responseHash": "1bdac65d635bac2586b53e6ce070c577d9170e5c4865a5fe8c26a710166bb150",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "claude/d9f24ccb2e922af18d9574e98d2e5cafd28ccc42f44e241ca012893495d5a891/1bdac65d635bac2586b53e6ce070c577d9170e5c4865a5fe8c26a710166bb150/corpus/src/accuracy/wildcard-discount.ts": {
+    "sourceHash": "9dbcff59e710be827be727cb75e5f6bd7c7cf40d2a3a237bcb3d4730e1e2bd66",
+    "promptHash": "d9f24ccb2e922af18d9574e98d2e5cafd28ccc42f44e241ca012893495d5a891",
+    "responseHash": "1bdac65d635bac2586b53e6ce070c577d9170e5c4865a5fe8c26a710166bb150",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "claude/d9f24ccb2e922af18d9574e98d2e5cafd28ccc42f44e241ca012893495d5a891/1bdac65d635bac2586b53e6ce070c577d9170e5c4865a5fe8c26a710166bb150/corpus/src/accuracy/forwarded-coupon.ts": {
+    "sourceHash": "bac2a9673d197bdff07ca8127d2f3c2fca6c0486c332b309545330a9ebeb128a",
+    "promptHash": "d9f24ccb2e922af18d9574e98d2e5cafd28ccc42f44e241ca012893495d5a891",
+    "responseHash": "1bdac65d635bac2586b53e6ce070c577d9170e5c4865a5fe8c26a710166bb150",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  },
+  "claude/d9f24ccb2e922af18d9574e98d2e5cafd28ccc42f44e241ca012893495d5a891/1bdac65d635bac2586b53e6ce070c577d9170e5c4865a5fe8c26a710166bb150/corpus/src/accuracy/constructed-reading.ts": {
+    "sourceHash": "468050c90c52a0959c209527182c81e0b589ffa338e975cefe248bac78df7633",
+    "promptHash": "d9f24ccb2e922af18d9574e98d2e5cafd28ccc42f44e241ca012893495d5a891",
+    "responseHash": "1bdac65d635bac2586b53e6ce070c577d9170e5c4865a5fe8c26a710166bb150",
+    "matchesDefect": true,
+    "validDefect": true,
+    "note": "Reviewed trigger and wrong result match the recorded defect."
+  }
+}

@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { mkdtemp, mkdir, readFile, rm } from "node:fs/promises";
+import { mkdtemp, mkdir, readFile, readdir, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -28,10 +28,12 @@ try {
     const packed = JSON.parse(await run([
         npmCli, "pack", "--json", "--pack-destination", workspace
     ], { env: packageEnv }))[0];
+    const compilerAssets = (await readdir(path.join(root, "dist/typescript-lib"))).map(file => `dist/typescript-lib/${file}`);
+    assert.ok(compilerAssets.includes("dist/typescript-lib/lib.es2022.full.d.ts"));
     assert.deepEqual(packed.files.map(file => file.path).sort(), [
         "CHANGELOG.md", "LICENSE", "README.md", "dist/mcp-server.js",
-        "package.json", "tools/log-analyzer/analyze_logs.py"
-    ]);
+        "package.json", "tools/log-analyzer/analyze_logs.py", ...compilerAssets
+    ].sort());
     assert.equal(Object.keys(pkg.dependencies ?? {}).length, 0, "Runtime dependencies must be bundled.");
     const tarball = path.join(workspace, packed.filename);
     const consumer = path.join(workspace, "consumer project");

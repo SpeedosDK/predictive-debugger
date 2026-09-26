@@ -2,7 +2,7 @@
 
 [Back to README](../README.md#tools)
 
-The MCP server exposes six tools. Static analysis, dependency mapping and log
+The MCP server exposes seven tools. Type checking, static analysis, dependency mapping and log
 analysis run locally. Only `predict_failures` calls a model provider.
 
 Source analysis supports `.js`, `.jsx`, `.mjs`, `.cjs`, `.ts`, `.tsx`, `.mts` and
@@ -35,6 +35,32 @@ when reviewing the test suite itself.
 Pass `file` to get AST complexity metrics, `riskScore`, `riskDensity` and the
 signals behind the scores. A parse failure returns `parseError` and a zero score;
 that zero is not evidence that the file is safe.
+
+## `check_types`
+
+Pass `files` with up to 20 absolute paths from one project. Optional `project`
+selects a `tsconfig.json` or `jsconfig.json`; otherwise the nearest config is
+discovered. The bundled TypeScript compiler loads the complete config's root
+files, preserving ambient declarations, aliases and inherited options. Only
+selected files' diagnostics are returned. Nothing is emitted or executed, and
+no provider is called. The reply still occupies the calling agent's context.
+
+Without a config, `mode: "inferred"` uses ES2022, bundler module resolution,
+JS checking, null checking and implicit-this checking on the selected roots.
+Configured JavaScript checking and file-level opt-outs are respected. This is
+compiler evidence under those settings, not proof of a runtime defect or safety.
+
+Results include `compiler`, `project`, `checked`, `skipped`, `diagnostics`,
+`contextIssues` and `truncated`. Each diagnostic has a code, message and source
+position. Missing dependencies and invalid compiler options appear separately
+as context issues. `status: "unavailable"` reports a config failure or limit;
+it never means the files are clean.
+
+Limits are 1,000 root files, 1,000 compiler reads, 4 MB per file, 32 MB total
+reads and 100 returned diagnostics. Project references are currently unsupported;
+select a leaf config. The compiler runs synchronously, so these size limits are
+not a hard execution timeout. The package includes the compiler and its standard
+declarations; a project-local TypeScript installation is not required.
 
 ## `map_dependencies`
 
@@ -88,7 +114,7 @@ model. Each file requires a model call and uses the provider's usage allowance.
 | --- | --- | --- |
 | `file` | Required unless `files` is supplied | One source file |
 | `files` | None | Non-empty batch of source paths; takes precedence over `file` |
-| `concurrency` | `4` | Concurrent batch predictions, from 1 to 8 |
+| `concurrency` | `4` | Concurrent model calls, from 1 to 8 |
 | `provider` | First installed CLI | `claude`, `codex` or `copilot` |
 | `model` | CLI default | Model override passed to the provider |
 | `calleeContext` | `true` | Include bounded imported definitions and referenced types |
@@ -96,10 +122,20 @@ model. Each file requires a model call and uses the provider's usage allowance.
 | `logFile` | None | Log file to include in the combined score |
 | `verbose` | `false` | Include static metrics and the full log breakdown |
 
-Use `files` for a change set. Predictions run concurrently, with duplicate
-resolved paths removed. The reply contains `results` in input order and lists
-individual `failures` separately. A batch still makes one model call per unique
-file; lower `concurrency` if the provider starts rate-limiting.
+Use `files` for a change set. Up to eight small files share a model call, with
+the grouped prompt bounded at 120,000 characters. Large files run alone with
+their existing source allowance. Groups run concurrently; lower `concurrency`
+if the provider starts rate-limiting. Duplicate resolved paths are removed.
+
+The reply contains `results` in input order and lists `failures` separately.
+Each verdict is checked against its own file's source ranges. Missing, duplicate
+or incomplete verdicts are unavailable, never clean. A file whose group verdict
+names a defect with a score under 0.80 is reviewed again on its own, and that
+verdict replaces the group's: grouped scores near the 0.70 gate were unreliable
+in both directions. So is a file the group calls clean when it contains an async
+function that awaits a read and later awaits a write, the shape of a lost update
+that group replies missed. A failed CLI call affects its group and is not retried;
+retry only files whose assessment failed or is unavailable.
 
 ### Reading a verdict
 
@@ -109,7 +145,7 @@ Use `actionable` when deciding whether to present a prediction as a defect.
 | `status` | Meaning |
 | --- | --- |
 | `actionable` | A reported defect has a model score of at least `0.7` |
-| `uncertain` | A possible defect falls below the reporting threshold |
+| `uncertain` | A named defect scored below the reporting threshold. The reply adds `check`: read the cited lines and confirm or dismiss it |
 | `none` | No defect reported |
 | `unavailable` | No usable model verdict; this is not a clean result |
 

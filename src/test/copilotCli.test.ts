@@ -39,6 +39,7 @@ describe("completeArgs", () => {
     it("denies the tools that could act on the untrusted source", () => {
         const args = completeArgs();
         assert.ok(args.includes("--deny-tool=shell,write,url"));
+        assert.ok(args.includes("--available-tools="));
         assert.ok(args.includes("--disable-builtin-mcps"));
     });
 

@@ -94,3 +94,11 @@ estimates, but use tokens for the published comparison. These development cases
 informed the tool and do not measure held-out accuracy on arbitrary projects.
 
 [Dependency improvements and local measurements](DEPENDENCY-IMPROVEMENTS.md)
+
+[Claude provider cache and isolation checkpoint](CACHE-CHECKPOINT.md)
+
+[Cross-provider batching experiment and token accounting](BATCHING-CHECKPOINT.md)
+
+[Production compiler checks, grouped workflows and accuracy limitations](PRODUCTION-IMPROVEMENTS.md)
+
+[Grouped prediction accuracy and near-gate re-checks](ENGINE-ACCURACY.md)

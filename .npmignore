@@ -1,10 +1,12 @@
 # npm uses this allowlist because vsce rejects a package.json "files" field
-# alongside .vscodeignore. Dependencies are bundled; only the Python helper
-# needs to ship beside the MCP entry point.
+# alongside .vscodeignore. Dependencies are bundled; compiler declarations and
+# the Python helper ship beside the MCP entry point.
 *
 !dist/
 dist/*
 !dist/mcp-server.js
+!dist/typescript-lib/
+!dist/typescript-lib/*
 !tools/
 tools/*
 !tools/log-analyzer/

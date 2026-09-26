@@ -1,0 +1,267 @@
+{
+  "config": {
+    "provider": "claude",
+    "model": "sonnet",
+    "size": 8,
+    "concurrency": 4,
+    "trials": 2,
+    "suite": "holdout",
+    "targets": [
+      "corpus/src/holdout/eventBridge.js",
+      "corpus/src/holdout/tokenBucket.ts",
+      "corpus/src/holdout/feed.js",
+      "corpus/src/holdout/leaderboard.js",
+      "corpus/src/holdout/heartbeat.js",
+      "corpus/src/holdout/recent.ts",
+      "corpus/src/holdout/notifier.js",
+      "corpus/src/holdout/quota.ts",
+      "corpus/src/holdout/range.js",
+      "corpus/src/holdout/sortUsers.ts",
+      "corpus/src/holdout/poller.ts",
+      "corpus/src/holdout/profile.ts"
+    ],
+    "version": "2.1.283 (Claude Code)",
+    "engineHash": "b8111115e3bd61500ff4a1919e16ba6a8b5826b04a5c44f6148c2a47329ddc45",
+    "runnerHash": "2d2624d4a9aefac0b05dfc9e757f19c39ef8f69a11aa58684cc28877530b74d9"
+  },
+  "startedAt": "2026-09-26T09:50:53.509Z",
+  "runs": [
+    {
+      "trial": 1,
+      "wallMs": 180110,
+      "calls": 0,
+      "usage": {
+        "input": 0,
+        "cacheRead": 0,
+        "cacheWrite": 0,
+        "output": 0,
+        "total": 0
+      },
+      "failures": {
+        "corpus/src/holdout/eventBridge.js": "CLI timed out after 180000ms: C:\\Users\\ladin\\AppData\\Local\\Temp\\predictive-engine-claude\\shim\\claude.cmd",
+        "corpus/src/holdout/tokenBucket.ts": "CLI timed out after 180000ms: C:\\Users\\ladin\\AppData\\Local\\Temp\\predictive-engine-claude\\shim\\claude.cmd",
+        "corpus/src/holdout/feed.js": "CLI timed out after 180000ms: C:\\Users\\ladin\\AppData\\Local\\Temp\\predictive-engine-claude\\shim\\claude.cmd",
+        "corpus/src/holdout/leaderboard.js": "CLI timed out after 180000ms: C:\\Users\\ladin\\AppData\\Local\\Temp\\predictive-engine-claude\\shim\\claude.cmd",
+        "corpus/src/holdout/heartbeat.js": "CLI timed out after 180000ms: C:\\Users\\ladin\\AppData\\Local\\Temp\\predictive-engine-claude\\shim\\claude.cmd",
+        "corpus/src/holdout/recent.ts": "CLI timed out after 180000ms: C:\\Users\\ladin\\AppData\\Local\\Temp\\predictive-engine-claude\\shim\\claude.cmd",
+        "corpus/src/holdout/notifier.js": "CLI timed out after 180000ms: C:\\Users\\ladin\\AppData\\Local\\Temp\\predictive-engine-claude\\shim\\claude.cmd",
+        "corpus/src/holdout/quota.ts": "CLI timed out after 180000ms: C:\\Users\\ladin\\AppData\\Local\\Temp\\predictive-engine-claude\\shim\\claude.cmd",
+        "corpus/src/holdout/range.js": "CLI timed out after 180000ms: C:\\Users\\ladin\\AppData\\Local\\Temp\\predictive-engine-claude\\shim\\claude.cmd",
+        "corpus/src/holdout/sortUsers.ts": "CLI timed out after 180000ms: C:\\Users\\ladin\\AppData\\Local\\Temp\\predictive-engine-claude\\shim\\claude.cmd",
+        "corpus/src/holdout/poller.ts": "CLI timed out after 180000ms: C:\\Users\\ladin\\AppData\\Local\\Temp\\predictive-engine-claude\\shim\\claude.cmd",
+        "corpus/src/holdout/profile.ts": "CLI timed out after 180000ms: C:\\Users\\ladin\\AppData\\Local\\Temp\\predictive-engine-claude\\shim\\claude.cmd"
+      },
+      "bugs": 6,
+      "detected": 0,
+      "controls": 6,
+      "falseAlarms": 0,
+      "unavailable": 12,
+      "rows": [
+        {
+          "file": "corpus/src/holdout/eventBridge.js",
+          "kind": "buggy",
+          "unavailable": true,
+          "hit": false,
+          "falseAlarm": false
+        },
+        {
+          "file": "corpus/src/holdout/tokenBucket.ts",
+          "kind": "buggy",
+          "unavailable": true,
+          "hit": false,
+          "falseAlarm": false
+        },
+        {
+          "file": "corpus/src/holdout/feed.js",
+          "kind": "buggy",
+          "unavailable": true,
+          "hit": false,
+          "falseAlarm": false
+        },
+        {
+          "file": "corpus/src/holdout/leaderboard.js",
+          "kind": "buggy",
+          "unavailable": true,
+          "hit": false,
+          "falseAlarm": false
+        },
+        {
+          "file": "corpus/src/holdout/heartbeat.js",
+          "kind": "buggy",
+          "unavailable": true,
+          "hit": false,
+          "falseAlarm": false
+        },
+        {
+          "file": "corpus/src/holdout/recent.ts",
+          "kind": "buggy",
+          "unavailable": true,
+          "hit": false,
+          "falseAlarm": false
+        },
+        {
+          "file": "corpus/src/holdout/notifier.js",
+          "kind": "clean",
+          "unavailable": true,
+          "hit": false,
+          "falseAlarm": false
+        },
+        {
+          "file": "corpus/src/holdout/quota.ts",
+          "kind": "clean",
+          "unavailable": true,
+          "hit": false,
+          "falseAlarm": false
+        },
+        {
+          "file": "corpus/src/holdout/range.js",
+          "kind": "clean",
+          "unavailable": true,
+          "hit": false,
+          "falseAlarm": false
+        },
+        {
+          "file": "corpus/src/holdout/sortUsers.ts",
+          "kind": "clean",
+          "unavailable": true,
+          "hit": false,
+          "falseAlarm": false
+        },
+        {
+          "file": "corpus/src/holdout/poller.ts",
+          "kind": "clean",
+          "unavailable": true,
+          "hit": false,
+          "falseAlarm": false
+        },
+        {
+          "file": "corpus/src/holdout/profile.ts",
+          "kind": "clean",
+          "unavailable": true,
+          "hit": false,
+          "falseAlarm": false
+        }
+      ],
+      "raw": []
+    },
+    {
+      "trial": 2,
+      "wallMs": 180115,
+      "calls": 0,
+      "usage": {
+        "input": 0,
+        "cacheRead": 0,
+        "cacheWrite": 0,
+        "output": 0,
+        "total": 0
+      },
+      "failures": {
+        "corpus/src/holdout/profile.ts": "CLI timed out after 180000ms: C:\\Users\\ladin\\AppData\\Local\\Temp\\predictive-engine-claude\\shim\\claude.cmd",
+        "corpus/src/holdout/eventBridge.js": "CLI timed out after 180000ms: C:\\Users\\ladin\\AppData\\Local\\Temp\\predictive-engine-claude\\shim\\claude.cmd",
+        "corpus/src/holdout/tokenBucket.ts": "CLI timed out after 180000ms: C:\\Users\\ladin\\AppData\\Local\\Temp\\predictive-engine-claude\\shim\\claude.cmd",
+        "corpus/src/holdout/feed.js": "CLI timed out after 180000ms: C:\\Users\\ladin\\AppData\\Local\\Temp\\predictive-engine-claude\\shim\\claude.cmd",
+        "corpus/src/holdout/leaderboard.js": "CLI timed out after 180000ms: C:\\Users\\ladin\\AppData\\Local\\Temp\\predictive-engine-claude\\shim\\claude.cmd",
+        "corpus/src/holdout/heartbeat.js": "CLI timed out after 180000ms: C:\\Users\\ladin\\AppData\\Local\\Temp\\predictive-engine-claude\\shim\\claude.cmd",
+        "corpus/src/holdout/recent.ts": "CLI timed out after 180000ms: C:\\Users\\ladin\\AppData\\Local\\Temp\\predictive-engine-claude\\shim\\claude.cmd",
+        "corpus/src/holdout/notifier.js": "CLI timed out after 180000ms: C:\\Users\\ladin\\AppData\\Local\\Temp\\predictive-engine-claude\\shim\\claude.cmd",
+        "corpus/src/holdout/quota.ts": "CLI timed out after 180000ms: C:\\Users\\ladin\\AppData\\Local\\Temp\\predictive-engine-claude\\shim\\claude.cmd",
+        "corpus/src/holdout/range.js": "CLI timed out after 180000ms: C:\\Users\\ladin\\AppData\\Local\\Temp\\predictive-engine-claude\\shim\\claude.cmd",
+        "corpus/src/holdout/sortUsers.ts": "CLI timed out after 180000ms: C:\\Users\\ladin\\AppData\\Local\\Temp\\predictive-engine-claude\\shim\\claude.cmd",
+        "corpus/src/holdout/poller.ts": "CLI timed out after 180000ms: C:\\Users\\ladin\\AppData\\Local\\Temp\\predictive-engine-claude\\shim\\claude.cmd"
+      },
+      "bugs": 6,
+      "detected": 0,
+      "controls": 6,
+      "falseAlarms": 0,
+      "unavailable": 12,
+      "rows": [
+        {
+          "file": "corpus/src/holdout/eventBridge.js",
+          "kind": "buggy",
+          "unavailable": true,
+          "hit": false,
+          "falseAlarm": false
+        },
+        {
+          "file": "corpus/src/holdout/tokenBucket.ts",
+          "kind": "buggy",
+          "unavailable": true,
+          "hit": false,
+          "falseAlarm": false
+        },
+        {
+          "file": "corpus/src/holdout/feed.js",
+          "kind": "buggy",
+          "unavailable": true,
+          "hit": false,
+          "falseAlarm": false
+        },
+        {
+          "file": "corpus/src/holdout/leaderboard.js",
+          "kind": "buggy",
+          "unavailable": true,
+          "hit": false,
+          "falseAlarm": false
+        },
+        {
+          "file": "corpus/src/holdout/heartbeat.js",
+          "kind": "buggy",
+          "unavailable": true,
+          "hit": false,
+          "falseAlarm": false
+        },
+        {
+          "file": "corpus/src/holdout/recent.ts",
+          "kind": "buggy",
+          "unavailable": true,
+          "hit": false,
+          "falseAlarm": false
+        },
+        {
+          "file": "corpus/src/holdout/notifier.js",
+          "kind": "clean",
+          "unavailable": true,
+          "hit": false,
+          "falseAlarm": false
+        },
+        {
+          "file": "corpus/src/holdout/quota.ts",
+          "kind": "clean",
+          "unavailable": true,
+          "hit": false,
+          "falseAlarm": false
+        },
+        {
+          "file": "corpus/src/holdout/range.js",
+          "kind": "clean",
+          "unavailable": true,
+          "hit": false,
+          "falseAlarm": false
+        },
+        {
+          "file": "corpus/src/holdout/sortUsers.ts",
+          "kind": "clean",
+          "unavailable": true,
+          "hit": false,
+          "falseAlarm": false
+        },
+        {
+          "file": "corpus/src/holdout/poller.ts",
+          "kind": "clean",
+          "unavailable": true,
+          "hit": false,
+          "falseAlarm": false
+        },
+        {
+          "file": "corpus/src/holdout/profile.ts",
+          "kind": "clean",
+          "unavailable": true,
+          "hit": false,
+          "falseAlarm": false
+        }
+      ],
+      "raw": []
+    }
+  ],
+  "completedAt": "2026-09-26T09:56:53.842Z"
+}

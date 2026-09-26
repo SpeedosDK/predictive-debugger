@@ -1,0 +1,1 @@
+{"at":"2026-09-26T14:26:50.234Z","provider":"claude","model":"sonnet","version":"2.1.283 (Claude Code)","detected":7,"bugs":7,"falseAlarms":0,"controls":5,"unavailable":0,"tokens":30978,"calls":5,"wallMs":12624,"status":"pass","problems":[]}

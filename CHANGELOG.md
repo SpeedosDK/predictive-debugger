@@ -6,6 +6,74 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- `check_types` returns selected JavaScript/TypeScript files' compiler diagnostics
+  without model calls. It preserves configured project declarations and options,
+  reports incomplete context and limits, and bundles TypeScript's standard libraries.
+  Compiler diagnostics are separate from model confidence and runtime predictions.
+
+### Changed
+
+- Prediction batches now share the review policy and CLI context across up to
+  eight small files per model call for Claude, Codex and Copilot. Groups have a
+  bounded prompt size and retain per-file verdicts, line validation and errors.
+  Large files run alone. Missing or malformed batch verdicts stay unavailable,
+  and failed groups do not trigger hidden retries. MCP descriptions and project
+  scans use the same grouped pipeline.
+  The Copilot checkpoint reduced total workflow tokens 64% versus direct review,
+  but accuracy regressed and CLI credit estimates rose with different cache use.
+  See [measurements and remaining accuracy work](bench/PRODUCTION-IMPROVEMENTS.md).
+- Grouped predictions recover the accuracy grouping lost. A file whose group
+  verdict names a defect with a score under 0.80 is reviewed again on its own, and
+  that verdict replaces the group's. A prompt rule that dismissed a defect beside
+  a guarded sibling field was removed, and scores are anchored to a trigger and a
+  wrong result the shown code establishes. Over three trials on the 37-case
+  benchmark: Claude 48/51 with no false alarms (grouped: 14/17), Copilot 46/51
+  with none (13/17 and one), Codex 48/51 with three. Internal tokens stay 65–75%
+  below single-file review. See [the engine checkpoint](bench/ENGINE-ACCURACY.md).
+- Codex review calls turn off Codex's agent tools (shell, patching, web, browser,
+  computer use, plugins, image generation). With its defaults, asked to read a
+  file, the reviewing Codex called its shell and was stopped only by a Windows
+  sandbox error. The per-call context shrinks, but Codex no longer serves it from
+  its shared prompt cache, so each call sends about 9k more uncached tokens.
+- Only JavaScript/TypeScript source files are sent to the model. A path to a
+  `.env` or key file is refused before any provider call, imports resolve only to
+  source files, and `files` accepts at most 100 paths.
+- After two failed provider calls in a row, the remaining files fail at once with
+  the reason instead of each waiting out its timeout. A file's re-check starts as
+  soon as its group finishes, and files are read and parsed in parallel.
+- Replies include `providerVersion`, the CLI version that produced the verdicts.
+  `npm run bench:canary -- --provider=<id>` checks an installed CLI against the
+  held-out cases in about a minute and logs drift to `bench/canary-log.jsonl`.
+- `predict_failures` no longer tells the calling agent to ignore `uncertain`
+  results. Replies with one add `check`, asking it to read the cited lines and
+  confirm or dismiss each. Claude and Copilot each found one more planted bug over
+  two workflow trials, with no false alarms.
+- Files with an async read-await-write shape are reviewed alone when their group
+  calls them clean. Group replies had missed two such races that single-file
+  reviews found. On 49 cases, including 12 new held-out ones, all three CLIs had
+  no false alarms over two trials. See [the engine checkpoint](bench/ENGINE-ACCURACY.md).
+- Review calls run in an empty temporary directory. In the project directory,
+  Claude, Codex and Copilot each loaded its CLAUDE.md/AGENTS.md into every call,
+  adding 1.2–2.3k tokens per call here and letting repository text steer the
+  reviewer. Claude's internal tokens fell 13%, Codex's and Copilot's 5%.
+- Brackets in prose before a model's verdict (`checked [x]`, `line [12]`) no
+  longer make the verdict unavailable. All 325 saved single-file replies parse
+  unchanged.
+- Explicit `unknown` model verdicts remain unavailable instead of becoming clean
+  results. MCP tools advertise their read-only, non-destructive behavior, with
+  external model access disclosed for predictions.
+- Copilot predictions expose no tools to the model, including inherited custom
+  MCP tools. Disabling built-in MCP servers alone did not exclude those tools.
+
+- Reduced Claude provider token use. The spawned `claude` CLI no longer makes a
+  Haiku side call that sent each prompt uncached. It also no longer loads the
+  user's skills, MCP servers or session files. Against v0.8.2 on the Sonnet
+  benchmark, total tokens fell 54% and the CLI-estimated cost fell 38%.
+  Detections stayed at 45/51. The prompt text is unchanged. Codex and Copilot are
+  not affected. See [the cache checkpoint](bench/CACHE-CHECKPOINT.md).
+
 ## [0.8.2] - 2026-09-24
 
 ### Changed

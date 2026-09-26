@@ -12,7 +12,7 @@
 [![GitHub stars](https://img.shields.io/github/stars/SpeedosDK/predictive-debugger)](https://github.com/SpeedosDK/predictive-debugger/stargazers)
 
 MCP server for finding likely runtime failures in JavaScript and TypeScript.
-Six tools help your coding agent rank risky files, trace dependencies, inspect
+Seven tools help your coding agent check types, rank risky files, trace dependencies, inspect
 logs and get an independent model review with a line number and reason.
 
 Uses the Claude Code, Codex or GitHub Copilot CLI you already have installed.
@@ -96,7 +96,7 @@ For every project, see [Copilot user-level setup](docs/setup.md#copilot-user-lev
 
 ### 2. Check the connection
 
-Restart your agent and check `/mcp` for `predictive-debugger` and its six tools.
+Restart your agent and check `/mcp` for `predictive-debugger` and its seven tools.
 To check that the package downloads and print its version:
 
 ```bash
@@ -121,14 +121,16 @@ Find unusual entries in logs/app.log.
 | --- | --- | --- |
 | `scan_project` | Rank source files by risk density. Excludes tests by default. | No |
 | `analyze_file` | Return complexity metrics, risk scores and contributing signals. | No |
+| `check_types` | Return selected files' TypeScript compiler diagnostics using local project settings. | No |
 | `map_dependencies` | Find imports, reverse imports and connected test files, with source-line evidence. | No |
 | `analyze_logs` | Return log anomalies, ranked by severity and unusual wording. | No |
 | `predict_failures` | Get an independent model verdict with a line number, reason and confidence. Supports batches. | Yes |
 | `list_providers` | Check which supported CLIs are installed and their sign-in status. | No |
 
-Start with `scan_project`, then read the files it highlights. Use
+Start with `scan_project` and `check_types`, then read the files they highlight. Use
 `map_dependencies` to find related files and `predict_failures` when you want a
-second opinion. Pass several paths as `files` to review them concurrently.
+second opinion. Pass several paths as `files` so small files share bounded model
+calls and avoid repeating the CLI context for every file.
 
 See the [tool reference](docs/tools.md) for parameters, result fields and limits.
 
@@ -144,8 +146,8 @@ session from a fresh context. The routing depends on file count:
 | Several files | A sub-agent scoped to the changed files and intended behavior, where the host supports it |
 | Mechanical correction with one clear answer | Neither check required |
 
-Per-file predictions cannot verify that several files agree or that a feature
-meets its requirements. The benefit of the sub-agent rule has not been measured.
+Grouped predictions retain per-file verdicts. They do not verify a feature's
+requirements. The benefit of the sub-agent rule has not been measured.
 
 </details>
 
