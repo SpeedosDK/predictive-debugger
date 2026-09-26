@@ -8,7 +8,7 @@ const target = path.join(root, '.tmp/benchmark-master');
 const require = createRequire(import.meta.url);
 const { runProcess } = require('../out/providers/processRunner.js');
 const { which } = require('../out/providers/locate.js');
-const baseline = JSON.parse(await fs.readFile(path.join(root, 'bench/baseline-master.json'), 'utf8'));
+const baseline = JSON.parse(await fs.readFile(path.join(root, 'bench/results/baseline-master.json'), 'utf8'));
 async function run(file, args, cwd) {
     const result = await runProcess({ file, args, cwd, timeoutMs: 240_000 });
     if (result.code !== 0) throw Error(result.stdout + result.stderr);

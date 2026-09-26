@@ -14,7 +14,7 @@ const bugs = new Map(manifest.bugs.map(bug => [`corpus/${bug.file}`, bug]));
 const controls = new Set(manifest.controls.map(file => `corpus/${file}`));
 
 for (const file of process.argv.slice(2)) {
-    const data = JSON.parse(await fs.readFile(path.resolve(here, file), 'utf8'));
+    const data = JSON.parse(await fs.readFile(path.resolve(here, 'results', file), 'utf8'));
     const cells = data.runs.map(run => {
         let detected = 0, falseAlarms = 0, unavailable = 0;
         const notes = [];

@@ -12,7 +12,7 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.dirname(here);
 const hash = value => createHash('sha256').update(value).digest('hex');
 const flag = (name, fallback) => process.argv.find(arg => arg.startsWith(`--${name}=`))?.slice(name.length + 3) ?? fallback;
-const output = path.resolve(here, flag('output', 'results-dependency-map.json'));
+const output = path.resolve(here, 'results', flag('output', 'results-dependency-map.json'));
 const previous = path.resolve(root, flag('baseline', '.tmp/context-checkpoint/step3-baseline/mcp-server.cjs'));
 const current = path.join(root, 'dist/mcp-server.js');
 const trials = Number(flag('trials', '5'));

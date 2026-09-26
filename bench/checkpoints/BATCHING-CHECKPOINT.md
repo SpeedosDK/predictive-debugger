@@ -1,5 +1,9 @@
 # Fewer CLI calls per review
 
+> The scripts and raw results for this checkpoint were removed from the working tree when
+> `bench/` was reorganized. They remain in commit `87edf8d`: restore one with
+> `git checkout 87edf8d -- bench/<file>`. Surviving result files are in `../results/`.
+
 Recorded September 25, 2026. Development experiment, not a release comparison.
 
 Bounded multi-file model calls are the strongest measured next step. On eight

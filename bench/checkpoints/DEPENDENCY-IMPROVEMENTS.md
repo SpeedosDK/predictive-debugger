@@ -9,7 +9,7 @@ reviewing code across files:
 | Broader import/export resolution | Follows unambiguous wildcard barrels, re-exported imported bindings and imported constructors. Predictions can inspect contracts and implementations that were previously missing from their context. |
 | Project dependency map | Shows imports, reverse imports and tests connected through imports, with file-and-line paths. Agents can find related code to inspect and tests to consider running. Import connections do not establish runtime test coverage. |
 
-The complete [workflow comparison](RESULTS.md) separates the original 28 cases
+The complete [workflow comparison](../RESULTS.md) separates the original 28 cases
 from nine added dependency cases. The candidate found all 12 new planted bug
 trials, compared with 3/12 for v0.7.1. Across the complete 37-case workflow it used
 3% more tokens than v0.7.1 and 30% fewer than direct reading. These development

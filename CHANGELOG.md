@@ -23,7 +23,7 @@ All notable changes to this project are documented here. The format follows
   scans use the same grouped pipeline.
   The Copilot checkpoint reduced total workflow tokens 64% versus direct review,
   but accuracy regressed and CLI credit estimates rose with different cache use.
-  See [measurements and remaining accuracy work](bench/PRODUCTION-IMPROVEMENTS.md).
+  See [measurements and remaining accuracy work](bench/checkpoints/PRODUCTION-IMPROVEMENTS.md).
 - Grouped predictions recover the accuracy grouping lost. A file whose group
   verdict names a defect with a score under 0.80 is reviewed again on its own, and
   that verdict replaces the group's. A prompt rule that dismissed a defect beside
@@ -31,7 +31,7 @@ All notable changes to this project are documented here. The format follows
   wrong result the shown code establishes. Over three trials on the 37-case
   benchmark: Claude 48/51 with no false alarms (grouped: 14/17), Copilot 46/51
   with none (13/17 and one), Codex 48/51 with three. Internal tokens stay 65–75%
-  below single-file review. See [the engine checkpoint](bench/ENGINE-ACCURACY.md).
+  below single-file review. See [the engine checkpoint](bench/checkpoints/ENGINE-ACCURACY.md).
 - Codex review calls turn off Codex's agent tools (shell, patching, web, browser,
   computer use, plugins, image generation). With its defaults, asked to read a
   file, the reviewing Codex called its shell and was stopped only by a Windows
@@ -53,7 +53,7 @@ All notable changes to this project are documented here. The format follows
 - Files with an async read-await-write shape are reviewed alone when their group
   calls them clean. Group replies had missed two such races that single-file
   reviews found. On 49 cases, including 12 new held-out ones, all three CLIs had
-  no false alarms over two trials. See [the engine checkpoint](bench/ENGINE-ACCURACY.md).
+  no false alarms over two trials. See [the engine checkpoint](bench/checkpoints/ENGINE-ACCURACY.md).
 - Review calls run in an empty temporary directory. In the project directory,
   Claude, Codex and Copilot each loaded its CLAUDE.md/AGENTS.md into every call,
   adding 1.2–2.3k tokens per call here and letting repository text steer the
@@ -72,7 +72,7 @@ All notable changes to this project are documented here. The format follows
   user's skills, MCP servers or session files. Against v0.8.2 on the Sonnet
   benchmark, total tokens fell 54% and the CLI-estimated cost fell 38%.
   Detections stayed at 45/51. The prompt text is unchanged. Codex and Copilot are
-  not affected. See [the cache checkpoint](bench/CACHE-CHECKPOINT.md).
+  not affected. See [the cache checkpoint](bench/checkpoints/CACHE-CHECKPOINT.md).
 
 ## [0.8.2] - 2026-09-24
 
@@ -130,7 +130,7 @@ All notable changes to this project are documented here. The format follows
   3% more total tokens than v0.7.1 in the complete comparison. The report separates
   the original cases from new dependency cases and compares tokens, with no monetary
   savings claim. See [benchmark results](bench/RESULTS.md).
-- Shared batch caching is deferred after [profiling](bench/BATCH-PARSING-CHECKPOINT.md)
+- Shared batch caching is deferred after [profiling](bench/checkpoints/BATCH-PARSING-CHECKPOINT.md)
   found little repeated indexing time worth saving.
 - Release comparisons reuse compatible saved results for the latest official
   release and test only the candidate. Detailed results belong in `bench/`, with

@@ -3,7 +3,7 @@
 **v0.8.0 identified 51/51 planted bug trials with 0 false alarms.**
 
 Sonnet reviewed 37 JavaScript and TypeScript cases 3 times per workflow, every session fresh:
-the 28 cases from the [previous results](results-v07-balanced.json) and 9 new dependency cases.
+the 28 cases from the [previous results](results/results-v07-balanced.json) and 9 new dependency cases.
 The baseline is tagged v0.7.1; v0.8.0 labels the measured candidate build.
 The saved records retain its original v0.7.2 label and exact bundle hash.
 
@@ -41,5 +41,5 @@ Tokens include caller and internal model usage, including cache reads and writes
 There are 17 buggy files and 20 clean controls; repeated trials are not additional bugs.
 These development cases informed the tool, so this is not a held-out accuracy estimate.
 
-[Method and reproduction](METHOD.md) | [Full analysis](RESULTS-v072-full.md) | [Raw runs](results-v072-full.json) |
-[Defect judgments](judgments-v072-full.json) | [Token breakdown](workflow-summary.json)
+[Method and reproduction](METHOD.md) | [Full analysis](RESULTS-v072-full.md) | [Raw runs](results/results-v072-full.json) |
+[Defect judgments](results/judgments-v072-full.json) | [Token breakdown](results/workflow-summary.json)

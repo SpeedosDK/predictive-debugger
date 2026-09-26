@@ -95,7 +95,7 @@ export class ClaudeCliProvider implements CliProvider {
 
         // The prompt stays whole on stdin rather than moving its fixed instructions
         // into `--system-prompt` for cross-file caching: there, Sonnet scored the
-        // same defects ~0.1 lower, under the 0.70 gate. See bench/CACHE-CHECKPOINT.md.
+        // same defects ~0.1 lower, under the 0.70 gate. See bench/checkpoints/CACHE-CHECKPOINT.md.
         const result = await runProcess({
             file: location.file,
             args,

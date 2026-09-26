@@ -10,6 +10,7 @@ import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { summarize, internalFile, groupCounts, sessionCosts } from './workflow-summary.mjs';
 const here = path.dirname(fileURLToPath(import.meta.url));
+const results = path.join(here, 'results');
 const fmt = n => n.toLocaleString('en-US');
 const ARMS = ['read', 'previous', 'current'];
 const ACTIONABLE = 0.7;
@@ -244,17 +245,17 @@ additional bugs. These are development cases that informed the tool's prompt and
 dependency-resolution work, so this is not a held-out accuracy estimate. Findings were
 reviewed for defect identity, not just a matching line number.
 
-[Method](METHOD.md) | [Raw runs](results-v072-full.json) |
-[Judgments](judgments-v072-full.json) | [Token breakdown](workflow-summary-v072-full.json)
+[Method](METHOD.md) | [Raw runs](results/results-v072-full.json) |
+[Judgments](results/judgments-v072-full.json) | [Token breakdown](results/workflow-summary-v072-full.json)
 `;
 }
 
 async function readJson(name) {
-    return JSON.parse(await fs.readFile(path.join(here, name), 'utf8'));
+    return JSON.parse(await fs.readFile(path.join(results, name), 'utf8'));
 }
 
 async function main() {
-    const resultBytes = await fs.readFile(path.join(here, 'results-v072-full.json'));
+    const resultBytes = await fs.readFile(path.join(results, 'results-v072-full.json'));
     const data = JSON.parse(resultBytes);
     data.resultSha256 = createHash('sha256').update(resultBytes).digest('hex');
     const judgments = await readJson('judgments-v072-full.json');
@@ -284,7 +285,7 @@ async function main() {
     }
     const kinds = Object.fromEntries(data.config.targets.map(t => [t.file, t.kind]));
     const fp = falsePositiveEvidence(sources, originalFiles, kinds);
-    await fs.writeFile(path.join(here, 'workflow-summary-v072-full.json'), JSON.stringify({
+    await fs.writeFile(path.join(results, 'workflow-summary-v072-full.json'), JSON.stringify({
         completedAt: data.updatedAt, configHash: data.configHash,
         baseline: data.config.baseline, candidate: data.config.candidate, bundles: data.config.bundles,
         cliVersion: data.config.cliVersion, arms, groups, sessions, contractEvidence: evidence, falsePositives: fp,

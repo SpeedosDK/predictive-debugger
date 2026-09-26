@@ -350,7 +350,7 @@ function predictionBody(
  * Uncertain findings name a defect scored under the gate. On the benchmark most
  * were real, and an agent reading only the verdicts dropped them; the calling
  * agent has the file and can settle one by reading a few lines. See
- * bench/ENGINE-ACCURACY.md.
+ * bench/checkpoints/ENGINE-ACCURACY.md.
  */
 function uncertainHint(results: FilePrediction[]): { check?: string } {
     return results.some((result) => assessmentStatus(result.ai) === "uncertain")
@@ -359,7 +359,7 @@ function uncertainHint(results: FilePrediction[]): { check?: string } {
 }
 
 /**
- * Verdict quality moves with CLI releases (see bench/CACHE-CHECKPOINT.md), so a
+ * Verdict quality moves with CLI releases (see bench/checkpoints/CACHE-CHECKPOINT.md), so a
  * reply names the version that produced it.
  */
 function providerVersion(location: { version?: string }): { providerVersion?: string } {

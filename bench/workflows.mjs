@@ -14,7 +14,7 @@ const hash = value => createHash('sha256').update(value).digest('hex');
 const flag = (name, fallback) => process.argv.find(a => a.startsWith(`--${name}=`))?.slice(name.length + 3) ?? fallback;
 const model = flag('model', 'sonnet');
 const trials = Number(flag('trials', '3'));
-const output = path.resolve(here, flag('output', 'results-v072-full.json'));
+const output = path.resolve(here, 'results', flag('output', 'results-v072-full.json'));
 const previous = path.resolve(flag('previous', path.join(root, '.tmp/benchmark-master')));
 // Defaults match the comparison published in RESULTS.md. Its config hash includes these labels,
 // so a plain rerun resumes and validates it instead of starting a new experiment.

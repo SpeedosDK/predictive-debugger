@@ -24,7 +24,7 @@ const output = `canary-${provider}-${Date.now()}.json`;
 const args = [path.join(here, 'engine-accuracy.mjs'), `--provider=${provider}`, '--suite=holdout', '--size=8',
     '--trials=1', `--output=${output}`, ...(model ? [`--model=${model}`] : [])];
 const run = spawnSync(process.execPath, args, { stdio: 'inherit' });
-const file = path.join(here, output);
+const file = path.join(here, 'results', output);
 const data = JSON.parse(await fs.readFile(file, 'utf8').catch(() => 'null'));
 await fs.rm(file, { force: true });
 if (run.status !== 0 || !data?.runs?.[0]) {
@@ -53,7 +53,7 @@ const problems = [
 const entry = { at: new Date().toISOString(), provider, model: model ?? null, version: data.config.version.split('\n')[0],
     detected, bugs: bugs.size, falseAlarms, controls: controls.size, unavailable: row.unavailable,
     tokens: row.usage.total, calls: row.calls, wallMs: row.wallMs, status: problems.length ? 'drift' : 'pass', problems };
-await fs.appendFile(path.join(here, 'canary-log.jsonl'), JSON.stringify(entry) + '\n');
+await fs.appendFile(path.join(here, 'results', 'canary-log.jsonl'), JSON.stringify(entry) + '\n');
 console.log(`\n${entry.status.toUpperCase()}: ${provider} ${entry.version} - ${detected}/${bugs.size} bugs, ` +
     `${falseAlarms}/${controls.size} false alarms, ${entry.tokens} tokens, ${Math.round(entry.wallMs / 1000)}s`);
 for (const problem of problems) console.log(`  - ${problem}`);

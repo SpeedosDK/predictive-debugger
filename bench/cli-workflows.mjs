@@ -19,13 +19,13 @@ const arms = flag('arms', 'read,previous,current').split(',');
 // strict: the caller reports only actionable verdicts and never reads source (the original design).
 // neutral: the caller follows the tool's own guidance and may read source only where it asks.
 const caller = flag('caller', 'strict');
-const output = path.join(here, flag('output', `results-workflow-batching-${provider}.json`));
+const output = path.join(here, 'results', flag('output', `results-workflow-${provider}.json`));
 if (!['codex', 'copilot', 'claude'].includes(provider) || !Number.isInteger(trials) || trials < 1 ||
     arms.some(arm => !['read', 'previous', 'current'].includes(arm)) || !['strict', 'neutral'].includes(caller)) throw Error('Invalid experiment options.');
 const baseline = path.join(root, '.tmp/benchmark-v082');
 const cli = which(provider);
 if (!cli) throw Error(`Missing ${provider}`);
-const originalBytes = await fs.readFile(path.join(here, 'results-cache-v083-isolated.json'));
+const originalBytes = await fs.readFile(path.join(here, 'results', 'results-cache-v083-isolated.json'));
 const original = JSON.parse(originalBytes);
 const work = path.join(os.tmpdir(), `predictive-workflow-${provider}`);
 const stage = path.join(work, 'source');

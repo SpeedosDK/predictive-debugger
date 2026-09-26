@@ -1,5 +1,7 @@
 # Grouped prediction accuracy: re-checking near-gate verdicts
 
+> Result files named here are in `../results/`; the scripts are in `bench/`.
+
 Recorded September 26, 2026. Development checkpoint on the existing 37 targets
 (17 planted bugs, 20 controls), not a release comparison or held-out estimate.
 

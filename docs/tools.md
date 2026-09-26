@@ -97,7 +97,7 @@ replies are capped at 32,000 characters.
 
 A missing relationship in a partial scan is not proof of absence. The tool uses
 no model calls, but its replies occupy the calling agent's context. See the
-[local measurements](../bench/DEPENDENCY-MAP-CHECKPOINT.md).
+[local measurements](../bench/checkpoints/DEPENDENCY-MAP-CHECKPOINT.md).
 
 ## `analyze_logs`
 

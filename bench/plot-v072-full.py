@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import FuncFormatter, MaxNLocator
 
 here = Path(__file__).resolve().parent
-data = json.loads((here / 'workflow-summary-v072-full.json').read_text(encoding='utf-8'))
+data = json.loads((here / 'results' / 'workflow-summary-v072-full.json').read_text(encoding='utf-8'))
 rows = data['arms']
 groups = data['groups']
 out = here / 'charts'

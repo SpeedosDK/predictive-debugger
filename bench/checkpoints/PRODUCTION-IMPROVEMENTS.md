@@ -1,5 +1,9 @@
 # Compiler checks and grouped prediction checkpoint
 
+> The scripts and raw results for this checkpoint were removed from the working tree when
+> `bench/` was reorganized. They remain in commit `87edf8d`: restore one with
+> `git checkout 87edf8d -- bench/<file>`. Surviving result files are in `../results/`.
+
 The implementation now provides two concrete benefits: local compiler diagnostics
 without a provider call, and shared model calls for small files across Claude,
 Codex and Copilot. The model review does **not** yet demonstrate consistently
@@ -10,7 +14,7 @@ release-readiness claim or held-out accuracy estimate.
 
 `node bench/type-check.mjs` starts the bundled MCP over stdio and runs
 `check_types` on the existing 37 targets. All 83 staged source files match the
-existing corpus hashes. [Raw results](results-type-check.json) identify the
+existing corpus hashes. [Raw results](../results/results-type-check.json) identify the
 bundle, arguments, replies, hashes and timings.
 
 - Two calls checked all 37 files with no provider calls.
@@ -72,7 +76,7 @@ Copilot's grouped checkpoint used 64% fewer total tokens than direct review and
 instead of 37. Other runs made five. The caller chooses its MCP batches, so the
 total can exceed `ceil(files / 8)`. Earlier Copilot candidates scored 14/17 with
 one false alarm, 13/17 with none, and 15/17 with none. The best run is not used
-as the final result. All are retained in [the generated summary](workflow-batching-summary.json).
+as the final result. All are retained in the generated summary (`workflow-batching-summary.json`, removed from the tree; `git show 87edf8d:bench/workflow-batching-summary.json`).
 
 Codex's direct run had repeated Windows execution-helper failures and recovered
 through another reading path. Its 72% observed token reduction is therefore not
@@ -86,7 +90,7 @@ Codex's additional findings are separate from planted-defect credit: backfill
 discarding the opening balance in direct review; a settlement applied twice in
 the grouped worker result; and decimal rounding and mixed-case header lookup in
 two nominal controls. The summary retains both original control flags. They are
-reproduced by [counterexample tests](batching-counterexamples.test.mjs), rather
+reproduced by [counterexample tests](../batching-counterexamples.test.mjs), rather
 than relabeling them as planted detections. The earlier numeric-column claim
 had no demonstrated runtime misuse and remains unsupported.
 
@@ -145,8 +149,8 @@ increase the compressed tarball to approximately 1.84 MB.
 providers. Use a new output filename for a new experiment. Compatible saved
 Copilot direct/release runs were reused from
 `results-workflow-batching-copilot.json`; each candidate records its reused-file
-SHA-256. [The summary](workflow-batching-summary.json) records every result-file
-hash and build hash. [Judgments](judgments-workflow-batching.json) bind positive
+SHA-256. The summary (`workflow-batching-summary.json`, removed from the tree; `git show 87edf8d:bench/workflow-batching-summary.json`) records every result-file
+hash and build hash. Judgments (`judgments-workflow-batching.json`, removed from the tree; `git show 87edf8d:bench/judgments-workflow-batching.json`) bind positive
 verdicts to source, prompt and response hashes. Failed and incomplete runs remain
 visible. The original corpus and answer key are unchanged.
 

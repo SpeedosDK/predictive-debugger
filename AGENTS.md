@@ -50,7 +50,13 @@ next person who changes it has to remember to change both, and usually doesn't.
 - Record each version/build hash and the reused result file/hash. Report accuracy, false alarms,
   unavailable results, token usage and CLI-estimated cost, with matching case/prediction counts
   and cache accounting. Release claims use this comparison; incremental checkpoints stay separate.
-- Keep benchmark measurements in `bench/`; keep README focused on setup and tool behavior.
+- Keep benchmark measurements in `bench/results/` and experiment write-ups in
+  `bench/checkpoints/`; `bench/METHOD.md` maps the folder. Keep README focused on setup
+  and tool behavior.
+- After changing the prompt, grouping or a provider's arguments, run
+  `npm run bench:canary -- --provider=<id>` for each provider you can. It takes about a
+  minute on the held-out cases. Do not tune anything against the `holdout` cases; add
+  new cases instead, and freeze their answers before the first run.
   Release notes should briefly state what improved and explain any measured token/cost increase,
   linking to the results rather than repeating the report.
 - Reuse `bench/corpus` and `bench/manifest.json` for a new benchmark. A new fixture corpus makes

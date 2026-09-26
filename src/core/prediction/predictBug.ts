@@ -161,7 +161,7 @@ export async function predictBugs(inputs: readonly BugInput[], options: BugOptio
     // false alarms scored just over it; it also called two read-await-write races
     // clean that single-file reviews found. Those files get the single-file review
     // the release gave every file, and its verdict replaces the group's. A failed
-    // or unreadable re-check keeps the group verdict. See bench/ENGINE-ACCURACY.md.
+    // or unreadable re-check keeps the group verdict. See bench/checkpoints/ENGINE-ACCURACY.md.
     const needsRecheck = (entry: ReviewSource): boolean => {
         const outcome = outcomes[entry.index];
         const top = outcome.kind === "assessment" ? outcome.assessment.findings[0] : undefined;

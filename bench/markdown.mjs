@@ -4,6 +4,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { summarize, groupCounts, sessionCosts } from './workflow-summary.mjs';
 const here = path.dirname(fileURLToPath(import.meta.url));
+const results = path.join(here, 'results');
 const fmt = n => n.toLocaleString('en-US');
 const change = (a, b) => Math.round(100 * (a / b - 1));
 const ARMS = ['read', 'previous', 'current'];
@@ -25,7 +26,7 @@ export function renderReport({ arms, groups, sessions, prior, trials }) {
 **v0.8.0 identified ${current.detected}/${current.bugs} planted bug trials with ${current.falseAlarms} false alarms.**
 
 Sonnet reviewed ${cases(o) + cases(a)} JavaScript and TypeScript cases ${trials} times per workflow, every session fresh:
-the ${cases(o)} cases from the [previous results](results-v07-balanced.json) and ${cases(a)} new dependency cases.
+the ${cases(o)} cases from the [previous results](results/results-v07-balanced.json) and ${cases(a)} new dependency cases.
 The baseline is tagged v0.7.1; v0.8.0 labels the measured candidate build.
 The saved records retain its original v0.7.2 label and exact bundle hash.
 
@@ -65,13 +66,13 @@ Tokens include caller and internal model usage, including cache reads and writes
 There are ${current.bugs / trials} buggy files and ${current.controls / trials} clean controls; repeated trials are not additional bugs.
 These development cases informed the tool, so this is not a held-out accuracy estimate.
 
-[Method and reproduction](METHOD.md) | [Full analysis](RESULTS-v072-full.md) | [Raw runs](results-v072-full.json) |
-[Defect judgments](judgments-v072-full.json) | [Token breakdown](workflow-summary.json)
+[Method and reproduction](METHOD.md) | [Full analysis](RESULTS-v072-full.md) | [Raw runs](results/results-v072-full.json) |
+[Defect judgments](results/judgments-v072-full.json) | [Token breakdown](results/workflow-summary.json)
 `;
 }
 
 async function readJson(name) {
-    return JSON.parse(await fs.readFile(path.join(here, name), 'utf8'));
+    return JSON.parse(await fs.readFile(path.join(results, name), 'utf8'));
 }
 
 async function main() {
@@ -95,7 +96,7 @@ async function main() {
     const v07 = summarize(prior, await readJson('judgments-v07-balanced.json'))[2];
     const priorScore = { detected: v07.detected, bugs: v07.bugs, falseAlarms: v07.falseAlarms, controls: v07.controls };
     const trials = data.config.trials;
-    await fs.writeFile(path.join(here, 'workflow-summary.json'), JSON.stringify({
+    await fs.writeFile(path.join(results, 'workflow-summary.json'), JSON.stringify({
         completedAt: data.updatedAt, configHash: data.configHash, cliVersion: data.config.cliVersion, trials,
         baseline: data.config.baseline, candidate: data.config.candidate, bundles: data.config.bundles,
         arms, groups, sessions, previousResults: { file: 'results-v07-balanced.json', ...priorScore }

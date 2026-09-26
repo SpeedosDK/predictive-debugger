@@ -108,5 +108,5 @@ additional bugs. These are development cases that informed the tool's prompt and
 dependency-resolution work, so this is not a held-out accuracy estimate. Findings were
 reviewed for defect identity, not just a matching line number.
 
-[Method](METHOD.md) | [Raw runs](results-v072-full.json) |
-[Judgments](judgments-v072-full.json) | [Token breakdown](workflow-summary-v072-full.json)
+[Method](METHOD.md) | [Raw runs](results/results-v072-full.json) |
+[Judgments](results/judgments-v072-full.json) | [Token breakdown](results/workflow-summary-v072-full.json)

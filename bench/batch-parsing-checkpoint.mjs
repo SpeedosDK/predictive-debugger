@@ -13,7 +13,7 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.dirname(here);
 const require = createRequire(import.meta.url);
 const hash = value => createHash('sha256').update(value).digest('hex');
-const output = path.resolve(here, process.argv.find(arg => arg.startsWith('--output='))?.slice(9)
+const output = path.resolve(here, 'results', process.argv.find(arg => arg.startsWith('--output='))?.slice(9)
     ?? 'results-batch-parsing.json');
 try { await fs.access(output); throw Error('Choose a new --output; results are immutable.'); }
 catch (error) { if (error.code !== 'ENOENT') throw error; }

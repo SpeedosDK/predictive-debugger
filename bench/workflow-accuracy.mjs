@@ -9,7 +9,7 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { providerUsage } from './workflow-batching-summary.mjs';
+import { providerUsage } from './usage.mjs';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const sum = (a, b) => Object.fromEntries(['input', 'cacheRead', 'cacheWrite', 'output', 'total'].map(k => [k, (a[k] ?? 0) + (b[k] ?? 0)]));
@@ -39,7 +39,7 @@ export function scoreWorkflow(config, run) {
 
 async function main() {
     for (const file of process.argv.slice(2)) {
-        const data = JSON.parse(await fs.readFile(path.resolve(here, file), 'utf8'));
+        const data = JSON.parse(await fs.readFile(path.resolve(here, 'results', file), 'utf8'));
         console.log(`## ${file} (${data.config.provider} ${data.config.version.split('\n')[0]}, ${data.status})`);
         for (const run of data.runs) {
             const r = scoreWorkflow(data.config, run);

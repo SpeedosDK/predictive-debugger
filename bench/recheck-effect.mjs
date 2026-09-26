@@ -14,7 +14,7 @@ const { parseAssessment, parseBatchAssessment } = require('../out/core/predictio
 const here = path.dirname(fileURLToPath(import.meta.url));
 
 for (const file of process.argv.slice(2)) {
-    const data = JSON.parse(await fs.readFile(path.resolve(here, file), 'utf8'));
+    const data = JSON.parse(await fs.readFile(path.resolve(here, 'results', file), 'utf8'));
     const kinds = new Map();
     console.log(`## ${file}`);
     for (const run of data.runs) {

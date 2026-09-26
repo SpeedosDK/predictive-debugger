@@ -13,7 +13,7 @@ import os from 'node:os';
 import { createHash } from 'node:crypto';
 import { createRequire } from 'node:module';
 import { fileURLToPath } from 'node:url';
-import { providerUsage } from './workflow-batching-summary.mjs';
+import { providerUsage } from './usage.mjs';
 
 const require = createRequire(import.meta.url);
 const { predictBugs } = require('../out/core/prediction/predictBug.js');
@@ -54,10 +54,10 @@ async function main() {
     const size = Number(flag('size', '8'));
     const trials = Number(flag('trials', '1'));
     const concurrency = Number(flag('concurrency', '4'));
-    const output = path.join(here, flag('output', `results-engine-${provider}-${size}.json`));
+    const output = path.join(here, 'results', flag('output', `results-engine-${provider}-${size}.json`));
     if (!['claude', 'codex', 'copilot'].includes(provider) || !(size >= 1) || !(trials >= 1)) throw Error('Invalid options.');
 
-    const record = JSON.parse(await fs.readFile(path.join(here, 'results-cache-v083-isolated.json'), 'utf8'));
+    const record = JSON.parse(await fs.readFile(path.join(here, 'results', 'results-cache-v083-isolated.json'), 'utf8'));
     const work = path.join(os.tmpdir(), `predictive-engine-${provider}`);
     const stage = path.join(work, 'source');
     await fs.rm(stage, { recursive: true, force: true });

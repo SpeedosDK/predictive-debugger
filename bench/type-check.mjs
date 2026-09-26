@@ -11,7 +11,7 @@ import { encode } from 'gpt-tokenizer';
 const here = path.dirname(fileURLToPath(import.meta.url));
 const root = path.dirname(here);
 const hash = value => createHash('sha256').update(value).digest('hex');
-const baselineBytes = await fs.readFile(path.join(here, 'results-cache-v083-isolated.json'));
+const baselineBytes = await fs.readFile(path.join(here, 'results', 'results-cache-v083-isolated.json'));
 const saved = JSON.parse(baselineBytes);
 const stage = await fs.mkdtemp(path.join(os.tmpdir(), 'predictive-type-corpus-'));
 const client = new Client({ name: 'type-check-benchmark', version: '1' });
@@ -37,7 +37,7 @@ try {
     const data = { createdAt: new Date().toISOString(), sourceRecordHash: hash(baselineBytes), corpus: saved.config.corpus,
         targets: saved.config.targets, bundle: hash(await fs.readFile(path.join(root, 'dist/mcp-server.js'))),
         providerCalls: 0, calls };
-    await fs.writeFile(path.join(here, 'results-type-check.json'), JSON.stringify(data, null, 2) + '\n');
+    await fs.writeFile(path.join(here, 'results', 'results-type-check.json'), JSON.stringify(data, null, 2) + '\n');
     console.log(JSON.stringify(calls.map(c => ({ files: c.files.length, diagnostics: c.response.diagnostics,
         contextIssues: c.response.contextIssues.length, responseTokens: c.responseTokens, wallMs: c.wallMs })), null, 2));
 } finally {

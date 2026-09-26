@@ -48,7 +48,7 @@
     "watch": "node esbuild.mjs --watch",
     "watch:tsc": "tsc -p tsconfig.json --watch",
     "pretest": "npm run compile",
-    "test": "node --test \"out/test/**/*.test.js\" \"bench/*.test.mjs\"",
+    "test": "node --test \"out/test/**/*.test.js\" \"bench/*.test.mjs\" && node .github/scripts/check-links.mjs",
     "test:package": "node .github/scripts/check-npx.mjs",
     "mcp": "node ./dist/mcp-server.js",
     "prepack": "npm run build",
