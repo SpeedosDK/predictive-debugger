@@ -5,7 +5,7 @@ later and kept) and 25 clean files. Each session is a complete agent run. It rev
 file and reports one verdict per file. Tokens count the agent and every model call the tool
 makes. Each row is two sessions.
 
-| CLI | Agent reads the files | Agent + v0.8.2 | Agent + this version |
+| CLI | Agent reads the files | Agent + v0.8.2 | Agent + v0.9.0 |
 |---|---|---|---|
 | Claude Code 2.1.283 (Sonnet) | 21, 21 bugs · 0 false alarms · 279k tokens | 21, 21 · 0 · 771k | **21, 22 · 0 · 173k** |
 | GitHub Copilot 1.0.82 (Sonnet) | 20, 20 · 1 · 883k | 22, 24 · 0 · 1.50M | **22, 22 · 0 · 598k** |

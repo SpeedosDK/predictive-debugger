@@ -8,12 +8,12 @@
     "url": "https://github.com/SpeedosDK/predictive-debugger",
     "source": "github"
   },
-  "version": "0.8.2",
+  "version": "0.9.0",
   "packages": [
     {
       "registryType": "npm",
       "identifier": "predictive-debugger",
-      "version": "0.8.2",
+      "version": "0.9.0",
       "transport": {
         "type": "stdio"
       }
