@@ -94,8 +94,7 @@ that interact with Claude "should use API key authentication", and that third-pa
 developers may not "route requests through Free, Pro, or Max plan credentials on behalf
 of their users". Predictive Debugger runs the Claude Code CLI you signed in to and never
 handles your login, but Anthropic's terms decide whether that counts as ordinary use of
-your plan, not this project. If you are unsure, set `ANTHROPIC_API_KEY` or use another
-provider.
+your plan, not this project. If you are unsure, use another provider.
 
 The software is provided under the [MIT License](LICENSE), without warranty.
 
