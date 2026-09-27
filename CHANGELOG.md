@@ -6,6 +6,10 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Changed
+
+- The npm and VS Code Marketplace description now matches the GitHub repository description.
+
 ## [0.9.0] - 2026-09-26
 
 Measured on 49 benchmark files in full agent sessions with Claude, Copilot and Codex:
