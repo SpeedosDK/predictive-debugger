@@ -62,6 +62,43 @@ JavaScript dependencies are bundled into the shipped server. Run `npm audit`
 in a source checkout to inspect the dependencies used to build it. Auditing the
 installed npm package does not inspect code inside the bundle.
 
+## Provider terms
+
+This section is not legal advice. The project cannot tell you whether your use of a
+provider is allowed; your agreement with Anthropic, OpenAI or GitHub decides that.
+Read the terms for your account before using `predict_failures`. If you are not sure
+they allow it, ask the provider or don't use that provider with this tool.
+
+What the project does and does not do:
+
+- It does not bundle, modify or redistribute the Claude Code, Codex or GitHub Copilot
+  CLI. You install the CLI and sign in through the provider's own flow.
+- It has no backend or proxy. Each prediction starts the CLI on your machine, and the
+  CLI sends the request to its provider.
+- It does not read, store or transmit credentials (see [Security model](#security-model)).
+- Every call runs under your account and counts against your plan or API key.
+
+Terms to check:
+
+- Anthropic: [Claude Code legal and compliance](https://code.claude.com/docs/en/legal-and-compliance),
+  [Consumer Terms](https://www.anthropic.com/legal/consumer-terms) (Free, Pro and Max) and
+  [Commercial Terms](https://www.anthropic.com/legal/commercial-terms) (API keys, Team and Enterprise)
+- OpenAI: [Terms of Use](https://openai.com/policies/terms-of-use/) (ChatGPT sign-in) and
+  [Services Agreement](https://openai.com/policies/services-agreement/) (API keys)
+- GitHub: [Copilot terms](https://docs.github.com/en/site-policy/github-terms/github-terms-for-additional-products-and-features#github-copilot)
+
+Take extra care if you sign in to Claude Code with a Claude subscription. Anthropic's
+Claude Code legal page says subscription sign-in "is designed to support ordinary use of
+Claude Code and other native Anthropic applications", that developers building products
+that interact with Claude "should use API key authentication", and that third-party
+developers may not "route requests through Free, Pro, or Max plan credentials on behalf
+of their users". Predictive Debugger runs the Claude Code CLI you signed in to and never
+handles your login, but Anthropic's terms decide whether that counts as ordinary use of
+your plan, not this project. If you are unsure, set `ANTHROPIC_API_KEY` or use another
+provider.
+
+The software is provided under the [MIT License](LICENSE), without warranty.
+
 ## What is in scope
 
 The parts most worth attacking:

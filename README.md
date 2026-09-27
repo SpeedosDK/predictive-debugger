@@ -17,7 +17,8 @@ logs and get an independent model review with a line number and reason.
 
 Uses the Claude Code, Codex or GitHub Copilot CLI you already have installed.
 Prediction calls use that CLI's model access and usage allowance. No separate
-API key is needed.
+API key is needed. Your provider's terms apply to those calls; check them before
+use, especially on a Claude subscription. See [Provider terms](SECURITY.md#provider-terms).
 
 <a id="using-it-from-an-agent-mcp"></a>
 <a id="download-and-install"></a>
